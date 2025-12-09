@@ -1,3 +1,8 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
+[![GH-code-size](https://img.shields.io/github/languages/code-size/jayjojayson/Sun-Position-Card?color=blue)](https://github.com/jayjojayson/Sun-Position-Card)
+[![README Deutsch](https://img.shields.io/badge/README-Deutsch-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README_eng.md)
+
 # Sun Position Card für Home Assistant
 
 Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit entsprechenden Bildern und zur Anzeige relevanter Sonnenzeiten. Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
@@ -15,6 +20,8 @@ Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen
 ## Installation
 
 ### HACS (Empfohlen)
+ 
+ [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jayjojayson&repository=Sun-Position-Card&category=plugin)
 
 Öffnen Sie HACS in Home Assistant.
 
