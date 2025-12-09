@@ -159,7 +159,7 @@ card_mod:
 
 #### Bild bearbeiten
 
-Fügt dem Bild einen Rahmen hinzu und macht es leicht transparent und zoomt etwas heraus.
+Fügt dem Bild einen Rahmen hinzu und macht es leicht transparent.
 
 ```yaml
 type: custom:sun-position-card
@@ -170,7 +170,6 @@ card_mod:
       border: 2px solid var(--primary-color);
       border-radius: 10px;
       opacity: 0.9;
-	  zoom: 75%;
     }
 ```
 
