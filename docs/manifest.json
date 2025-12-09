@@ -1,0 +1,8 @@
+{
+  "domain": "sun_position_card",
+  "name": "Sun Position Card",
+  "documentation": "https://github.com/jayjojayson/Sun-Position-Card",
+  "issue_tracker": "https://github.com/jayjojayson/sun-position-card/issues",
+  "codeowners": ["@jayjojayson"],
+  "version": "1.0.0"
+}
