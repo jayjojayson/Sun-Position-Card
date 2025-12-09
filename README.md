@@ -1,7 +1,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
 [![GH-code-size](https://img.shields.io/github/languages/code-size/jayjojayson/Sun-Position-Card?color=blue)](https://github.com/jayjojayson/Sun-Position-Card)
-[![README Deutsch](https://img.shields.io/badge/README-Deutsch-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README_eng.md)
+[![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 
 # Sun Position Card für Home Assistant
 
@@ -34,16 +34,16 @@ Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen
 
 ### Manuelle Installation
 1.  **Dateien herunterladen:**
-    *   Laden Sie die `sun-custom-card.js`, `sun-custom-card-editor.js` und die PNG-Bilddateien aus diesem Repository herunter.
+    *   Laden Sie die `sun-position-card.js`, `sun-position-card-editor.js` und die PNG-Bilddateien aus diesem Repository herunter.
 
 2.  **Dateien in Home Assistant hochladen:**
     *   Erstellen Sie einen neuen Ordner namens `sun-card` im `www`-Verzeichnis Ihrer Home Assistant-Konfiguration. (Das `www`-Verzeichnis befindet sich im selben Ordner wie Ihre `configuration.yaml`).
     *   Kopieren Sie **alle heruntergeladenen Dateien** in diesen neuen Ordner. Ihre Ordnerstruktur sollte wie folgt aussehen:
         ```
-        /config/www/sun-card/sun-custom-card.js
-        /config/www/sun-card/sun-custom-card-editor.js
-        /config/www/sun-card/morgen.png
-        /config/www/sun-card/mittag.png
+        /config/www/Sun-Position-Card/dist/sun-position-card.js
+        /config/www/Sun-Position-Card/dist/sun-position-card-editor.js
+        /config/www/Sun-Position-Card/dist/images/morgen.png
+        /config/www/Sun-Position-Card/dist/images/mittag.png
         ... (alle anderen Bilder)
         ```
 
@@ -51,7 +51,7 @@ Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen
     *   Gehen Sie in Home Assistant zu **Einstellungen > Dashboards**.
     *   Klicken Sie auf das Menü mit den drei Punkten oben rechts und wählen Sie **Ressourcen**.
     *   Klicken Sie auf **+ Ressource hinzufügen**.
-    *   Geben Sie als URL `/local/sun-card/sun-custom-card.js` ein.
+    *   Geben Sie als URL `/local/Sun-Position-Card/dist/sun-position-card.js` ein.
     *   Wählen Sie als Ressourcentyp **JavaScript-Modul**.
     *   Klicken Sie auf **Erstellen**.
 

@@ -1,11 +1,11 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
 [![GH-code-size](https://img.shields.io/github/languages/code-size/jayjojayson/Sun-Position-Card?color=blue)](https://github.com/jayjojayson/Sun-Position-Card)
-[![README Deutsch](https://img.shields.io/badge/README-Deutsch-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README_eng.md)
+[![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 
 # Sun Position Card
 
-This is a custom card for Home Assistant that displays the sun's position with custom images.
+This is a custom card for Home Assistant that displays the sun's position with custom images and details.
 
 ## Installation
 
@@ -24,12 +24,12 @@ This is a custom card for Home Assistant that displays the sun's position with c
 ### Manual Installation
 
 1.  Download the `sun-position-card.js`, `sun-position-card-editor.js` and the `images` folder from the `dist` directory.
-2.  Place the `sun-position-card.js` and `sun-position-card-editor.js` files and the `images` folder in `config/www/community/sun-position-card/`. You will have to create the `community` and `sun-position-card` folders.
+2.  Place the `sun-position-card.js` and `sun-position-card-editor.js` files and the `images` folder in `config/www/community/Sun-Position-Card/dist/`. You will have to create the `community` and `sun-position-card` folders.
 3.  Add the resource to your Lovelace configuration through the Home Assistant UI:
     a. Go to "Settings" -> "Dashboards".
     b. Click on the three dots in the top right corner and select "Resources".
     c. Click on "+ ADD RESOURCE".
-    d. Enter `/local/community/sun-position-card/sun-position-card.js` as the URL and select "JavaScript Module" as the Resource type.
+    d. Enter `/local/community/Sun-Position-Card/dist/sun-position-card.js` as the URL and select "JavaScript Module" as the Resource type.
     e. Click "CREATE".
 4.  Restart Home Assistant.
 

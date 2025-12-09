@@ -86,7 +86,7 @@ class SunPositionCard extends HTMLElement {
     
     let timeEntries = [];
     if (statePosition === 'in_list') {
-        timeEntries.push(`<div class="time-entry">Status: ${currentState}</div>`);
+        timeEntries.push(`<div class="time-entry">Akt.: ${currentState}</div>`);
     }
     
     if (showDegrees && showDegreesInList) {
@@ -112,7 +112,7 @@ class SunPositionCard extends HTMLElement {
     const timeHtml = timeEntries.join(showDividers ? '<hr class="divider">' : '');
     
     const imageHtml = showImage 
-      ? `<div class="sun-image-container"><img class="sun-image" src="/local/community/sun-position-card/images/${image}" alt="${currentState}"></div>`
+      ? `<div class="sun-image-container"><img class="sun-image" src="/local/community/Sun-Position-Card/dist/images/${image}" alt="${currentState}"></div>`
       : '';
     const timesContainer = `<div class="times-container">${timeHtml}</div>`;
     

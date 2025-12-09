@@ -2,5 +2,5 @@
   "name": "Sun Position Card",
   "render_readme": true,
   "content_in_root": false,
-  "filename": "dist/sun-position-card.js"
+  "filename": "sun-position-card.js"
 }
