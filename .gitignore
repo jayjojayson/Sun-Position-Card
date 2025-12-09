@@ -5,5 +5,5 @@
 hacs.json.tmp
 
 # Dateien und Ordner, die bei Releases ausgeschlossen werden sollen:
-/docs
+# /docs
 /FUNDING.yml
