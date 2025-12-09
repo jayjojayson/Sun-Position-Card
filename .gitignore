@@ -1,0 +1,9 @@
+.DS_Store
+.vscode/
+.idea/
+
+hacs.json.tmp
+
+# Dateien und Ordner, die bei Releases ausgeschlossen werden sollen:
+/docs
+/FUNDING.yml
