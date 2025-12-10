@@ -20,8 +20,8 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, um die Tagesphasen genau an Ihren geografischen Standort anzupassen.
 -   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML manuell bearbeiten zu müssen.
 
-<img width="45%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
-<img width="45%" height="auto" alt="image" src="https://github.com/user-attachments/assets/d6353870-f448-4648-8ae6-a5fdc4793d91" />
+<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
+<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/d6353870-f448-4648-8ae6-a5fdc4793d91" />
 
 
 ---
@@ -157,7 +157,7 @@ Hier sind einige Beispiele, wie du `card-mod` in der YAML-Konfiguration deiner C
 
 Macht den Hauptstatus-Text größer und blau und die Zeiteinträge etwas kleiner und grau.
 
-<img width="25%" height="auto" alt="image" src="https://github.com/user-attachments/assets/80e1bd5b-0098-4fa6-96c6-d5c866f9cb5c" />
+<img width="30%" height="auto" alt="image" src="https://github.com/user-attachments/assets/80e1bd5b-0098-4fa6-96c6-d5c866f9cb5c" />
 
 
 ```yaml
