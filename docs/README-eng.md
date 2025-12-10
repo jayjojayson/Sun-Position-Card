@@ -117,7 +117,6 @@ card_mod:
       border: 2px solid var(--primary-color);
       border-radius: 10px;
       opacity: 0.9;
-	  zoom: 75%;
     }
 ```
 
