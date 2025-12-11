@@ -20,10 +20,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, um die Tagesphasen genau an Ihren geografischen Standort anzupassen.
 -   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML manuell bearbeiten zu müssen.
 
-<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
-<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/06d65d24-4a4d-4287-a7d2-a180cfb210a8" />
-
-
+<img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
 
 ---
 
@@ -98,6 +95,7 @@ Nach der Installation kannst du die Karte zu deinem Dashboard hinzufügen:
     *   **Time Position:** Lege fest, wo die Zeiten angezeigt werden sollen.
     *   **Thresholds (Advanced):** Passe bei Bedarf die Azimut- und Höhenwerte an.
 
+<img width="70%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card%20config.gif" />
 
 ---
 
@@ -113,7 +111,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
 | `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
 | `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `über dem Bild`, `rechts vom Bild`, `unter dem Bild`    |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `above`, `right`, `below`    |
 | `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
@@ -185,7 +183,7 @@ Hier sind einige Beispiele, wie du `card-mod` in der YAML-Konfiguration deiner C
 
 Macht den Hauptstatus-Text größer und blau und die Zeiteinträge etwas kleiner und grau.
 
-<img width="30%" height="auto" alt="image" src="https://github.com/user-attachments/assets/80e1bd5b-0098-4fa6-96c6-d5c866f9cb5c" />
+<img width="30%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card3.png" />
 
 
 ```yaml
