@@ -19,8 +19,7 @@ If you like the Integration, I would appreciate a Star rating ⭐ from you. 🤗
 -   **Adjustable Thresholds:** Adjust the azimuth and elevation thresholds to precisely match the day phases to your geographical location.
 -   **UI Configuration:** Conveniently configure all options via the visual editor without having to manually edit YAML.
 
-<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
-<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/06d65d24-4a4d-4287-a7d2-a180cfb210a8" />
+<img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
 
 ---
 
@@ -67,6 +66,8 @@ If you like the Integration, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Configuration
 
+<img width="70%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card%20config.gif" />
+
 Although the UI configuration is recommended, the card can also be configured manually using the YAML editor:
 
 ### Options
@@ -77,7 +78,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
 | `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
 | `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `über dem Bild`, `rechts vom Bild`, `unter dem Bild`    |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `above`, `right`, `below`    |
 | `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
