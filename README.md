@@ -17,8 +17,8 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 -   **Visuelle Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
 -   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
--   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, um die Tagesphasen genau an Ihren geografischen Standort anzupassen.
--   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML manuell bearbeiten zu müssen.
+-   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, geografischen Standort anpassen.
+-   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
 
