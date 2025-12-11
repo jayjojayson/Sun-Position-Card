@@ -30,15 +30,18 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 ## Installation
 
 ### HACS (Empfohlen)
+
+- Das github über den Link in Home Assistant einfügen.
  
- [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jayjojayson&repository=Sun-Position-Card&category=plugin)
+  [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jayjojayson&repository=Sun-Position-Card&category=plugin)
 
 - Die "Sun Position Card" sollte nun in HACS verfügbar sein. Klicke auf "INSTALLIEREN" ("INSTALL").
-- Die Ressource wird automatisch zu Ihrer Lovelace-Konfiguration hinzugefügt.
+- Die Ressource wird automatisch zu deiner Lovelace-Konfiguration hinzugefügt.
 
 <details>
   <summary> <b>Manuelle Installation über Hacs</b></summary>  
- 
+
+### Manuelle Installation über Hacs 
 Öffne HACS in Home Assistant.
 
 - Gehe zu "Frontend" und klicke auf die drei Punkte in der oberen rechten Ecke.
@@ -46,10 +49,13 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 - Füge die URL zu Ihrem GitHub-Repository hinzu und wähle "Lovelace" als Kategorie.
 - Klicke auf "HINZUFÜGEN" ("ADD").
 - Die "Sun Position Card" sollte nun in HACS verfügbar sein. Klicke auf "INSTALLIEREN" ("INSTALL").
-- Die Ressource wird automatisch zu Ihrer Lovelace-Konfiguration hinzugefügt.
+- Die Ressource wird automatisch zu deiner Lovelace-Konfiguration hinzugefügt.
 </details>
 
-### Manuelle Installation
+<details>
+  <summary> <b>Manuelle Installation in HA</b></summary>  
+ 
+### Manuelle Installation in HA
 1.  **Dateien herunterladen:**
     *   Lade die `sun-position-card.js`, `sun-position-card-editor.js` und die PNG-Bilddateien aus diesem Repository herunter.
 
@@ -66,11 +72,12 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 
 3.  **Ressource zu Home Assistant hinzufügen:**
     *   Gehe in Home Assistant zu **Einstellungen > Dashboards**.
-    *   Klicke auf das Menü mit den drei Punkten oben rechts und wählen Sie **Ressourcen**.
+    *   Klicke auf das Menü mit den drei Punkten oben rechts und wähle **Ressourcen**.
     *   Klicke auf **+ Ressource hinzufügen**.
     *   Gebe als URL `/local/Sun-Position-Card/sun-position-card.js` ein.
     *   Wähle als Ressourcentyp **JavaScript-Modul**.
     *   Klicke auf **Erstellen**.
+</details>
 
 ---
 
@@ -103,7 +110,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | Name                  | Typ      | Erforderlich | Beschreibung                                                                                                | Standard                                 |
 | --------------------- | -------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | `type`                | `string` | Ja           | `custom:sun-custom-card`                                                                                    |                                          |
-| `entity`              | `string` | Ja           | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
+| `entity`              | `string` | Ja           | Die Entität deiner Sonne, normalerweise `sun.sun`.                                                               |                                          |
 | `times_to_show`       | `list`   | Nein         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
 | `time_position`       | `string` | Nein         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
 | `morning_azimuth`     | `number` | Nein         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
