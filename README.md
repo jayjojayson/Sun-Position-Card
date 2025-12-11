@@ -12,16 +12,17 @@ Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen
 
 Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewertung ⭐ freuen. 🤗
 
-## Merkmale
+## Features
 
--   **Visuelle Darstellung:** Zeigt je nach Tageszeit (Morgen, Mittag, Nachmittag, Abend, Dämmerung) unterschiedliche Sonnenstandbilder an.
--   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten (Sonnenaufgang, Sonnenuntergang, Mittag usw.) angezeigt werden sollen.
+-   **Visuelle Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
+-   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, um die Tagesphasen genau an Ihren geografischen Standort anzupassen.
 -   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML manuell bearbeiten zu müssen.
 
 <img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
-<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/d6353870-f448-4648-8ae6-a5fdc4793d91" />
+<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/06d65d24-4a4d-4287-a7d2-a180cfb210a8" />
+
 
 
 ---
@@ -32,6 +33,12 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
  
  [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jayjojayson&repository=Sun-Position-Card&category=plugin)
 
+- Die "Sun Position Card" sollte nun in HACS verfügbar sein. Klicke auf "INSTALLIEREN" ("INSTALL").
+- Die Ressource wird automatisch zu Ihrer Lovelace-Konfiguration hinzugefügt.
+
+<details>
+  <summary> <b>Manuelle Installation über Hacs</b></summary>  
+ 
 Öffne HACS in Home Assistant.
 
 - Gehe zu "Frontend" und klicke auf die drei Punkte in der oberen rechten Ecke.
@@ -40,6 +47,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 - Klicke auf "HINZUFÜGEN" ("ADD").
 - Die "Sun Position Card" sollte nun in HACS verfügbar sein. Klicke auf "INSTALLIEREN" ("INSTALL").
 - Die Ressource wird automatisch zu Ihrer Lovelace-Konfiguration hinzugefügt.
+</details>
 
 ### Manuelle Installation
 1.  **Dateien herunterladen:**
