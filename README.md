@@ -60,7 +60,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
     *   Lade die `sun-position-card.js`, `sun-position-card-editor.js` und die PNG-Bilddateien aus diesem Repository herunter.
 
 2.  **Dateien in Home Assistant hochladen:**
-    *   Erstelle einen neuen Ordner namens `sun-card` im `www`-Verzeichnis deiner Home Assistant-Konfiguration. (Das `www`-Verzeichnis befindet sich im selben Ordner wie deine `configuration.yaml`).
+    *   Erstelle einen neuen Ordner namens `Sun-Position-Card` im `www`-Verzeichnis deiner Home Assistant-Konfiguration. (Das `www`-Verzeichnis befindet sich im selben Ordner wie deine `configuration.yaml`).
     *   Kopiere **alle heruntergeladenen Dateien** in diesen neuen Ordner. Deine Ordnerstruktur sollte wie folgt aussehen:
         ```
         /config/www/Sun-Position-Card/sun-position-card.js
@@ -107,16 +107,21 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 
 ### Optionen
 
-| Name                  | Typ      | Erforderlich | Beschreibung                                                                                                | Standard                                 |
-| --------------------- | -------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Ja           | `custom:sun-custom-card`                                                                                    |                                          |
-| `entity`              | `string` | Ja           | Die Entität deiner Sonne, normalerweise `sun.sun`.                                                               |                                          |
-| `times_to_show`       | `list`   | Nein         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
-| `time_position`       | `string` | Nein         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
-| `morning_azimuth`     | `number` | Nein         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
-| `noon_azimuth`        | `number` | Nein         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
-| `afternoon_azimuth`   | `number` | Nein         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
-| `dusk_elevation`      | `number` | Nein         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
+| name                  | typ      | required   | description                                                                                                 | standard                                 |
+| --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                    |                                          |
+| `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
+| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
+| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `über dem Bild`, `rechts vom Bild`, `unter dem Bild`    |
+| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
+| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
+| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
+| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder																			  | `true`, `false`                          |
+| `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
+| `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
+| `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
+| `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
 
 
 ### Beispielkonfiguration
@@ -124,27 +129,35 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 einfaches Beispiel:
 
 ```yaml
-type: custom:sun-custom-card
+type: custom:sun-position-card
 entity: sun.sun
 times_to_show:
   - next_rising
   - next_setting
 time_position: right
+show_image: false
 ```
 
 erweitertes Beispiel:
 
 ```yaml
-type: custom:sun-custom-card
+type: custom:sun-position-card
 entity: sun.sun
+state_position: above
+show_dividers: true
+show_degrees: true
+show_degrees_in_list: false
 times_to_show:
   - next_rising
   - next_setting
+  - daylight_duration
 time_position: right
+show_image: true
 morning_azimuth: 140
-noon_azimuth: 190
-afternoon_azimuth: 260
-dusk_elevation: 12
+dusk_elevation: 10
+noon_azimuth: 200
+afternoon_azimuth: 255
+animate_images: true
 ```
 
 ---

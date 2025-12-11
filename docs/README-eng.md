@@ -1,17 +1,42 @@
+![Home Assistant](https://img.shields.io/badge/home%20assistant-41BDF5?logo=home-assistant&logoColor=white)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
-[![GH-code-size](https://img.shields.io/github/languages/code-size/jayjojayson/Sun-Position-Card?color=blue)](https://github.com/jayjojayson/Sun-Position-Card)
+![File size](https://img.shields.io/github/size/jayjojayson/Sun-Position-Card/dist/sun-position-card.js?label=Card%20Size)
+![last commit](https://img.shields.io/github/last-commit/jayjojayson/Sun-Position-Card)
 [![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
+![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
-# Sun Position Card
+# :sunny: Sun Position Card
 
 This is a custom card for Home Assistant that displays the sun's position with custom images and details.
+
+If you like the Integration, I would appreciate a Star rating ⭐ from you. 🤗
+
+## Features
+-   **Visual Representation:** Displays different sun position images depending on the time of day.
+-   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
+-   **Flexible Layout:** Position the time information above, below, or to the right of the image.
+-   **Adjustable Thresholds:** Adjust the azimuth and elevation thresholds to precisely match the day phases to your geographical location.
+-   **UI Configuration:** Conveniently configure all options via the visual editor without having to manually edit YAML.
+
+<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/7c7688ba-49a0-4cf7-b545-3244ab64a600" />
+<img width="48%" height="auto" alt="image" src="https://github.com/user-attachments/assets/06d65d24-4a4d-4287-a7d2-a180cfb210a8" />
+
+---
 
 ## Installation
 
 ### HACS (Recommended)
 
+- Add this repository to HACS. To do so, use the following link.
+
  [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jayjojayson&repository=Sun-Position-Card&category=plugin)
+
+- The "Sun Position Card" should now be available in HACS. Click "INSTALL".
+- The resource will be added to your Lovelace configuration automatically.
+
+<details>
+  <summary> <b>Manual Installation via Hacs</b></summary>  
 
 1.  Open HACS in Home Assistant.
 2.  Go to "Frontend" and click the three dots in the top right corner.
@@ -20,29 +45,43 @@ This is a custom card for Home Assistant that displays the sun's position with c
 5.  Click "ADD".
 6.  The "Sun Position Card" should now be available in HACS. Click "INSTALL".
 7.  The resource will be added to your Lovelace configuration automatically.
+</details>
+
+<details>
+  <summary> <b>Manuelle Installation in HA</b></summary>  
 
 ### Manual Installation
 
-1.  Download the `sun-position-card.js`, `sun-position-card-editor.js` and the `images` folder from the `dist` directory.
-2.  Place the `sun-position-card.js` and `sun-position-card-editor.js` files and the `images` folder in `config/www/community/Sun-Position-Card/dist/`. You will have to create the `community` and `sun-position-card` folders.
+1.  Download the `sun-position-card.js`, `sun-position-card-editor.js` and the `images` folder from the repo in github.
+2.  Place the `sun-position-card.js` and `sun-position-card-editor.js` files and the `images` folder in `config/www/community/Sun-Position-Card/`. You will have to create the `community` and `Sun-Position-Card` folders.
 3.  Add the resource to your Lovelace configuration through the Home Assistant UI:
     a. Go to "Settings" -> "Dashboards".
     b. Click on the three dots in the top right corner and select "Resources".
     c. Click on "+ ADD RESOURCE".
-    d. Enter `/local/community/Sun-Position-Card/dist/sun-position-card.js` as the URL and select "JavaScript Module" as the Resource type.
+    d. Enter `/local/community/Sun-Position-Card/sun-position-card.js` as the URL and select "JavaScript Module" as the Resource type.
     e. Click "CREATE".
 4.  Restart Home Assistant.
+</details>
+
+---
 
 ## Configuration
+
+Although the UI configuration is recommended, the card can also be configured manually using the YAML editor:
 
 ### Options
 
 | name                  | typ      | required   | description                                                                                                 | standard                                 |
 | --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Yes        | `custom:sun-custom-card`                                                                                    |                                          |
+| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                    |                                          |
 | `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
+| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `['next_rising', 'next_setting']`        |
 | `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `über dem Bild`, `rechts vom Bild`, `unter dem Bild`    |
+| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
+| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
+| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
+| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder																			  | `true`, `false`                          |
 | `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
@@ -50,17 +89,38 @@ This is a custom card for Home Assistant that displays the sun's position with c
 
 
 
+simple example:
+
 ```yaml
 type: custom:sun-position-card
 entity: sun.sun
-show_image: true
-state_position: in_list
+times_to_show:
+  - next_rising
+  - next_setting
+time_position: right
+show_image: false
+```
+
+advanced example:
+
+```yaml
+type: custom:sun-position-card
+entity: sun.sun
+state_position: above
 show_dividers: true
-show_degrees: false
+show_degrees: true
 show_degrees_in_list: false
 times_to_show:
   - next_rising
   - next_setting
+  - daylight_duration
+time_position: right
+show_image: true
+morning_azimuth: 140
+dusk_elevation: 10
+noon_azimuth: 200
+afternoon_azimuth: 255
+animate_images: true
 ```
 
 ---
@@ -80,13 +140,12 @@ times_to_show:
 | `.degrees-in-list`      | The Azimuth/Elevation text when positioned inside the times list.           |
 | `.divider`              | The horizontal line `<hr>` used as a separator between time entries.        |
 
-### Beispiele
+### Examples
 
-Hier sind einige Beispiele, wie Sie `card-mod` in der YAML-Konfiguration Ihrer Card verwenden können.
+Here are some examples of how you can use `card-mod` in the YAML configuration of your card.
 
-#### Schriftgröße und Farbe ändern
+#### Change Fontsize and Color
 
-Macht den Hauptstatus-Text größer und blau und die Zeiteinträge etwas kleiner und grau.
 
 ```yaml
 type: custom:sun-position-card
@@ -104,9 +163,8 @@ card_mod:
     }
 ```
 
-#### Bild bearbeiten
+#### Edit Image
 
-Fügt dem Bild einen Rahmen hinzu und macht es leicht transparent und zoomt etwas heraus.
 
 ```yaml
 type: custom:sun-position-card
@@ -120,9 +178,8 @@ card_mod:
     }
 ```
 
-#### Background ändern und Shadows entfernen
+#### Change Background and remove Shadows
 
-Setzt einen hellgelben Hintergrund für die Card und entfernt den standardmäßigen Schatten (Box Shadow).
 
 ```yaml
 type: custom:sun-position-card
@@ -135,9 +192,8 @@ card_mod:
     }
 ```
 
-#### Trennlinien bearbeiten
+#### Edit Divider
 
-Macht die Trennlinie dicker und formatiert sie als gestrichelte rote Linie.
 
 ```yaml
 type: custom:sun-position-card
