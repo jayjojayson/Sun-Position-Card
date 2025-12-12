@@ -10,7 +10,7 @@
 
 This is a custom card for Home Assistant that displays the sun's position with custom images and details.
 
-If you like the Integration, I would appreciate a Star rating ⭐ from you. 🤗
+If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
 -   **Visual Representation:** Displays different sun position images depending on the time of day.
