@@ -14,12 +14,19 @@ If you like the Integration, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
 -   **Visual Representation:** Displays different sun position images depending on the time of day.
+-   **Animated Images** Images of the sun's position in the morning, at midday, and in the afternoon can be animated.
 -   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
 -   **Flexible Layout:** Position the time information above, below, or to the right of the image.
 -   **Adjustable Thresholds:** Adjust the azimuth and elevation thresholds to precisely match the day phases to your geographical location.
 -   **UI Configuration:** Conveniently configure all options via the visual editor without having to manually edit YAML.
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
+
+<details>
+  <summary> <b>Have a look at the animated card</b></summary>  
+  
+<img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card-animation.gif" />
+</details>
 
 ---
 

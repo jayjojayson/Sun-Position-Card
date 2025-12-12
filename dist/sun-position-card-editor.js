@@ -67,7 +67,7 @@ class SunPositionCardEditor extends HTMLElement {
         
         <ha-entity-picker
           id="entity"
-          label="Sun Entity"
+          label="Sun Entität"
           domain-filter="sun"
           allow-custom-entity
         ></ha-entity-picker>
@@ -77,6 +77,11 @@ class SunPositionCardEditor extends HTMLElement {
         <div class="row">
           <ha-switch id="show_image"></ha-switch>
           <span style="margin-left: 16px;">Sonnenstand (Bild) anzeigen</span>
+        </div>
+
+        <div class="row">
+          <ha-switch id="animate_images"></ha-switch>
+          <span style="margin-left: 16px;">Bilder animieren (Vormittag, Mittag, Nachmittag)</span>
         </div>
 
         <ha-select
@@ -118,6 +123,7 @@ class SunPositionCardEditor extends HTMLElement {
 
         <h4>Zeiten auswählen</h4>
         <div class="checkbox-group">
+            ${this._renderCheckbox('daylight_duration', 'Tageslänge', hasTime('daylight_duration'))}
             ${this._renderCheckbox('next_rising', 'Sonnenaufgang', hasTime('next_rising'))}
             ${this._renderCheckbox('next_setting', 'Sonnenuntergang', hasTime('next_setting'))}
             ${this._renderCheckbox('next_dawn', 'Morgendämmerung', hasTime('next_dawn'))}
@@ -167,15 +173,16 @@ class SunPositionCardEditor extends HTMLElement {
 
     setupEl('entity', config.entity || 'sun.sun');
     setupEl('show_image', config.show_image ?? true);
-    setupEl('state_position', statePosition, 'above', 'selected'); 
+    setupEl('animate_images', config.animate_images ?? false);
+    setupEl('state_position', statePosition, 'selected');
     setupEl('show_dividers', config.show_dividers ?? true);
     setupEl('show_degrees', config.show_degrees ?? true);
     setupEl('show_degrees_in_list', config.show_degrees_in_list ?? false);
-    setupEl('time_position', config.time_position || 'right', 'selected');
+    setupEl('time_position', config.time_position || 'right');
     setupEl('morning_azimuth', config.morning_azimuth || 150);
     setupEl('noon_azimuth', config.noon_azimuth || 200);
     setupEl('afternoon_azimuth', config.afternoon_azimuth || 255);
-    setupEl('dusk_elevation', config.dusk_elevation || 10);
+    setupEl('dusk_elevation', config.dusk_elevation || 9);
     
     this.shadowRoot.querySelectorAll('ha-select').forEach(el => {
         el.addEventListener('closed', (e) => e.stopPropagation());
