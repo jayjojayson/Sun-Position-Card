@@ -6,6 +6,7 @@
 [![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 ![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
+
 # :sunny: Sun Position Card
 
 Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit entsprechenden Sonnenstandbildern und zur Anzeige relevanter Sonnenzeiten. Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
@@ -28,6 +29,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
   
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card-animation.gif" />
 </details>
+
 
 ---
 
@@ -254,3 +256,11 @@ card_mod:
       border-top: 2px dashed red;
     }
 ```
+
+---
+
+## Forum-Diskussionen 
+
+[![Forum smarthome-community](https://img.shields.io/badge/Forum-smarthome--community-blue)](https://community-smarthome.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/9389) [![Forum simon42-community](https://img.shields.io/badge/Forum-simon42--community-blue)](https://community.simon42.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/72199)
+
+
