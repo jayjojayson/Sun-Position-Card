@@ -1,3 +1,6 @@
+import de from './lang-de.js';
+import en from './lang-en.js';
+
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
   detail = detail === null || detail === undefined ? {} : detail;
@@ -12,6 +15,11 @@ const fireEvent = (node, type, detail, options) => {
 };
 
 class SunPositionCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.langs = { de, en };
+  }
+    
   setConfig(config) {
     this._config = config;
     if (this.shadowRoot) {
@@ -22,11 +30,25 @@ class SunPositionCardEditor extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this.shadowRoot) {
-      const entityPicker = this.shadowRoot.querySelector("ha-entity-picker");
-      if (entityPicker) {
-        entityPicker.hass = hass;
-      }
+        this.shadowRoot.querySelectorAll("ha-entity-picker").forEach(picker => {
+            if (picker) {
+                picker.hass = hass;
+            }
+        });
     }
+  }
+  
+  _localize(key, lang = this._hass?.locale?.language || 'en') {
+    const keys = key.split('.');
+    let a = this.langs[lang];
+    for (const k of keys) {
+        if (typeof a[k] === 'undefined') {
+            console.error(`Missing translation for ${key} in ${lang}`);
+            return this.langs['en'][keys[0]][keys[1]];
+        }
+        a = a[k];
+    }
+    return a;
   }
 
   connectedCallback() {
@@ -61,96 +83,129 @@ class SunPositionCardEditor extends HTMLElement {
         .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-left: 16px; }
         ha-textfield, ha-select, ha-entity-picker { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
+        .hidden { display: none; }
       </style>
 
       <div class="card-config">
         
         <ha-entity-picker
           id="entity"
-          label="Sun Entität"
+          label="${this._localize('editor.entity')}"
           domain-filter="sun"
           allow-custom-entity
         ></ha-entity-picker>
 
-        <h4>Anzeigeoptionen</h4>
+        <ha-entity-picker
+          id="moon_entity"
+          label="${this._localize('editor.moon_entity')}"
+          domain-filter="sensor"
+          allow-custom-entity
+        ></ha-entity-picker>
+
+        <h4>${this._localize('editor.main_options')}</h4>
         
         <div class="row">
           <ha-switch id="show_image"></ha-switch>
-          <span style="margin-left: 16px;">Sonnenstand (Bild) anzeigen</span>
+          <span style="margin-left: 16px;">${this._localize('editor.show_image')}</span>
         </div>
 
         <div class="row">
           <ha-switch id="animate_images"></ha-switch>
-          <span style="margin-left: 16px;">Bilder animieren (Vormittag, Mittag, Nachmittag)</span>
+          <span style="margin-left: 16px;">${this._localize('editor.animate_images')}</span>
         </div>
 
         <ha-select
           id="state_position"
-          label="Position des Status"
+          label="${this._localize('editor.state_position')}"
           fixedMenuPosition
           naturalMenuWidth
         >
-          <mwc-list-item value="above">Über dem Bild</mwc-list-item>
-          <mwc-list-item value="in_list">In der Liste</mwc-list-item>
-          <mwc-list-item value="hide">Ausblenden</mwc-list-item>
+          <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
+          <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
+          <mwc-list-item value="hide">${this._localize('editor.state_pos_hide')}</mwc-list-item>
         </ha-select>
+        
+        <div id="moon_phase_position_container" class="${config.moon_entity ? '' : 'hidden'}">
+            <ha-select
+              id="moon_phase_position"
+              label="${this._localize('editor.moon_phase_position')}"
+              fixedMenuPosition
+              naturalMenuWidth
+            >
+              <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
+              <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
+            </ha-select>
+        </div>
 
         <div class="row">
           <ha-switch id="show_dividers"></ha-switch>
-          <span style="margin-left: 16px;">Trennlinien anzeigen</span>
+          <span style="margin-left: 16px;">${this._localize('editor.show_dividers')}</span>
         </div>
 
         <div class="row">
           <ha-switch id="show_degrees"></ha-switch>
-          <span style="margin-left: 16px;">Gradzahlen anzeigen (Azimut/Elevation)</span>
+          <span style="margin-left: 16px;">${this._localize('editor.show_degrees')}</span>
         </div>
 
         <div class="row">
           <ha-switch id="show_degrees_in_list"></ha-switch>
-          <span style="margin-left: 16px;">Gradzahlen in Liste anzeigen</span>
+          <span style="margin-left: 16px;">${this._localize('editor.show_degrees_in_list')}</span>
         </div>
 
         <ha-select
           id="time_position"
-          label="Position der Zeiten"
+          label="${this._localize('editor.time_position')}"
           fixedMenuPosition
           naturalMenuWidth
         >
-          <mwc-list-item value="below">Unter dem Bild</mwc-list-item>
-          <mwc-list-item value="above">Über dem Bild</mwc-list-item>
-          <mwc-list-item value="right">Rechts neben Bild</mwc-list-item>
+          <mwc-list-item value="below">${this._localize('editor.time_pos_below')}</mwc-list-item>
+          <mwc-list-item value="above">${this._localize('editor.time_pos_above')}</mwc-list-item>
+          <mwc-list-item value="right">${this._localize('editor.time_pos_right')}</mwc-list-item>
+        </ha-select>
+        
+        <ha-select
+          id="time_list_format"
+          label="${this._localize('editor.time_list_format')}"
+          fixedMenuPosition
+          naturalMenuWidth
+        >
+          <mwc-list-item value="centered">${this._localize('editor.time_format_centered')}</mwc-list-item>
+          <mwc-list-item value="block">${this._localize('editor.time_format_block')}</mwc-list-item>
         </ha-select>
 
-        <h4>Zeiten auswählen</h4>
+        <h4>${this._localize('editor.times_to_show')}</h4>
         <div class="checkbox-group">
-            ${this._renderCheckbox('daylight_duration', 'Tageslänge', hasTime('daylight_duration'))}
-            ${this._renderCheckbox('next_rising', 'Sonnenaufgang', hasTime('next_rising'))}
-            ${this._renderCheckbox('next_setting', 'Sonnenuntergang', hasTime('next_setting'))}
-            ${this._renderCheckbox('next_dawn', 'Morgendämmerung', hasTime('next_dawn'))}
-            ${this._renderCheckbox('next_dusk', 'Abenddämmerung', hasTime('next_dusk'))}
-            ${this._renderCheckbox('next_noon', 'Mittag', hasTime('next_noon'))}
-            ${this._renderCheckbox('next_midnight', 'Mitternacht', hasTime('next_midnight'))}
+            ${this._renderCheckbox('daylight_duration', this._localize('time_entry.daylight_duration'), hasTime('daylight_duration'))}
+            ${this._renderCheckbox('next_rising', this._localize('time_entry.next_rising'), hasTime('next_rising'))}
+            ${this._renderCheckbox('next_setting', this._localize('time_entry.next_setting'), hasTime('next_setting'))}
+            ${this._renderCheckbox('next_dawn', this._localize('time_entry.next_dawn'), hasTime('next_dawn'))}
+            ${this._renderCheckbox('next_dusk', this._localize('time_entry.next_dusk'), hasTime('next_dusk'))}
+            ${this._renderCheckbox('next_noon', this._localize('time_entry.next_noon'), hasTime('next_noon'))}
+            ${this._renderCheckbox('next_midnight', this._localize('time_entry.next_midnight'), hasTime('next_midnight'))}
+            <div id="moon_phase_checkbox_container" class="${config.moon_entity ? '' : 'hidden'}">
+                ${this._renderCheckbox('moon_phase', this._localize('time_entry.moon_phase'), hasTime('moon_phase'))}
+            </div>
         </div>
 
-        <h4>Schwellwerte (Erweitert)</h4>
+        <h4>${this._localize('editor.advanced_options')}</h4>
         <ha-textfield
             id="morning_azimuth"
-            label="Morgen Azimut"
+            label="${this._localize('editor.morning_azimuth')}"
             type="number"
         ></ha-textfield>
         <ha-textfield
             id="noon_azimuth"
-            label="Mittag Azimut"
+            label="${this._localize('editor.noon_azimuth')}"
             type="number"
         ></ha-textfield>
         <ha-textfield
             id="afternoon_azimuth"
-            label="Nachmittag Azimut"
+            label="${this._localize('editor.afternoon_azimuth')}"
             type="number"
         ></ha-textfield>
         <ha-textfield
             id="dusk_elevation"
-            label="Dämmerung Elevation"
+            label="${this._localize('editor.dusk_elevation')}"
             type="number"
         ></ha-textfield>
 
@@ -172,13 +227,16 @@ class SunPositionCardEditor extends HTMLElement {
     }
 
     setupEl('entity', config.entity || 'sun.sun');
+    setupEl('moon_entity', config.moon_entity || '');
     setupEl('show_image', config.show_image ?? true);
     setupEl('animate_images', config.animate_images ?? false);
     setupEl('state_position', statePosition, 'selected');
+    setupEl('moon_phase_position', config.moon_phase_position || 'in_list', 'selected');
     setupEl('show_dividers', config.show_dividers ?? true);
     setupEl('show_degrees', config.show_degrees ?? true);
     setupEl('show_degrees_in_list', config.show_degrees_in_list ?? false);
     setupEl('time_position', config.time_position || 'right');
+    setupEl('time_list_format', config.time_list_format || 'centered');
     setupEl('morning_azimuth', config.morning_azimuth || 150);
     setupEl('noon_azimuth', config.noon_azimuth || 200);
     setupEl('afternoon_azimuth', config.afternoon_azimuth || 255);
@@ -188,10 +246,11 @@ class SunPositionCardEditor extends HTMLElement {
         el.addEventListener('closed', (e) => e.stopPropagation());
     });
     
-    const picker = this.shadowRoot.getElementById('entity');
-    if (picker && this._hass) {
-        picker.hass = this._hass;
-    }
+    this.shadowRoot.querySelectorAll('ha-entity-picker').forEach(picker => {
+        if (picker && this._hass) {
+            picker.hass = this._hass;
+        }
+    });
 
     const checkboxes = this.shadowRoot.querySelectorAll('ha-checkbox');
     checkboxes.forEach(cb => {
@@ -227,10 +286,10 @@ class SunPositionCardEditor extends HTMLElement {
 
   _valueChanged(ev) {
     if (!this._config) return;
-    
+
     const target = ev.target;
     const configValue = target.configValue;
-    
+
     if (!configValue) return;
 
     let newValue;
@@ -243,8 +302,24 @@ class SunPositionCardEditor extends HTMLElement {
     }
 
     if (this._config[configValue] === newValue) return;
+    
+    let newConfig = { ...this._config };
 
-    const newConfig = { ...this._config };
+    if (configValue === 'moon_entity') {
+        const positionContainer = this.shadowRoot.getElementById('moon_phase_position_container');
+        const checkboxContainer = this.shadowRoot.getElementById('moon_phase_checkbox_container');
+        if (newValue) {
+            positionContainer.classList.remove('hidden');
+            checkboxContainer.classList.remove('hidden');
+        } else {
+            positionContainer.classList.add('hidden');
+            checkboxContainer.classList.add('hidden');
+            
+            if (newConfig.times_to_show) {
+                newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'moon_phase');
+            }
+        }
+    }
     
     if (configValue === 'state_position') {
         newConfig.state_position = newValue;
@@ -252,8 +327,21 @@ class SunPositionCardEditor extends HTMLElement {
     } else {
         newConfig[configValue] = newValue;
     }
+    
+    const orderedConfig = {
+        type: newConfig.type,
+        entity: newConfig.entity,
+        moon_entity: newConfig.moon_entity,
+        moon_phase_position: newConfig.moon_phase_position,
+        ...newConfig
+    };
+    
+    if (!orderedConfig.moon_entity) {
+        delete orderedConfig.moon_entity;
+        delete orderedConfig.moon_phase_position;
+    }
 
-    fireEvent(this, "config-changed", { config: newConfig });
+    fireEvent(this, "config-changed", { config: orderedConfig });
   }
 }
 

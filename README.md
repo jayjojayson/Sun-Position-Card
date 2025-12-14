@@ -9,13 +9,16 @@
 
 # :sunny: Sun Position Card
 
-Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit entsprechenden Sonnenstandbildern und zur Anzeige relevanter Sonnenzeiten. Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
+Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit entsprechenden Sonnenstandbildern, sowie der aktuellen Mondphase und zur Anzeige relevanter Sonnenzeiten. Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
+Du benötigst die sun.sun-Entität, die von Home Assistant bereitgestellt wird, sobald dein Home-Standort konfiguriert ist. Die moon.phase-Entität ist optional und wird nur benötigt, um die aktuelle Mondphase anzuzeigen.
+Um den Mond-Sensor zu erhalten, gehe zu Einstellungen → Geräte & Dienste → Integration hinzufügen und suche nach Mond. Dies ist die integrierte Mond-Integration von Home Assistant.
 
 Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewertung ⭐ freuen. 🤗
 
 ## Features
 
--   **Visuelle Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
+-   **Sonnestand visuelle Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
+-   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen)
 -   **Animierte Bilder** Sonnenstandbilder Vormittag, Mittag, Nachmittag können animiert werden.
 -   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
@@ -116,11 +119,14 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 
 | name                  | typ      | required   | description                                                                                                 | standard                                 |
 | --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                    |                                          |
-| `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
+| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
+| `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
+| `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
+| `moon_phase_position: above`| `string` | No         | Position Text Mondphase im Verhältnis zum Bild. Mögliche Werte: `above`, `in_list`		                  | `above`, `in_list`    |
 | `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `'next_rising', 'next_setting', usw.`        |
 | `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste)							  | `above`, `in_list`    |
+| `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste)							 				  | `above`, `in_list` 						 |
 | `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
@@ -129,6 +135,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
 | `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
+
 
 
 ### Beispielkonfiguration
@@ -150,6 +157,8 @@ erweitertes Beispiel:
 ```yaml
 type: custom:sun-position-card
 entity: sun.sun
+moon_entity: sensor.moon_phase
+moon_phase_position: above
 state_position: above
 show_dividers: true
 show_degrees: true
@@ -158,13 +167,15 @@ times_to_show:
   - next_rising
   - next_setting
   - daylight_duration
+  - moon_phase
 time_position: right
 show_image: true
-morning_azimuth: 140
-dusk_elevation: 10
+morning_azimuth: 155
+dusk_elevation: 5
 noon_azimuth: 200
 afternoon_azimuth: 255
-animate_images: true
+animate_images: false
+time_list_format: block
 ```
 
 ---
@@ -180,6 +191,7 @@ animate_images: true
 | `.times-container`      | The container for the list of times.                                        |
 | `.time-entry`           | An individual row/entry in the times list (e.g., "Aufgang: 06:30").         |
 | `.state`                | The current state text (e.g., "Mittag") when positioned above the image.    |
+| `.moon-phase-state`     | The current state text (e.g., "Full-Moon") when positioned above the image. |
 | `.degrees`              | The Azimuth/Elevation text when positioned above the image.                 |
 | `.degrees-in-list`      | The Azimuth/Elevation text when positioned inside the times list.           |
 | `.divider`              | The horizontal line `<hr>` used as a separator between time entries.        |

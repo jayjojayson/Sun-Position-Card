@@ -6,14 +6,18 @@
 [![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 ![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
+
 # :sunny: Sun Position Card
 
-This is a custom card for Home Assistant that displays the sun's position with custom images and details.
+This is a custom card for Home Assistant that displays the sun's position with custom images and details, as well as the current moon phase.
+You need the sun.sun entity provided by Home Assistant when your Home location is configured. The moon.phase entity is optional and only required to display the current moon phase.
+To get the Moon sensor, go to Settings → Devices & Services → Add Integration and search for Moon. This is Home Assistant’s built-in Moon integration.
 
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
--   **Visual Representation:** Displays different sun position images depending on the time of day.
+-   **Visual Representation Sun Position:** Displays different sun position images depending on the time of day.
+-   **Visual Representation Lunar Phases:** Displays the current moon phase depending on the moon’s position (8 lunar phases).
 -   **Animated Images** Images of the sun's position in the morning, at midday, and in the afternoon can be animated.
 -   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
 -   **Flexible Layout:** Position the time information above, below, or to the right of the image.
@@ -81,11 +85,14 @@ Although the UI configuration is recommended, the card can also be configured ma
 
 | name                  | typ      | required   | description                                                                                                 | standard                                 |
 | --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                    |                                          |
-| `entity`              | `string` | Yes        | Die Entität Ihrer Sonne, normalerweise `sun.sun`.                                                               |                                          |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `'next_rising', 'next_setting', ...`        |
+| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
+| `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
+| `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
+| `moon_phase_position: above`| `string` | No         | Position Text Mondphase im Verhältnis zum Bild. Mögliche Werte: `above`, `in_list`		                  | `above`, `in_list`    |
+| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `'next_rising', 'next_setting', usw.`        |
 | `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, rechts vom Bild, unter dem Bild)							  | `above`, `in_list`    |
+| `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste)							 				  | `above`, `in_list` 						 |
 | `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
@@ -114,6 +121,8 @@ advanced example:
 ```yaml
 type: custom:sun-position-card
 entity: sun.sun
+moon_entity: sensor.moon_phase
+moon_phase_position: above
 state_position: above
 show_dividers: true
 show_degrees: true
@@ -122,13 +131,15 @@ times_to_show:
   - next_rising
   - next_setting
   - daylight_duration
+  - moon_phase
 time_position: right
 show_image: true
-morning_azimuth: 140
-dusk_elevation: 10
+morning_azimuth: 155
+dusk_elevation: 5
 noon_azimuth: 200
 afternoon_azimuth: 255
-animate_images: true
+animate_images: false
+time_list_format: block
 ```
 
 ---
@@ -144,9 +155,11 @@ animate_images: true
 | `.times-container`      | The container for the list of times.                                        |
 | `.time-entry`           | An individual row/entry in the times list (e.g., "Aufgang: 06:30").         |
 | `.state`                | The current state text (e.g., "Mittag") when positioned above the image.    |
+| `.moon-phase-state`     | The current state text (e.g., "Full-Moon") when positioned above the image. |
 | `.degrees`              | The Azimuth/Elevation text when positioned above the image.                 |
 | `.degrees-in-list`      | The Azimuth/Elevation text when positioned inside the times list.           |
 | `.divider`              | The horizontal line `<hr>` used as a separator between time entries.        |
+
 
 ### Examples
 
