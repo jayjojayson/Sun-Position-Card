@@ -6,17 +6,23 @@
 [![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 ![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
+<img width="100%" height="auto" alt="sun-position-card-ubersicht" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-ubersicht.png" />
+
+---
+
 
 # :sunny: Sun Position Card
 
-This is a custom card for Home Assistant that displays the sun's position with custom images and details, as well as the current moon phase.
+is a custom Lovelace card used to visualize the current position of the sun with various configuration options, as well as the current moon phase and the display of additional relevant solar times.  
+
 You need the sun.sun entity provided by Home Assistant when your Home location is configured. The moon.phase entity is optional and only required to display the current moon phase.
 To get the Moon sensor, go to Settings → Devices & Services → Add Integration and search for Moon. This is Home Assistant’s built-in Moon integration.
 
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
--   **Visual Representation Sun Position:** Displays different sun position images depending on the time of day.
+-   **Classic sun position visualization:** Displays different sun position images depending on the time of day.
+-   **Calculated sun position visualization:** Displays the calculated position of the sun on the horizon depending on the time of day.
 -   **Visual Representation Lunar Phases:** Displays the current moon phase depending on the moon’s position (8 lunar phases).
 -   **Animated Images** Images of the sun's position in the morning, at midday, and in the afternoon can be animated.
 -   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
@@ -88,20 +94,20 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
 | `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
 | `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
-| `moon_phase_position: above`| `string` | No         | Position Text Mondphase im Verhältnis zum Bild. Mögliche Werte: `above`, `in_list`		                  | `above`, `in_list`    |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `'next_rising', 'next_setting', usw.`        |
-| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
+| `moon_phase_position` | `string` | No         | Position Text Mondphase im Verhältnis zum Bild. 											                  | `above`, `in_list`   					 |
+| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. 														  | `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`       |
+| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. 											                  | `above`, `below`, `right`                |
 | `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste)							 				  | `above`, `in_list` 						 |
-| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
-| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
-| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
-| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder																			  | `true`, `false`                          |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste).							 				  | `above`, `in_list` 						 |
+| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation. 																  | `true`, `false`                          |
+| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
+| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
+| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
+| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`   				 |
 | `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
 | `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
-
 
 
 simple example:

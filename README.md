@@ -6,10 +6,13 @@
 [![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-eng.md)
 ![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
+<img width="100%" height="auto" alt="sun-position-card-ubersicht" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-ubersicht.png" />
 
-# :sunny: Sun Position Card
+---
 
-Dies ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit entsprechenden Sonnenstandbildern, sowie der aktuellen Mondphase und zur Anzeige relevanter Sonnenzeiten. Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
+Die :sunny: Sun Position Card ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit verschiedenen Optionen, sowie der aktuellen Mondphase und Anzeige weiterer relevanter Sonnenzeiten.  
+
+Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
 Du benötigst die sun.sun-Entität, die von Home Assistant bereitgestellt wird, sobald dein Home-Standort konfiguriert ist. Die moon.phase-Entität ist optional und wird nur benötigt, um die aktuelle Mondphase anzuzeigen.
 Um den Mond-Sensor zu erhalten, gehe zu Einstellungen → Geräte & Dienste → Integration hinzufügen und suche nach Mond. Dies ist die integrierte Mond-Integration von Home Assistant.
 
@@ -17,13 +20,15 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 
 ## Features
 
--   **Sonnestand visuelle Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
--   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen)
+-   **Sonnestand klassiche Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
+-   **Sonnestand berechnete Darstellung:** Zeigt je nach Tageszeit den berechneten Sonnenstand am Horizont an.
+-   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen).
 -   **Animierte Bilder** Sonnenstandbilder Vormittag, Mittag, Nachmittag können animiert werden.
 -   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, geografischen Standort anpassen.
 -   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML
+
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
 
@@ -122,20 +127,20 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
 | `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
 | `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
-| `moon_phase_position: above`| `string` | No         | Position Text Mondphase im Verhältnis zum Bild. Mögliche Werte: `above`, `in_list`		                  | `above`, `in_list`    |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. Mögliche Werte: `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`. | `'next_rising', 'next_setting', usw.`        |
-| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. Mögliche Werte: `above`, `below`, `right`.                 | `below`                                  |
+| `moon_phase_position` | `string` | No         | Position Text Mondphase im Verhältnis zum Bild. 											                  | `above`, `in_list`   					 |
+| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. 														  | `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`       |
+| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. 											                  | `above`, `below`, `right`                |
 | `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste)							 				  | `above`, `in_list` 						 |
-| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation 																  | `true`, `false`                          |
-| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste																		  | `true`, `false`                          |
-| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten 																	  | `true`, `false`                          |
-| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder																			  | `true`, `false`                          |
+| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste).							 				  | `above`, `in_list` 						 |
+| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation. 																  | `true`, `false`                          |
+| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
+| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
+| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
+| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`   				 |
 | `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
 | `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
-
 
 
 ### Beispielkonfiguration
@@ -274,5 +279,3 @@ card_mod:
 ## Forum-Diskussionen 
 
 [![Forum smarthome-community](https://img.shields.io/badge/Forum-smarthome--community-blue)](https://community-smarthome.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/9389) [![Forum simon42-community](https://img.shields.io/badge/Forum-simon42--community-blue)](https://community.simon42.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/72199)
-
-
