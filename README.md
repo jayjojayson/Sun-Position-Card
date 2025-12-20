@@ -10,7 +10,7 @@
 
 ---
 
-Die :sunny: Sun Position Card ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit verschiedenen Optionen, sowie der aktuellen Mondphase und Anzeige weiterer relevanter Sonnenzeiten.  
+Die 🔆 Sun Position Card ist eine benutzerdefinierte Lovelace-Karte zur Visualisierung der aktuellen Sonnenposition mit verschiedenen Optionen, sowie der aktuellen Mondphase und Anzeige weiterer relevanter Sonnenzeiten.  
 
 Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfigurierbar.
 Du benötigst die sun.sun-Entität, die von Home Assistant bereitgestellt wird, sobald dein Home-Standort konfiguriert ist. Die moon.phase-Entität ist optional und wird nur benötigt, um die aktuelle Mondphase anzuzeigen.
@@ -20,15 +20,15 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 
 ## Features
 
--   **Sonnestand klassiche Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
--   **Sonnestand berechnete Darstellung:** Zeigt je nach Tageszeit den berechneten Sonnenstand am Horizont an.
--   **Sonnestand berechneter Bogen:** Zeigt je nach Tageszeit den berechneten Sonnenstand im 180 Grad Bogen an.
--   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen).
--   **Animierte Bilder** Bilder zum Sonnenstand können animiert werden, außer Morgen- und Dämmerungsbild in klassischer Ansicht.
--   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
--   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
--   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, geografischen Standort anpassen.
--   **UI-Konfiguration:** Konfiguriere alle Optionen bequem über den visuellen Editor, ohne YAML
+### 🔆 **Sonnestand klassische Darstellung**  
+### 🌅 **Sonnestand berechnete Darstellung**  
+### 🌄 **Sonnestand berechneter Bogen**  
+### 🌙 **Mondphasen – visuelle Darstellung**  
+### 🎞️ **Animierter Sonnenstand**  
+### ⏰ **Anpassbare Zeiten**  
+### 📐 **Flexibles Layout**  
+### 📍 **Anpassbare Schwellenwerte**  
+### ⚙️ **UI-Konfiguration**  
 
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
