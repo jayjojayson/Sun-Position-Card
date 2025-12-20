@@ -21,15 +21,15 @@ To get the Moon sensor, go to Settings → Devices & Services → Add Integratio
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
--   **Classic sun position visualization:** Displays different sun position images depending on the time of day.
--   **Calculated sun position visualization:** Displays the calculated position of the sun on the horizon depending on the time of day.
--   **Calculated sun arc:** Displays the calculated position of the sun along a 180-degree arc depending on the time of day.
--   **Visual Representation Lunar Phases:** Displays the current moon phase depending on the moon’s position (8 lunar phases).
--   **Animated Images** Images of the sun's position can be animated, except morning and twilight image in classic view.
--   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
--   **Flexible Layout:** Position the time information above, below, or to the right of the image.
--   **Adjustable Thresholds:** Adjust the azimuth and elevation thresholds to precisely match the day phases to your geographical location.
--   **UI Configuration:** Conveniently configure all options via the visual editor without having to manually edit YAML.
+### 🔆 Sun Position – Classic Display  
+### 🌅 Sun Position – Calculated Display  
+### 🌄 Sun Position – Calculated Arc  
+### 🌙 Moon Phases – Visual Display  
+### 🎞️ Animated Sun Position  
+### ⏰ Customizable Times  
+### 📐 Flexible Layout  
+### 📍 Adjustable Thresholds  
+### ⚙️ UI Configuration  
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
 
