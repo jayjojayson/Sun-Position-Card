@@ -24,7 +24,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 -   **Sonnestand berechnete Darstellung:** Zeigt je nach Tageszeit den berechneten Sonnenstand am Horizont an.
 -   **Sonnestand berechneter Bogen:** Zeigt je nach Tageszeit den berechneten Sonnenstand im 180 Grad Bogen an.
 -   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen).
--   **Animierte Bilder** Bilder der Sonnenposition können animiert werden, außer das Morgen- und Dämmerungsbild in der klassischen Ansicht.
+-   **Animierte Bilder** Bilder zum Sonnenstand können animiert werden, außer Morgen- und Dämmerungsbild in klassischer Ansicht.
 -   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, geografischen Standort anpassen.
