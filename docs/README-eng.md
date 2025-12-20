@@ -23,8 +23,9 @@ If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 ## Features
 -   **Classic sun position visualization:** Displays different sun position images depending on the time of day.
 -   **Calculated sun position visualization:** Displays the calculated position of the sun on the horizon depending on the time of day.
+-   **Calculated sun arc:** Displays the calculated position of the sun along a 180-degree arc depending on the time of day.
 -   **Visual Representation Lunar Phases:** Displays the current moon phase depending on the moon’s position (8 lunar phases).
--   **Animated Images** Images of the sun's position in the morning, at midday, and in the afternoon can be animated.
+-   **Animated Images** Images of the sun's position can be animated, except morning and twilight image in classic view.
 -   **Customizable Times:** Select which sun times (e.g., rising, setting, dawn, dusk) should be displayed.
 -   **Flexible Layout:** Position the time information above, below, or to the right of the image.
 -   **Adjustable Thresholds:** Adjust the azimuth and elevation thresholds to precisely match the day phases to your geographical location.
@@ -103,7 +104,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
 | `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
-| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`   				 |
+| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`, `arc`			 |
 | `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
@@ -146,6 +147,7 @@ noon_azimuth: 200
 afternoon_azimuth: 255
 animate_images: false
 time_list_format: block
+view_mode: arc
 ```
 
 ---

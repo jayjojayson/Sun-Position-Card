@@ -64,7 +64,6 @@ class SunPositionCardEditor extends HTMLElement {
   _render() {
     if (!this.shadowRoot || !this._config) return;
 
-    // WICHTIG: HTML nur einmal bauen, um Endlosschleifen zu verhindern!
     if (this._initialized) {
         this._updateValues();
         return;
@@ -106,6 +105,7 @@ class SunPositionCardEditor extends HTMLElement {
         >
           <mwc-list-item value="classic">${this._localize('editor.view_mode_classic')}</mwc-list-item>
           <mwc-list-item value="calculated">${this._localize('editor.view_mode_calculated')}</mwc-list-item>
+          <mwc-list-item value="arc">${this._localize('editor.view_mode_arc')}</mwc-list-item>
         </ha-select>
         
         <div class="row">
@@ -199,7 +199,6 @@ class SunPositionCardEditor extends HTMLElement {
       </div>
     `;
 
-    // Event Listeners einmalig hinzufügen
     this._attachListeners();
     this._initialized = true;
     this._updateValues();
@@ -240,7 +239,6 @@ class SunPositionCardEditor extends HTMLElement {
         cb.addEventListener('change', this._timeCheckboxChanged.bind(this));
     });
     
-    // Stoppe Event Propagation bei Selects, damit der Drawer nicht zugeht
     root.querySelectorAll('ha-select').forEach(el => {
         el.addEventListener('closed', (e) => e.stopPropagation());
     });
@@ -285,11 +283,6 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('afternoon_azimuth', config.afternoon_azimuth || 255);
     setVal('dusk_elevation', config.dusk_elevation || 9);
 
-    // Sichtbarkeiten steuern (CSS Klassen)
-    const animateContainer = root.getElementById('animate_images_container');
-    if (config.view_mode === 'calculated') animateContainer.classList.add('hidden');
-    else animateContainer.classList.remove('hidden');
-
     const moonPosContainer = root.getElementById('moon_phase_position_container');
     const moonCheckContainer = root.getElementById('moon_phase_checkbox_container');
     if (config.moon_entity) {
@@ -300,7 +293,6 @@ class SunPositionCardEditor extends HTMLElement {
         moonCheckContainer.classList.add('hidden');
     }
 
-    // Checkboxen
     const times = config.times_to_show || [];
     const checkboxes = root.querySelectorAll('ha-checkbox');
     checkboxes.forEach(cb => {
@@ -308,7 +300,6 @@ class SunPositionCardEditor extends HTMLElement {
         cb.checked = times.includes(val);
     });
     
-    // Pickers HASS update
     if (this._hass) {
         root.querySelectorAll("ha-entity-picker").forEach(picker => {
             picker.hass = this._hass;
@@ -361,7 +352,6 @@ class SunPositionCardEditor extends HTMLElement {
     
     let newConfig = { ...this._config };
     
-    // Speziallogik für State Position Migration
     if (configValue === 'state_position') {
         newConfig.state_position = newValue;
         delete newConfig.show_state_in_times;
@@ -369,7 +359,6 @@ class SunPositionCardEditor extends HTMLElement {
         newConfig[configValue] = newValue;
     }
 
-    // Wenn Moon Entity entfernt wird, Cleanup
     if (configValue === 'moon_entity' && !newValue) {
          if (newConfig.times_to_show) {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'moon_phase');

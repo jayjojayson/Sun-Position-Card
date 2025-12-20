@@ -22,8 +22,9 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 
 -   **Sonnestand klassiche Darstellung:** Zeigt je nach Tageszeit unterschiedliche Sonnenstandbilder an.
 -   **Sonnestand berechnete Darstellung:** Zeigt je nach Tageszeit den berechneten Sonnenstand am Horizont an.
+-   **Sonnestand berechneter Bogen:** Zeigt je nach Tageszeit den berechneten Sonnenstand im 180 Grad Bogen an.
 -   **Mondphasen visuelle Darstellung:** Zeigt je nach Mondstand die aktuelle Mondphase an (8 Mondphasen).
--   **Animierte Bilder** Sonnenstandbilder Vormittag, Mittag, Nachmittag können animiert werden.
+-   **Animierte Bilder** Bilder der Sonnenposition können animiert werden, außer das Morgen- und Dämmerungsbild in der klassischen Ansicht.
 -   **Anpassbare Zeiten:** Wähle aus, welche Sonnenzeiten angezeigt werden sollen.
 -   **Flexibles Layout:** Platziere die Zeitangaben über, unter oder rechts neben dem Bild.
 -   **Anpassbare Schwellenwerte:** Passe die Azimut- und Höhenschwellenwerte an, geografischen Standort anpassen.
@@ -136,7 +137,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
 | `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
 | `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
-| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`   				 |
+| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`, `arc`			 |
 | `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
@@ -181,6 +182,7 @@ noon_azimuth: 200
 afternoon_azimuth: 255
 animate_images: false
 time_list_format: block
+view_mode: arc
 ```
 
 ---

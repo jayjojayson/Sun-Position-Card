@@ -2,7 +2,11 @@
 import de from './lang-de.js';
 import en from './lang-en.js';
 
-// WICHTIG: Damit die Karte im "Hinzufügen"-Menü erscheint:
+console.log(
+  "%c☀️ Sun-Position-Card v_1.4 loaded",
+  "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
+);
+
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: "sun-position-card",
@@ -35,16 +39,15 @@ class SunPositionCard extends HTMLElement {
     return a;
   }
 
+  // 1. Berechnung für den vertikalen Modus
   _calculateSunPosition(sunState, hass) {
     const fallback = { top: '270px', clipPath: 'inset(0 0 170px 0)' };
     if (!sunState || sunState.state !== 'above_horizon') return fallback;
 
-    // Check if sensors exist safely
     const riseEnt = hass.states['sensor.sun_next_rising'];
     const noonEnt = hass.states['sensor.sun_next_noon'];
     const setEnt  = hass.states['sensor.sun_next_setting'];
     
-    // If user doesn't have these specific sensors (e.g. from Sun2 integration), return safe fallback
     if (!riseEnt || !noonEnt || !setEnt) return fallback;
 
     const riseNext = new Date(riseEnt.state);
@@ -80,6 +83,49 @@ class SunPositionCard extends HTMLElement {
     return {
       top: `${topPos}px`,
       clipPath: 'none'
+    };
+  }
+
+  // 2. Berechnung für den Bogen-Modus (Arc)
+  _calculateSunPositionArc(sunState, hass, isCompact) {
+    const fallback = { left: '50%', top: '100%', clipPath: 'none' };
+    
+    if (!sunState || sunState.state !== 'above_horizon') return fallback;
+
+    const riseEnt = hass.states['sensor.sun_next_rising'];
+    const setEnt  = hass.states['sensor.sun_next_setting'];
+    
+    if (!riseEnt || !setEnt) return fallback;
+
+    const riseNext = new Date(riseEnt.state);
+    const setNext  = new Date(setEnt.state);
+    
+    if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
+
+    const now = new Date();
+    const dayMs = 24 * 60 * 60 * 1000;
+    
+    const set = setNext;
+    const rise = new Date(riseNext.getTime() - dayMs);
+    
+    const totalDay = set - rise;
+    const elapsed = now - rise;
+    let percent = totalDay > 0 ? elapsed / totalDay : 0;
+    
+    percent = Math.max(0, Math.min(1, percent));
+
+    // Kleinerer Radius, wenn Layout kompakt ist (Text rechts und oben)
+    const radius = isCompact ? 90 : 120; 
+    
+    const rad = Math.PI * (1 - percent);
+    
+    const xOffset = Math.cos(rad) * radius;
+    const yOffset = Math.sin(rad) * radius;
+
+    return {
+        left: `calc(50% + ${xOffset}px)`,
+        top: `calc(160px - ${yOffset}px)`,
+        clipPath: 'none'
     };
   }
 
@@ -141,9 +187,7 @@ class SunPositionCard extends HTMLElement {
       }
     } else {
         if (moonState) {
-            // Mapping moon state to image filename
             image = `${moonState.state}.png`;
-            // Fallback for unknown states handled implicitly by image loading or keep previous
         }
     }
 
@@ -156,6 +200,9 @@ class SunPositionCard extends HTMLElement {
     const showDegrees = config.show_degrees ?? false;
     const showDegreesInList = config.show_degrees_in_list ?? false;
     const timeListFormat = config.time_list_format || 'centered';
+
+    // FIX: Erkennen, ob kompaktes Layout aktiv ist (Text rechts)
+    const isCompact = (timePosition === 'right');
 
     const formatTime = (isoString) => {
       if (!isoString) return '';
@@ -258,47 +305,84 @@ class SunPositionCard extends HTMLElement {
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
     
     const imgEl = this.querySelector('#sun-card-image');
-    if (imgEl) {
-        if (config.view_mode === 'calculated') {
+    const wrapperEl = this.querySelector('#sun-icon-wrapper');
+    const container = this.querySelector('.sun-image-container');
+
+    if (imgEl && container && wrapperEl) {
+        
+        // --- LOGIK START ---
+        
+        if (config.view_mode === 'calculated' || config.view_mode === 'arc') {
+            
+            const arcEl = this.querySelector('.sun-arc-path');
+            if(arcEl) {
+                if(isCompact) arcEl.classList.add('compact');
+                else arcEl.classList.remove('compact');
+            }
+
             if (elevation <= 0) {
-                // Berechneter Modus - NACHT
+                // NACHT (Mond)
+                container.classList.remove('arc-mode');
+                
                 let displayImage = image;
                 if (displayImage === 'unterHorizont.png') {
                     displayImage = 'full_moon.png';
                 }
 
                 const newSrc = `/local/community/Sun-Position-Card/images/${displayImage}`;
-                
-                if (!imgEl.src.endsWith(displayImage)) {
-                     imgEl.src = newSrc;
-                }
+                if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
 
-                // ZENTRIERUNG DES MONDES
-                imgEl.style.top = '50%';
-                imgEl.style.transform = 'translate(-50%, -50%)'; // Vertikal und Horizontal zentrieren
-                imgEl.style.clipPath = 'none';
+                // Positionierung via Wrapper (Zentriert)
+                wrapperEl.style.top = '50%';
+                wrapperEl.style.left = '50%';
+                wrapperEl.style.transform = 'translate(-50%, -50%)';
+                
+                if (arcEl) arcEl.style.display = 'none';
+
+                // Keine Animation für Mond
+                imgEl.classList.remove('sun-image-animated');
 
             } else {
-                // Berechneter Modus - TAG
+                // TAG (Sonne)
                 const sunSrc = `/local/community/Sun-Position-Card/images/calc-sun.png`;
-                if (!imgEl.src.endsWith('calc-sun.png')) {
-                    imgEl.src = sunSrc;
+                if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
+
+                if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
+
+                if (config.view_mode === 'arc') {
+                    // ARC MODUS
+                    container.classList.add('arc-mode');
+                    
+                    // Wrapper übernimmt Positionierung
+                    const { left, top } = this._calculateSunPositionArc(state, hass, isCompact);
+                    wrapperEl.style.left = left;
+                    wrapperEl.style.top = top;
+                    wrapperEl.style.transform = 'translate(-50%, -50%)'; 
+
+                } else {
+                    // CALCULATED MODUS
+                    container.classList.remove('arc-mode');
+                    
+                    const { top, clipPath } = this._calculateSunPosition(state, hass);
+                    wrapperEl.style.left = '50%';
+                    wrapperEl.style.top = top;
+                    wrapperEl.style.transform = 'translateX(-50%)'; 
+                    
+                    imgEl.style.clipPath = clipPath; 
                 }
 
-                // Reset Transform für Sonne (Position wird über top gesteuert)
-                imgEl.style.transform = ''; 
-
-                const { top, clipPath } = this._calculateSunPosition(state, hass);
-                imgEl.style.top = top;
-                imgEl.style.clipPath = clipPath;
-            }
-
-            if (imgEl.classList.contains('sun-image-animated')) {
-                imgEl.classList.remove('sun-image-animated');
+                // Animation aktivieren
+                if (config.animate_images) {
+                    imgEl.classList.add('sun-image-animated');
+                } else {
+                    imgEl.classList.remove('sun-image-animated');
+                }
             }
 
         } else {
             // CLASSIC MODE
+            container.classList.remove('arc-mode');
+
             const newSrc = `/local/community/Sun-Position-Card/images/${image}`;
             if (this._lastImage !== image) {
                 imgEl.src = newSrc;
@@ -306,20 +390,17 @@ class SunPositionCard extends HTMLElement {
                 this._lastImage = image;
             }
             
-            // Inline Styles zurücksetzen
-            imgEl.style.top = '';
-            imgEl.style.transform = '';
+            // Reset Styles
+            wrapperEl.style.top = '';
+            wrapperEl.style.left = '';
+            wrapperEl.style.transform = '';
             imgEl.style.clipPath = '';
             
             const shouldAnimate = config.animate_images && ['morgen.png', 'mittag.png', 'nachmittag.png'].includes(image);
             if (shouldAnimate) {
-                if (!imgEl.classList.contains('sun-image-animated')) {
-                    imgEl.classList.add('sun-image-animated');
-                }
+                imgEl.classList.add('sun-image-animated');
             } else {
-                if (imgEl.classList.contains('sun-image-animated')) {
-                    imgEl.classList.remove('sun-image-animated');
-                }
+                imgEl.classList.remove('sun-image-animated');
             }
         }
     }
@@ -338,18 +419,59 @@ class SunPositionCard extends HTMLElement {
         .sun-image-container.calculated {
             position: relative;
             overflow: hidden;
-            min-height: 170px; /* Ensure container has height */
+            min-height: 170px;
             padding: 0;
 			margin: 10px 0 20px 0;
         }
-        .calculated-sun {
+        
+        /* WRAPPER für Positionierung */
+        .sun-icon-wrapper {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
+            width: auto;
+            height: auto;
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            transition: top 0.5s ease, left 0.5s ease;
+        }
+
+        /* Das Bild im Wrapper */
+        .calculated-sun {
+            width: 175px;  /* FIX: Feste Breite für große Darstellung (Mond & Calculated) */
             max-width: 175px;
             height: auto;
         }
+
+        /* Override für Arc-Mode (Sonne klein) */
+        .sun-image-container.arc-mode .calculated-sun {
+            width: 50px;
+            max-width: 50px;
+        }
+        
+        .sun-arc-path {
+            position: absolute;
+            width: 220px;
+            height: 110px;
+            border-top: 3px dashed var(--secondary-text-color, #727272);
+            border-left: 3px dashed var(--secondary-text-color, #727272);
+            border-right: 3px dashed var(--secondary-text-color, #727272);
+            border-radius: 110px 110px 0 0;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.4;
+            pointer-events: none;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        .sun-arc-path.compact {
+            width: 180px;
+            height: 90px;
+            border-radius: 90px 90px 0 0;
+            top: 70px;
+        }
+
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -358,7 +480,8 @@ class SunPositionCard extends HTMLElement {
           animation: spin 40s linear infinite;
           will-change: transform;
         }
-        .sun-image-container { text-align: center; padding: 16px; }
+        
+        .sun-image-container { text-align: center; padding: 16px; position: relative; display: flex; justify-content: center; } 
         .sun-image { max-width: 100%; height: auto; }
         .times-container { padding: 8px; }
         .time-entry { padding: 4px 0; text-align: center; }
@@ -373,6 +496,10 @@ class SunPositionCard extends HTMLElement {
         .degrees { text-align: center; font-size: 0.9em; opacity: 0.8; padding-bottom: 0px; }
         .degrees-in-list { font-size: 0.9em; opacity: 0.8; }
         .divider { border: 0; border-top: 1px solid var(--divider-color, #e0e0e0); margin: 0; }
+        
+        .sun-image-container:not(.calculated) .sun-icon-wrapper {
+            position: relative;
+        }
       </style>
     `;
 
@@ -382,13 +509,18 @@ class SunPositionCard extends HTMLElement {
 
     let imageHtml = '';
     if (showImage) {
-        if (viewMode === 'calculated') {
+        if (viewMode === 'calculated' || viewMode === 'arc') {
             imageHtml = `<div class="sun-image-container calculated">
-                           <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
+                           <div class="sun-arc-path"></div>
+                           <div class="sun-icon-wrapper" id="sun-icon-wrapper">
+                               <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
+                           </div>
                          </div>`;
         } else {
             imageHtml = `<div class="sun-image-container">
-                           <img id="sun-card-image" class="sun-image" src="" alt="">
+                           <div class="sun-icon-wrapper" id="sun-icon-wrapper">
+                               <img id="sun-card-image" class="sun-image" src="" alt="">
+                           </div>
                          </div>`;
         }
     }

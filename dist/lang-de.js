@@ -1,7 +1,7 @@
 export default {
     card: {
         name: "Sun Position Card",
-        description: "Sonnen- und Mondpositin mit benutzerdefinierten Bildern."
+        description: "Sonnen- und Mondposition mit benutzerdefinierten Bildern."
     },
     error: {
         no_sun_entity: "Bitte eine Sonnen-Entität definieren.",
@@ -44,9 +44,10 @@ export default {
         main_options: "Anzeigeoptionen",
         view_mode: "Ansichtsmodus",
         view_mode_classic: "Klassisch (6 Bilder)",
-        view_mode_calculated: "Berechnet (Dynamischer Horizont)",
+        view_mode_calculated: "Berechnet (Nur Elevation)",
+        view_mode_arc: "Bogen (180° Verlauf)",
         show_image: "Sonnenstand (Bild) anzeigen",
-        animate_images: "Bilder animieren (Vormittag, Mittag, Nachmittag)",
+        animate_images: "Bilder animieren (außer Morgen/Dämmerung Bild)",
         state_position: "Position des Status",
         state_pos_above: "Über dem Bild",
         state_pos_in_list: "In der Liste",
