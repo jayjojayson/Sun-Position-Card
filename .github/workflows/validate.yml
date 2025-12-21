@@ -1,10 +1,11 @@
-name: Validate with hassfest and HACS 
+name: Validate with hassfest and HACS
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -18,9 +19,4 @@ jobs:
       - name: Run HACS validation
         uses: hacs/action@main
         with:
-          category: integration 
-
-      # 2. Hassfest-Prüfungen
-      # NEU: Verwendet die offizielle HA-Action, um Installationsfehler zu vermeiden.
-      - name: Run hassfest checks
-        uses: home-assistant/actions/hassfest@master 
+          category: plugin
