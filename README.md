@@ -27,7 +27,7 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 - ### 🌙 **Mondphasen – visuelle Darstellung**  
 - ### 🎞️ **Animierter Sonnenstand**  
 - ### ⏰ **Anpassbare Zeiten**  
-- ### 🌤️ **Weather Status** - NEW
+- ### 🌤️ **Wetter Status** - NEU
 - ### 📐 **Flexibles Layout**  
 - ### 📍 **Anpassbare Schwellenwerte**  
 - ### ⚙️ **UI-Konfiguration**  
