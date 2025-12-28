@@ -13,7 +13,7 @@
 
 # :sunny: Sun Position Card
 
-is a custom Lovelace card used to visualize the current position of the sun with various configuration options, as well as the current moon phase and the display of additional relevant solar times.  
+is a custom Lovelace card used to visualize the current position of the sun with various configuration options, as well as the current moon phase and the display of additional relevant solar times. The Card is completely translated to English. 
 
 You need the sun.sun entity provided by Home Assistant when your Home location is configured. The moon.phase entity is optional and only required to display the current moon phase.
 To get the Moon sensor, go to Settings → Devices & Services → Add Integration and search for Moon. This is Home Assistant’s built-in Moon integration.
