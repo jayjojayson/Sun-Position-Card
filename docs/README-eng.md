@@ -21,17 +21,19 @@ To get the Moon sensor, go to Settings → Devices & Services → Add Integratio
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
-### 🔆 Sun Position – Classic Display  
-### 🌅 Sun Position – Calculated Display  
-### 🌄 Sun Position – Calculated Arc  
-### 🌙 Moon Phases – Visual Display  
-### 🎞️ Animated Sun Position  
-### ⏰ Customizable Times  
-### 📐 Flexible Layout  
-### 📍 Adjustable Thresholds  
-### ⚙️ UI Configuration  
+- ### 🔆 **Sun Position – Classic Display**  
+- ### 🌅 **Sun Position – Calculated Display**  
+- ### 🌄 **Sun Position – Calculated Arc**  
+- ### 🌙 **Moon Phases – Visual Display**  
+- ### 🎞️ **Animated Sun Position**  
+- ### ⏰ **Customizable Times**  
+- ### 🌤️ **Wetter Status** - NEU
+- ### 📐 **Flexible Layout**  
+- ### 📍 **Adjustable Thresholds**  
+- ### ⚙️ **UI Configuration**  
 
 <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card2.png" />
+<img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card4.png" /> <img width="48%" height="auto" alt="image" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-positiion-card5.png" />
 
 <details>
   <summary> <b>Have a look at the animated card</b></summary>  

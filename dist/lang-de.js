@@ -25,6 +25,23 @@ export default {
         last_quarter: 'Letztes Viertel',
         waning_crescent: 'Abnehmende Sichel'
     },
+    weather_state: {
+        'clear-night': 'Klare Nacht',
+        'cloudy': 'Bewölkt',
+        'fog': 'Nebel',
+        'hail': 'Hagel',
+        'lightning': 'Gewitter',
+        'lightning-rainy': 'Gewitter mit Regen',
+        'partlycloudy': 'Teils bewölkt',
+        'pouring': 'Strömender Regen',
+        'rainy': 'Regnerisch',
+        'snowy': 'Schnee',
+        'snowy-rainy': 'Schneeregen',
+        'sunny': 'Sonnig',
+        'windy': 'Windig',
+        'windy-variant': 'Windig',
+        'exceptional': 'Warnung'
+    },
     time_entry: {
         current: "Akt.",
         azimuth: "Azimut",
@@ -36,17 +53,20 @@ export default {
         next_dusk: "Abendämmerung",
         next_noon: "Mittag",
         next_midnight: "Mitternacht",
-        moon_phase: "Mondphase"
+        moon_phase: "Mondphase",
+        weather: "Wetter"
     },
     editor: {
         entity: "Sonnen-Entität",
         moon_entity: "Mond-Entität (Optional)",
+        weather_entity: "Wetter-Entität (Optional)",
         main_options: "Anzeigeoptionen",
         view_mode: "Ansichtsmodus",
         view_mode_classic: "Klassisch (6 Bilder)",
         view_mode_calculated: "Berechnet (Nur Elevation)",
         view_mode_arc: "Bogen (180° Verlauf)",
         show_image: "Sonnenstand (Bild) anzeigen",
+        show_weather_badge: "Wetter-Badge im Bild anzeigen",
         animate_images: "Bilder animieren (außer Morgen/Dämmerung Bild)",
         state_position: "Position des Status",
         state_pos_above: "Über dem Bild",

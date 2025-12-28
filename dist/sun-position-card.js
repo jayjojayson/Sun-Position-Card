@@ -3,7 +3,7 @@ import de from './lang-de.js';
 import en from './lang-en.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.4 loaded",
+  "%c☀️ Sun-Position-Card v_1.5 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -32,6 +32,7 @@ class SunPositionCard extends HTMLElement {
 
     for (const k of keys) {
         if (typeof a[k] === 'undefined') {
+            if(keys[0] === 'weather_state') return keys[1];
             return this.langs['en'][keys[0]][keys[1]];
         }
         a = a[k];
@@ -39,7 +40,27 @@ class SunPositionCard extends HTMLElement {
     return a;
   }
 
-  // 1. Berechnung für den vertikalen Modus
+  _getWeatherIcon(state) {
+    const mapping = {
+        'clear-night': 'mdi:weather-night',
+        'cloudy': 'mdi:weather-cloudy',
+        'fog': 'mdi:weather-fog',
+        'hail': 'mdi:weather-hail',
+        'lightning': 'mdi:weather-lightning',
+        'lightning-rainy': 'mdi:weather-lightning-rainy',
+        'partlycloudy': 'mdi:weather-partly-cloudy',
+        'pouring': 'mdi:weather-pouring',
+        'rainy': 'mdi:weather-rainy',
+        'snowy': 'mdi:weather-snowy',
+        'snowy-rainy': 'mdi:weather-snowy-rainy',
+        'sunny': 'mdi:weather-sunny',
+        'windy': 'mdi:weather-windy',
+        'windy-variant': 'mdi:weather-windy-variant',
+        'exceptional': 'mdi:alert-circle-outline'
+    };
+    return mapping[state] || 'mdi:weather-cloudy';
+  }
+
   _calculateSunPosition(sunState, hass) {
     const fallback = { top: '270px', clipPath: 'inset(0 0 170px 0)' };
     if (!sunState || sunState.state !== 'above_horizon') return fallback;
@@ -86,7 +107,6 @@ class SunPositionCard extends HTMLElement {
     };
   }
 
-  // 2. Berechnung für den Bogen-Modus (Arc)
   _calculateSunPositionArc(sunState, hass, isCompact) {
     const fallback = { left: '50%', top: '100%', clipPath: 'none' };
     
@@ -114,7 +134,7 @@ class SunPositionCard extends HTMLElement {
     
     percent = Math.max(0, Math.min(1, percent));
 
-    // Kleinerer Radius, wenn Layout kompakt ist (Text rechts und oben)
+    // Radius Logik: Compact 90px, Groß 120px
     const radius = isCompact ? 90 : 120; 
     
     const rad = Math.PI * (1 - percent);
@@ -122,9 +142,14 @@ class SunPositionCard extends HTMLElement {
     const xOffset = Math.cos(rad) * radius;
     const yOffset = Math.sin(rad) * radius;
 
+    // Basislinie berechnen (Horizont)
+    // CSS Top ist 50px (Groß) oder 70px (Compact)
+    // Baseline = CSS Top + Radius
+    const baselineY = isCompact ? (70 + 90) : (50 + 120); // 160px oder 170px
+
     return {
         left: `calc(50% + ${xOffset}px)`,
-        top: `calc(160px - ${yOffset}px)`,
+        top: `calc(${baselineY}px - ${yOffset}px)`,
         clipPath: 'none'
     };
   }
@@ -155,6 +180,10 @@ class SunPositionCard extends HTMLElement {
     const moonEntityId = config.moon_entity;
     const moonState = moonEntityId ? hass.states[moonEntityId] : null;
     const moonPhasePosition = config.moon_phase_position || 'in_list';
+    
+    const weatherEntityId = config.weather_entity;
+    const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
+    const showWeatherBadge = config.show_weather_badge ?? true;
 
     const sunState = state.state;
     const azimuth = state.attributes.azimuth || 0;
@@ -201,7 +230,6 @@ class SunPositionCard extends HTMLElement {
     const showDegreesInList = config.show_degrees_in_list ?? false;
     const timeListFormat = config.time_list_format || 'centered';
 
-    // FIX: Erkennen, ob kompaktes Layout aktiv ist (Text rechts)
     const isCompact = (timePosition === 'right');
 
     const formatTime = (isoString) => {
@@ -227,6 +255,20 @@ class SunPositionCard extends HTMLElement {
     
     const translateMoonPhase = (phase) => {
         return this._localize(`moon_phase.${phase}`) || phase;
+    }
+    
+    let weatherText = '';
+    let weatherIcon = '';
+    let weatherTemp = '';
+    
+    if (weatherStateObj) {
+        const cond = this._localize(`weather_state.${weatherStateObj.state}`);
+        const temp = weatherStateObj.attributes.temperature;
+        const unit = hass.config.unit_system.temperature || '°C';
+        
+        weatherTemp = `${temp}${unit}`;
+        weatherText = `${cond}, ${weatherTemp}`;
+        weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
 
     const daylightDuration = calculateDaylight(state.attributes.next_rising, state.attributes.next_setting);
@@ -268,15 +310,21 @@ class SunPositionCard extends HTMLElement {
                     content = translatedMoonPhase;
                 }
                 break;
+            case 'weather':
+                if (weatherStateObj) {
+                    label = this._localize('time_entry.weather');
+                    content = weatherText;
+                }
+                break;
         }
 
         if (timeListFormat === 'block' && label) {
-            const timeValue = (timeKey === 'daylight_duration' || timeKey === 'moon_phase') ? content : formatTime(state.attributes[timeKey]);
+            const timeValue = (timeKey === 'daylight_duration' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
             if (timeValue) {
                  timeEntries.push(`<div class="time-entry-block"><span class="time-label">${label}</span><span class="time-value">${timeValue}</span></div>`);
             }
         } else if (label) {
-            if (timeKey === 'daylight_duration' || timeKey === 'moon_phase') {
+            if (timeKey === 'daylight_duration' || timeKey === 'moon_phase' || timeKey === 'weather') {
                 if (content) timeEntries.push(`<div class="time-entry">${label}: ${content}</div>`);
             } else {
                  const timeValue = state.attributes[timeKey];
@@ -304,13 +352,29 @@ class SunPositionCard extends HTMLElement {
     const degreesEl = this.querySelector('#sun-degrees-text');
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
     
+    // UPDATE Badge Visibility and Background Color
+    const badgeEl = this.querySelector('#weather-badge');
+    if (badgeEl) {
+        if (weatherStateObj && showWeatherBadge) {
+            badgeEl.style.display = 'flex';
+            
+            // Logik für Hintergrundfarbe (Tag vs Nacht)
+            const isDay = elevation > 0;
+            // UPDATE: Angepasstes Blau für den Tag
+            const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+            badgeEl.style.background = badgeBg;
+            
+            badgeEl.innerHTML = `<ha-icon icon="${weatherIcon}"></ha-icon><span>${weatherTemp}</span>`;
+        } else {
+            badgeEl.style.display = 'none';
+        }
+    }
+
     const imgEl = this.querySelector('#sun-card-image');
     const wrapperEl = this.querySelector('#sun-icon-wrapper');
     const container = this.querySelector('.sun-image-container');
 
     if (imgEl && container && wrapperEl) {
-        
-        // --- LOGIK START ---
         
         if (config.view_mode === 'calculated' || config.view_mode === 'arc') {
             
@@ -332,14 +396,13 @@ class SunPositionCard extends HTMLElement {
                 const newSrc = `/local/community/Sun-Position-Card/images/${displayImage}`;
                 if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
 
-                // Positionierung via Wrapper (Zentriert)
+                // Zentriert
                 wrapperEl.style.top = '50%';
                 wrapperEl.style.left = '50%';
                 wrapperEl.style.transform = 'translate(-50%, -50%)';
                 
                 if (arcEl) arcEl.style.display = 'none';
 
-                // Keine Animation für Mond
                 imgEl.classList.remove('sun-image-animated');
 
             } else {
@@ -353,7 +416,6 @@ class SunPositionCard extends HTMLElement {
                     // ARC MODUS
                     container.classList.add('arc-mode');
                     
-                    // Wrapper übernimmt Positionierung
                     const { left, top } = this._calculateSunPositionArc(state, hass, isCompact);
                     wrapperEl.style.left = left;
                     wrapperEl.style.top = top;
@@ -371,7 +433,6 @@ class SunPositionCard extends HTMLElement {
                     imgEl.style.clipPath = clipPath; 
                 }
 
-                // Animation aktivieren
                 if (config.animate_images) {
                     imgEl.classList.add('sun-image-animated');
                 } else {
@@ -390,7 +451,6 @@ class SunPositionCard extends HTMLElement {
                 this._lastImage = image;
             }
             
-            // Reset Styles
             wrapperEl.style.top = '';
             wrapperEl.style.left = '';
             wrapperEl.style.transform = '';
@@ -424,7 +484,6 @@ class SunPositionCard extends HTMLElement {
 			margin: 10px 0 20px 0;
         }
         
-        /* WRAPPER für Positionierung */
         .sun-icon-wrapper {
             position: absolute;
             width: auto;
@@ -435,27 +494,30 @@ class SunPositionCard extends HTMLElement {
             transition: top 0.5s ease, left 0.5s ease;
         }
 
-        /* Das Bild im Wrapper */
+        /* 175px für große Sonne/Mond */
         .calculated-sun {
-            width: 175px;  /* FIX: Feste Breite für große Darstellung (Mond & Calculated) */
+            width: 175px;
             max-width: 175px;
             height: auto;
         }
 
-        /* Override für Arc-Mode (Sonne klein) */
+        /* Kleine Sonne im Arc-Modus */
         .sun-image-container.arc-mode .calculated-sun {
             width: 50px;
             max-width: 50px;
         }
         
+        /* UPDATE: Bogen vergrößert auf 240px Breite (Radius 120), 
+           damit er zur JS Berechnung passt 
+        */
         .sun-arc-path {
             position: absolute;
-            width: 220px;
-            height: 110px;
+            width: 240px; 
+            height: 120px;
             border-top: 3px dashed var(--secondary-text-color, #727272);
             border-left: 3px dashed var(--secondary-text-color, #727272);
             border-right: 3px dashed var(--secondary-text-color, #727272);
-            border-radius: 110px 110px 0 0;
+            border-radius: 120px 120px 0 0;
             top: 50px;
             left: 50%;
             transform: translateX(-50%);
@@ -470,6 +532,28 @@ class SunPositionCard extends HTMLElement {
             height: 90px;
             border-radius: 90px 90px 0 0;
             top: 70px;
+        }
+        
+        .weather-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            /* Default background wird dynamisch überschrieben */
+            background: rgba(0, 0, 0, 0.4); 
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: none; 
+            align-items: center;
+            gap: 6px;
+            font-size: 1em; /* UPDATE: Größere Schrift */
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+            z-index: 5;
+            transition: background 0.5s ease;
+        }
+        .weather-badge ha-icon {
+            --mdc-icon-size: 18px;
         }
 
         @keyframes spin {
@@ -511,6 +595,7 @@ class SunPositionCard extends HTMLElement {
     if (showImage) {
         if (viewMode === 'calculated' || viewMode === 'arc') {
             imageHtml = `<div class="sun-image-container calculated">
+                           <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
@@ -518,6 +603,7 @@ class SunPositionCard extends HTMLElement {
                          </div>`;
         } else {
             imageHtml = `<div class="sun-image-container">
+                           <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="sun-image" src="" alt="">
                            </div>

@@ -25,6 +25,23 @@ export default {
         last_quarter: 'Last Quarter',
         waning_crescent: 'Waning Crescent'
     },
+    weather_state: {
+        'clear-night': 'Clear Night',
+        'cloudy': 'Cloudy',
+        'fog': 'Fog',
+        'hail': 'Hail',
+        'lightning': 'Lightning',
+        'lightning-rainy': 'Lightning & Rainy',
+        'partlycloudy': 'Partly Cloudy',
+        'pouring': 'Pouring',
+        'rainy': 'Rainy',
+        'snowy': 'Snowy',
+        'snowy-rainy': 'Snowy & Rainy',
+        'sunny': 'Sunny',
+        'windy': 'Windy',
+        'windy-variant': 'Windy',
+        'exceptional': 'Exceptional'
+    },
     time_entry: {
         current: "Current",
         azimuth: "Azimuth",
@@ -36,17 +53,20 @@ export default {
         next_dusk: "Dusk",
         next_noon: "Noon",
         next_midnight: "Midnight",
-        moon_phase: "Moon Phase"
+        moon_phase: "Moon Phase",
+        weather: "Weather"
     },
     editor: {
         entity: "Sun Entity",
         moon_entity: "Moon Entity (Optional)",
+        weather_entity: "Weather Entity (Optional)",
         main_options: "Display Options",
         view_mode: "View Mode",
         view_mode_classic: "Classic (6 Images)",
         view_mode_calculated: "Calculated (Elevation only)",
         view_mode_arc: "Arc (180° Movement)",
         show_image: "Show Sun Position (Image)",
+        show_weather_badge: "Show Weather Badge",
         animate_images: "Animate Images (except morning/twilight image)",
         state_position: "State Position",
         state_pos_above: "Above Image",
