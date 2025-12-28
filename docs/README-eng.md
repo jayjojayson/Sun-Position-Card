@@ -27,7 +27,7 @@ If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 - ### 🌙 **Moon Phases – Visual Display**  
 - ### 🎞️ **Animated Sun Position**  
 - ### ⏰ **Customizable Times**  
-- ### 🌤️ **Wetter Status** - NEU
+- ### 🌤️ **Weather Status** - NEW
 - ### 📐 **Flexible Layout**  
 - ### 📍 **Adjustable Thresholds**  
 - ### ⚙️ **UI Configuration**  
