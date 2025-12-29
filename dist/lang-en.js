@@ -60,6 +60,7 @@ export default {
         entity: "Sun Entity",
         moon_entity: "Moon Entity (Optional)",
         weather_entity: "Weather Entity (Optional)",
+        temp_entity: "Temperature Entity (Optional, overrides weather)",
         main_options: "Display Options",
         view_mode: "View Mode",
         view_mode_classic: "Classic (6 Images)",

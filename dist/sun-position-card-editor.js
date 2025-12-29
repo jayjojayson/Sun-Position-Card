@@ -77,8 +77,6 @@ class SunPositionCardEditor extends HTMLElement {
         return;
     }
 
-    // WICHTIG: ha-selector benötigt keine domain-filter im HTML, 
-    // sondern ein .selector Property im JS (siehe unten).
     this.shadowRoot.innerHTML = `
       <style>
         .card-config { display: flex; flex-direction: column; gap: 16px; padding: 8px; }
@@ -104,6 +102,11 @@ class SunPositionCardEditor extends HTMLElement {
         <ha-selector
           id="weather_entity"
           label="${this._localize('editor.weather_entity')}"
+        ></ha-selector>
+
+        <ha-selector
+          id="temp_entity"
+          label="${this._localize('editor.temp_entity')}"
         ></ha-selector>
 
         <h4>${this._localize('editor.main_options')}</h4>
@@ -218,7 +221,6 @@ class SunPositionCardEditor extends HTMLElement {
       </div>
     `;
 
-    // Hier setzen wir die Selector-Konfiguration programmatisch
     const entitySelector = this.shadowRoot.getElementById('entity');
     if (entitySelector) {
         entitySelector.selector = { entity: { domain: "sun" } };
@@ -232,6 +234,11 @@ class SunPositionCardEditor extends HTMLElement {
     const weatherSelector = this.shadowRoot.getElementById('weather_entity');
     if (weatherSelector) {
         weatherSelector.selector = { entity: { domain: "weather" } };
+    }
+
+    const tempSelector = this.shadowRoot.getElementById('temp_entity');
+    if (tempSelector) {
+        tempSelector.selector = { entity: { domain: "sensor" } };
     }
 
     this._attachListeners();
@@ -253,6 +260,8 @@ class SunPositionCardEditor extends HTMLElement {
     add('entity', 'value-changed');
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
+    add('temp_entity', 'value-changed');
+    
     add('view_mode', 'selected');
     add('state_position', 'selected');
     add('moon_phase_position', 'selected');
@@ -303,6 +312,7 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('entity', config.entity);
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
+    setVal('temp_entity', config.temp_entity || '');
     
     setSelect('view_mode', config.view_mode || 'classic');
     setSelect('state_position', config.state_position || 'in_list');
@@ -336,16 +346,18 @@ class SunPositionCardEditor extends HTMLElement {
         moonCheckContainer.classList.add('hidden');
     }
 
-    // Wetter Checkbox Sichtbarkeit
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
-    
+    const tempEntityContainer = root.getElementById('temp_entity');
+
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
+        if(tempEntityContainer) tempEntityContainer.classList.remove('hidden');
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
+        if(tempEntityContainer) tempEntityContainer.classList.add('hidden');
     }
 
     const times = config.times_to_show || [];
@@ -356,7 +368,6 @@ class SunPositionCardEditor extends HTMLElement {
     });
     
     if (this._hass) {
-        // hass auch an Selektoren übergeben
         root.querySelectorAll("ha-selector").forEach(picker => {
             picker.hass = this._hass;
         });
@@ -400,8 +411,8 @@ class SunPositionCardEditor extends HTMLElement {
 
     let newValue;
     
-    // Check für ha-selector Werte (liegen in ev.detail.value)
-    if (ev.detail && ev.detail.value !== undefined) {
+    // KORREKTUR: Check ob 'value' Eigenschaft existiert, auch wenn sie undefined/null ist
+    if (ev.detail && 'value' in ev.detail) {
         newValue = ev.detail.value;
     } 
     // Fallback & andere Elemente
@@ -431,13 +442,14 @@ class SunPositionCardEditor extends HTMLElement {
          delete newConfig.moon_entity;
          delete newConfig.moon_phase_position;
     }
-    // Cleanup Wetter
+    
     if (configValue === 'weather_entity' && !newValue) {
          if (newConfig.times_to_show) {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'weather');
          }
          delete newConfig.weather_entity;
          delete newConfig.show_weather_badge; 
+         // Optional: delete newConfig.temp_entity;
     }
 
     fireEvent(this, "config-changed", { config: newConfig });

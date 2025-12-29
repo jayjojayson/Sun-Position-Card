@@ -3,7 +3,7 @@ import de from './lang-de.js';
 import en from './lang-en.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.5 loaded",
+  "%c☀️ Sun-Position-Card v_1.5.1 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -183,7 +183,9 @@ class SunPositionCard extends HTMLElement {
     
     const weatherEntityId = config.weather_entity;
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
-    const showWeatherBadge = config.show_weather_badge ?? true;
+    const showWeatherBadge = config.show_weather_badge ?? true;    
+    const tempEntityId = config.temp_entity;
+    const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
 
     const sunState = state.state;
     const azimuth = state.attributes.azimuth || 0;
@@ -263,8 +265,16 @@ class SunPositionCard extends HTMLElement {
     
     if (weatherStateObj) {
         const cond = this._localize(`weather_state.${weatherStateObj.state}`);
-        const temp = weatherStateObj.attributes.temperature;
-        const unit = hass.config.unit_system.temperature || '°C';
+        let temp = weatherStateObj.attributes.temperature;
+        let unit = hass.config.unit_system.temperature || '°C';
+        
+        // Logik zum Überschreiben der Temperatur
+        if (tempStateObj && !isNaN(tempStateObj.state)) {
+            temp = tempStateObj.state;
+            if (tempStateObj.attributes.unit_of_measurement) {
+                unit = tempStateObj.attributes.unit_of_measurement;
+            }
+        }
         
         weatherTemp = `${temp}${unit}`;
         weatherText = `${cond}, ${weatherTemp}`;
