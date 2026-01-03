@@ -77,11 +77,13 @@ class SunPositionCardEditor extends HTMLElement {
         return;
     }
 
+    // WICHTIG: ha-selector benötigt keine domain-filter im HTML, 
+    // sondern ein .selector Property im JS (siehe unten).
     this.shadowRoot.innerHTML = `
       <style>
-        .card-config { display: flex; flex-direction: column; gap: 16px; padding: 8px; }
-        .row { display: flex; align-items: center; margin-bottom: 8px; }
-        .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-left: 16px; }
+        .card-config { display: flex; flex-direction: column; gap: 15px; padding: 8px; }
+        .row { display: flex; align-items: center; margin-bottom: 3px; }
+        .checkbox-group { display: flex; flex-direction: column; gap: 3px; margin-left: 16px; }
         ha-textfield, ha-select, ha-selector { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
         .hidden { display: none; }
@@ -104,10 +106,12 @@ class SunPositionCardEditor extends HTMLElement {
           label="${this._localize('editor.weather_entity')}"
         ></ha-selector>
 
-        <ha-selector
-          id="temp_entity"
-          label="${this._localize('editor.temp_entity')}"
-        ></ha-selector>
+        <div id="temp_entity_container" class="hidden">
+             <ha-selector
+              id="temp_entity"
+              label="${this._localize('editor.temp_entity')}"
+            ></ha-selector>
+        </div>
 
         <h4>${this._localize('editor.main_options')}</h4>
 
@@ -121,6 +125,13 @@ class SunPositionCardEditor extends HTMLElement {
           <mwc-list-item value="calculated">${this._localize('editor.view_mode_calculated')}</mwc-list-item>
           <mwc-list-item value="arc">${this._localize('editor.view_mode_arc')}</mwc-list-item>
         </ha-select>
+        
+        <div id="sun_size_container" class="hidden">
+             <ha-selector
+              id="sun_size"
+              label="${this._localize('editor.sun_size')}"
+            ></ha-selector>
+        </div>
         
         <div class="row">
           <ha-switch id="show_image"></ha-switch>
@@ -148,7 +159,7 @@ class SunPositionCardEditor extends HTMLElement {
           <mwc-list-item value="hide">${this._localize('editor.state_pos_hide')}</mwc-list-item>
         </ha-select>
         
-        <div id="moon_phase_position_container">
+        <div id="moon_phase_position_container" class="hidden">
             <ha-select
               id="moon_phase_position"
               label="${this._localize('editor.moon_phase_position')}"
@@ -158,6 +169,16 @@ class SunPositionCardEditor extends HTMLElement {
               <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
               <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
             </ha-select>
+            
+            <div class="row" style="margin: 16px 0 10px 0;">
+                <ha-switch id="hide_moon_phase_on_day"></ha-switch>
+                <span style="margin-left: 16px;">${this._localize('editor.hide_moon_phase_on_day')}</span>
+            </div>
+            
+             <div class="row">
+                <ha-switch id="show_moon_icon_in_text"></ha-switch>
+                <span style="margin-left: 16px;">${this._localize('editor.show_moon_icon_in_text')}</span>
+            </div>
         </div>
 
         <div class="row">
@@ -205,10 +226,10 @@ class SunPositionCardEditor extends HTMLElement {
             ${this._renderCheckbox('next_dusk', this._localize('time_entry.next_dusk'))}
             ${this._renderCheckbox('next_noon', this._localize('time_entry.next_noon'))}
             ${this._renderCheckbox('next_midnight', this._localize('time_entry.next_midnight'))}
-            <div id="moon_phase_checkbox_container">
+            <div id="moon_phase_checkbox_container" class="hidden">
                 ${this._renderCheckbox('moon_phase', this._localize('time_entry.moon_phase'))}
             </div>
-            <div id="weather_checkbox_container">
+            <div id="weather_checkbox_container" class="hidden">
                 ${this._renderCheckbox('weather', this._localize('time_entry.weather'))}
             </div>
         </div>
@@ -221,6 +242,7 @@ class SunPositionCardEditor extends HTMLElement {
       </div>
     `;
 
+    // Hier setzen wir die Selector-Konfiguration programmatisch
     const entitySelector = this.shadowRoot.getElementById('entity');
     if (entitySelector) {
         entitySelector.selector = { entity: { domain: "sun" } };
@@ -236,9 +258,16 @@ class SunPositionCardEditor extends HTMLElement {
         weatherSelector.selector = { entity: { domain: "weather" } };
     }
 
+    // NEU: Temperatur Selector (nur Sensoren mit device_class temperature)
     const tempSelector = this.shadowRoot.getElementById('temp_entity');
     if (tempSelector) {
-        tempSelector.selector = { entity: { domain: "sensor" } };
+        tempSelector.selector = { entity: { domain: "sensor", device_class: "temperature" } };
+    }
+
+    // Slider Konfiguration für Sun Size
+    const sunSizeSelector = this.shadowRoot.getElementById('sun_size');
+    if (sunSizeSelector) {
+        sunSizeSelector.selector = { number: { min: 20, max: 120, mode: "slider", unit_of_measurement: "px" } };
     }
 
     this._attachListeners();
@@ -260,9 +289,9 @@ class SunPositionCardEditor extends HTMLElement {
     add('entity', 'value-changed');
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
-    add('temp_entity', 'value-changed');
-    
+    add('temp_entity', 'value-changed'); // NEU
     add('view_mode', 'selected');
+    add('sun_size', 'value-changed');
     add('state_position', 'selected');
     add('moon_phase_position', 'selected');
     add('time_position', 'selected');
@@ -271,6 +300,8 @@ class SunPositionCardEditor extends HTMLElement {
     add('show_image', 'change');
     add('show_weather_badge', 'change');
     add('animate_images', 'change');
+    add('hide_moon_phase_on_day', 'change'); 
+    add('show_moon_icon_in_text', 'change'); 
     add('show_dividers', 'change');
     add('show_degrees', 'change');
     add('show_degrees_in_list', 'change');
@@ -312,7 +343,8 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('entity', config.entity);
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
-    setVal('temp_entity', config.temp_entity || '');
+    setVal('temp_entity', config.temp_entity || ''); // NEU
+    setVal('sun_size', config.sun_size || 50);
     
     setSelect('view_mode', config.view_mode || 'classic');
     setSelect('state_position', config.state_position || 'in_list');
@@ -323,6 +355,8 @@ class SunPositionCardEditor extends HTMLElement {
     setCheck('show_image', config.show_image ?? true);
     setCheck('show_weather_badge', config.show_weather_badge ?? true); 
     setCheck('animate_images', config.animate_images ?? false);
+    setCheck('hide_moon_phase_on_day', config.hide_moon_phase_on_day ?? false);
+    setCheck('show_moon_icon_in_text', config.show_moon_icon_in_text ?? false); 
     setCheck('show_dividers', config.show_dividers ?? true);
     setCheck('show_degrees', config.show_degrees ?? true);
     setCheck('show_degrees_in_list', config.show_degrees_in_list ?? false);
@@ -332,10 +366,16 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('afternoon_azimuth', config.afternoon_azimuth || 255);
     setVal('dusk_elevation', config.dusk_elevation || 9);
 
-    const animateContainer = root.getElementById('animate_images_container');
-    if (config.view_mode === 'classic') animateContainer.classList.remove('hidden');
-    else animateContainer.classList.add('hidden');
+    const sunSizeContainer = root.getElementById('sun_size_container');
 
+    // Sichtbarkeit des Sun Size Sliders nur bei 'arc'
+    if (config.view_mode === 'arc') {
+        sunSizeContainer.classList.remove('hidden');
+    } else {
+        sunSizeContainer.classList.add('hidden');
+    }
+
+    // Steuerung der Sichtbarkeit für alle Mond-Optionen
     const moonPosContainer = root.getElementById('moon_phase_position_container');
     const moonCheckContainer = root.getElementById('moon_phase_checkbox_container');
     if (config.moon_entity) {
@@ -346,18 +386,20 @@ class SunPositionCardEditor extends HTMLElement {
         moonCheckContainer.classList.add('hidden');
     }
 
+    // Wetter Checkbox Sichtbarkeit
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
-    const tempEntityContainer = root.getElementById('temp_entity');
-
+    // NEU: Temp Sensor nur anzeigen, wenn Wetter gewählt
+    const tempEntityContainer = root.getElementById('temp_entity_container');
+    
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
-        if(tempEntityContainer) tempEntityContainer.classList.remove('hidden');
+        tempEntityContainer.classList.remove('hidden'); // NEU
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
-        if(tempEntityContainer) tempEntityContainer.classList.add('hidden');
+        tempEntityContainer.classList.add('hidden'); // NEU
     }
 
     const times = config.times_to_show || [];
@@ -368,6 +410,7 @@ class SunPositionCardEditor extends HTMLElement {
     });
     
     if (this._hass) {
+        // hass auch an Selektoren übergeben
         root.querySelectorAll("ha-selector").forEach(picker => {
             picker.hass = this._hass;
         });
@@ -411,7 +454,7 @@ class SunPositionCardEditor extends HTMLElement {
 
     let newValue;
     
-    // KORREKTUR: Check ob 'value' Eigenschaft existiert, auch wenn sie undefined/null ist
+    // Check für ha-selector Werte (liegen in ev.detail.value)
     if (ev.detail && 'value' in ev.detail) {
         newValue = ev.detail.value;
     } 
@@ -428,28 +471,34 @@ class SunPositionCardEditor extends HTMLElement {
     
     let newConfig = { ...this._config };
     
-    if (configValue === 'state_position') {
-        newConfig.state_position = newValue;
-        delete newConfig.show_state_in_times;
+    if (newValue === undefined || newValue === null || newValue === '') {
+        delete newConfig[configValue];
     } else {
         newConfig[configValue] = newValue;
+        // Spezielle Logik für state_position zurücksetzen (Legacy)
+        if (configValue === 'state_position') {
+             delete newConfig.show_state_in_times;
+        }
     }
 
-    if (configValue === 'moon_entity' && !newValue) {
+    // Cleanup Moon Entity wenn gelöscht
+    if (configValue === 'moon_entity' && !newConfig.moon_entity) {
          if (newConfig.times_to_show) {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'moon_phase');
          }
          delete newConfig.moon_entity;
          delete newConfig.moon_phase_position;
+         delete newConfig.hide_moon_phase_on_day;
+         delete newConfig.show_moon_icon_in_text;
     }
-    
-    if (configValue === 'weather_entity' && !newValue) {
+    // Cleanup Wetter wenn gelöscht
+    if (configValue === 'weather_entity' && !newConfig.weather_entity) {
          if (newConfig.times_to_show) {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'weather');
          }
          delete newConfig.weather_entity;
          delete newConfig.show_weather_badge; 
-         // Optional: delete newConfig.temp_entity;
+         delete newConfig.temp_entity; // NEU: Temp Sensor auch löschen
     }
 
     fireEvent(this, "config-changed", { config: newConfig });

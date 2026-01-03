@@ -3,7 +3,7 @@ import de from './lang-de.js';
 import en from './lang-en.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.5.1 loaded",
+  "%c☀️ Sun-Position-Card v_1.6 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -59,6 +59,20 @@ class SunPositionCard extends HTMLElement {
         'exceptional': 'mdi:alert-circle-outline'
     };
     return mapping[state] || 'mdi:weather-cloudy';
+  }
+
+  _getMoonIcon(state) {
+    const mapping = {
+        'new_moon': 'mdi:moon-new',
+        'waxing_crescent': 'mdi:moon-waxing-crescent',
+        'first_quarter': 'mdi:moon-first-quarter',
+        'waxing_gibbous': 'mdi:moon-waxing-gibbous',
+        'full_moon': 'mdi:moon-full',
+        'waning_gibbous': 'mdi:moon-waning-gibbous',
+        'last_quarter': 'mdi:moon-last-quarter',
+        'waning_crescent': 'mdi:moon-waning-crescent'
+    };
+    return mapping[state] || 'mdi:moon-waning-crescent';
   }
 
   _calculateSunPosition(sunState, hass) {
@@ -183,9 +197,16 @@ class SunPositionCard extends HTMLElement {
     
     const weatherEntityId = config.weather_entity;
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
-    const showWeatherBadge = config.show_weather_badge ?? true;    
+    const showWeatherBadge = config.show_weather_badge ?? true;
+
+    // NEU: Temp Entity Support
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
+
+    // NEU: Hide Moon Config
+    const hideMoonOnDay = config.hide_moon_phase_on_day ?? false;
+    const showMoonIcon = config.show_moon_icon_in_text ?? false;
+    const sunSize = config.sun_size || 50;
 
     const sunState = state.state;
     const azimuth = state.attributes.azimuth || 0;
@@ -268,22 +289,34 @@ class SunPositionCard extends HTMLElement {
         let temp = weatherStateObj.attributes.temperature;
         let unit = hass.config.unit_system.temperature || '°C';
         
-        // Logik zum Überschreiben der Temperatur
+        // NEU: Override Temperature if Temp Entity is set and valid
         if (tempStateObj && !isNaN(tempStateObj.state)) {
             temp = tempStateObj.state;
             if (tempStateObj.attributes.unit_of_measurement) {
                 unit = tempStateObj.attributes.unit_of_measurement;
             }
         }
-        
+
         weatherTemp = `${temp}${unit}`;
         weatherText = `${cond}, ${weatherTemp}`;
         weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
 
     const daylightDuration = calculateDaylight(state.attributes.next_rising, state.attributes.next_setting);
-    const translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
-    const showMoonPhaseAbove = moonState && moonPhasePosition === 'above' && timesToShow.includes('moon_phase');
+    
+    let translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
+    
+    // NEU: Logik zum Hinzufügen des Icons zum Mondtext mit neuer Klasse
+    if (moonState && showMoonIcon) {
+        const mIcon = this._getMoonIcon(moonState.state);
+        translatedMoonPhase += ` <ha-icon class="moon-phase-icon" icon="${mIcon}"></ha-icon>`;
+    }
+    
+    // NEU: Logik zum Ausblenden des Mondtextes am Tag
+    const isDay = elevation > 0;
+    const showMoonPhaseText = moonState && !(hideMoonOnDay && isDay);
+
+    const showMoonPhaseAbove = showMoonPhaseText && moonPhasePosition === 'above' && timesToShow.includes('moon_phase');
 
     if (showMoonPhaseAbove) {
         timesToShow = timesToShow.filter(t => t !== 'moon_phase');
@@ -315,7 +348,7 @@ class SunPositionCard extends HTMLElement {
             case 'next_noon': label = this._localize('time_entry.next_noon'); break;
             case 'next_midnight': label = this._localize('time_entry.next_midnight'); break;
             case 'moon_phase':
-                if (moonState) {
+                if (showMoonPhaseText) { 
                     label = this._localize('time_entry.moon_phase');
                     content = translatedMoonPhase;
                 }
@@ -357,7 +390,7 @@ class SunPositionCard extends HTMLElement {
     if (stateEl) stateEl.innerText = currentState;
 
     const moonPhaseEl = this.querySelector('#moon-phase-text');
-    if (moonPhaseEl) moonPhaseEl.innerText = translatedMoonPhase;
+    if (moonPhaseEl) moonPhaseEl.innerHTML = translatedMoonPhase; // WICHTIG: innerHTML statt innerText wegen Icon
 
     const degreesEl = this.querySelector('#sun-degrees-text');
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
@@ -370,7 +403,6 @@ class SunPositionCard extends HTMLElement {
             
             // Logik für Hintergrundfarbe (Tag vs Nacht)
             const isDay = elevation > 0;
-            // UPDATE: Angepasstes Blau für den Tag
             const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
             badgeEl.style.background = badgeBg;
             
@@ -388,6 +420,23 @@ class SunPositionCard extends HTMLElement {
         
         if (config.view_mode === 'calculated' || config.view_mode === 'arc') {
             
+            // NEU: Sun Size dynamisch anwenden (im Bogen-Modus)
+            if (config.view_mode === 'arc') {
+                if (elevation <= 0) {
+                     // Nachts (Mond): Feste Größe 170px erzwingen
+                     imgEl.style.width = '170px';
+                     imgEl.style.maxWidth = '170px';
+                } else {
+                     // Tagsüber (Sonne): Benutzerdefinierte Größe
+                     imgEl.style.width = `${sunSize}px`;
+                     imgEl.style.maxWidth = `${sunSize}px`;
+                }
+            } else {
+                // Reset für andere Modi
+                imgEl.style.width = '';
+                imgEl.style.maxWidth = '';
+            }
+
             const arcEl = this.querySelector('.sun-arc-path');
             if(arcEl) {
                 if(isCompact) arcEl.classList.add('compact');
@@ -454,6 +503,10 @@ class SunPositionCard extends HTMLElement {
             // CLASSIC MODE
             container.classList.remove('arc-mode');
 
+             // Reset für Classic Mode
+            imgEl.style.width = '';
+            imgEl.style.maxWidth = '';
+
             const newSrc = `/local/community/Sun-Position-Card/images/${image}`;
             if (this._lastImage !== image) {
                 imgEl.src = newSrc;
@@ -491,7 +544,7 @@ class SunPositionCard extends HTMLElement {
             overflow: hidden;
             min-height: 170px;
             padding: 0;
-			margin: 10px 0 20px 0;
+			margin: 10px 0 8px 0;
         }
         
         .sun-icon-wrapper {
@@ -504,10 +557,10 @@ class SunPositionCard extends HTMLElement {
             transition: top 0.5s ease, left 0.5s ease;
         }
 
-        /* 175px für große Sonne/Mond */
+        /* 170px für große Sonne/Mond */
         .calculated-sun {
-            width: 175px;
-            max-width: 175px;
+            width: 170px;
+            max-width: 170px;
             height: auto;
         }
 
@@ -517,9 +570,6 @@ class SunPositionCard extends HTMLElement {
             max-width: 50px;
         }
         
-        /* UPDATE: Bogen vergrößert auf 240px Breite (Radius 120), 
-           damit er zur JS Berechnung passt 
-        */
         .sun-arc-path {
             position: absolute;
             width: 240px; 
@@ -565,6 +615,14 @@ class SunPositionCard extends HTMLElement {
         .weather-badge ha-icon {
             --mdc-icon-size: 18px;
         }
+        
+        /* NEU: CSS für Mond-Icon */
+        .moon-phase-icon {
+            --mdc-icon-size: 20px;
+            vertical-align: text-bottom;
+            opacity: 0.8;
+            padding-left: 4px;
+        }
 
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -576,8 +634,8 @@ class SunPositionCard extends HTMLElement {
         }
         
         .sun-image-container { text-align: center; padding: 16px; position: relative; display: flex; justify-content: center; } 
-        .sun-image { max-width: 100%; height: auto; }
-        .times-container { padding: 8px; }
+        .sun-image { max-width: 90%; height: auto; }
+        .times-container { padding: 8px 8px 0 8px; margin-top: 15px;}
         .time-entry { padding: 4px 0; text-align: center; }
         .time-entry-block { display: flex; justify-content: space-between; padding: 4px 0; }
         .time-label { text-align: left; }
@@ -688,6 +746,9 @@ class SunPositionCard extends HTMLElement {
         dusk_elevation: 5,
         noon_azimuth: 200,
         afternoon_azimuth: 255,
+        sun_size: 50,
+        hide_moon_phase_on_day: false,
+        show_moon_icon_in_text: false,
     };
   }
 }
