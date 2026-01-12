@@ -19,6 +19,8 @@ The `moon.phase` entity is optional and is only required to display the current 
 
 To get the moon sensor, go to Settings → Devices & Services → Add integration and search for "Moon." This is Home Assistant's built-in moon integration.
 
+Translation for English, German and Italian are included. If you need other translation, tell me.
+
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ## Features
