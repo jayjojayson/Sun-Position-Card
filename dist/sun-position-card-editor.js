@@ -1,6 +1,7 @@
 // sun-position-card-editor.js
 import de from './lang-de.js';
 import en from './lang-en.js';
+import ita from './lang-ita.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
@@ -18,7 +19,8 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en };
+    // HIER WAR DER FEHLER: Auch im Editor muss Italienisch registriert werden
+    this.langs = { de, en, it: ita };
     this._initialized = false;
   }
     

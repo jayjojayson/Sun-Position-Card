@@ -1,9 +1,10 @@
 // sun-position-card.js
 import de from './lang-de.js';
 import en from './lang-en.js';
+import ita from './lang-ita.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.6 loaded",
+  "%c☀️ Sun-Position-Card v_1.7.2 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -20,7 +21,8 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en };
+    // HIER WAR DER FEHLER: Italienisch (it) muss registriert werden
+    this.langs = { de, en, it: ita };
   }
   
   _localize(key, lang = this._hass?.locale?.language || 'en') {
