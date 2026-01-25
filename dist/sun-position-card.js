@@ -22,7 +22,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, it: ita };
+    this.langs = { de, en, fr, it: ita };
   }
   
   _localize(key, lang = this._hass?.locale?.language || 'en') {
