@@ -20,7 +20,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, it: ita };
+    this.langs = { de, en, fr, it: ita };
     this._initialized = false;
   }
     
