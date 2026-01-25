@@ -19,7 +19,6 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    // HIER WAR DER FEHLER: Auch im Editor muss Italienisch registriert werden
     this.langs = { de, en, it: ita };
     this._initialized = false;
   }
@@ -79,8 +78,6 @@ class SunPositionCardEditor extends HTMLElement {
         return;
     }
 
-    // WICHTIG: ha-selector benötigt keine domain-filter im HTML, 
-    // sondern ein .selector Property im JS (siehe unten).
     this.shadowRoot.innerHTML = `
       <style>
         .card-config { display: flex; flex-direction: column; gap: 15px; padding: 8px; }
@@ -253,17 +250,20 @@ class SunPositionCardEditor extends HTMLElement {
     const moonSelector = this.shadowRoot.getElementById('moon_entity');
     if (moonSelector) {
         moonSelector.selector = { entity: { domain: "sensor" } };
+        moonSelector.required = false; 
     }
 
     const weatherSelector = this.shadowRoot.getElementById('weather_entity');
     if (weatherSelector) {
         weatherSelector.selector = { entity: { domain: "weather" } };
+        weatherSelector.required = false; 
     }
 
-    // NEU: Temperatur Selector (nur Sensoren mit device_class temperature)
+    // Temperatur Selector (nur Sensoren mit device_class temperature)
     const tempSelector = this.shadowRoot.getElementById('temp_entity');
     if (tempSelector) {
         tempSelector.selector = { entity: { domain: "sensor", device_class: "temperature" } };
+        tempSelector.required = false; 
     }
 
     // Slider Konfiguration für Sun Size
@@ -391,7 +391,6 @@ class SunPositionCardEditor extends HTMLElement {
     // Wetter Checkbox Sichtbarkeit
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
-    // NEU: Temp Sensor nur anzeigen, wenn Wetter gewählt
     const tempEntityContainer = root.getElementById('temp_entity_container');
     
     if (config.weather_entity) {
@@ -500,7 +499,7 @@ class SunPositionCardEditor extends HTMLElement {
          }
          delete newConfig.weather_entity;
          delete newConfig.show_weather_badge; 
-         delete newConfig.temp_entity; // NEU: Temp Sensor auch löschen
+         delete newConfig.temp_entity; 
     }
 
     fireEvent(this, "config-changed", { config: newConfig });

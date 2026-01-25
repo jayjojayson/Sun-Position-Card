@@ -10,6 +10,7 @@ export default {
     sun_state: {
         below_horizon: "Unter dem Horizont",
         dawn: "Dämmerung",
+        dusk: "Abenddämmerung",
         morning: "Morgen",
         noon: "Mittag",
         afternoon: "Nachmittag",

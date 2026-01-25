@@ -10,6 +10,7 @@ export default {
     sun_state: {
         below_horizon: "Below Horizon",
         dawn: "Dawn",
+        dusk: "Dusk",
         morning: "Morning",
         noon: "Noon",
         afternoon: "Afternoon",

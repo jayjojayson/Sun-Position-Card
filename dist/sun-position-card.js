@@ -4,7 +4,7 @@ import en from './lang-en.js';
 import ita from './lang-ita.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.7.2 loaded",
+  "%c☀️ Sun-Position-Card v_1.8 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -21,7 +21,6 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    // HIER WAR DER FEHLER: Italienisch (it) muss registriert werden
     this.langs = { de, en, it: ita };
   }
   
@@ -224,8 +223,14 @@ class SunPositionCard extends HTMLElement {
 
     if (sunState === 'above_horizon' && elevation > 0) {
       if (elevation < duskElevation) {
-        currentState = this._localize('sun_state.dawn');
-        image = 'dammerung.png';
+        // NEUE LOGIK: Unterscheidung zwischen Morgendämmerung (Dawn) und Abenddämmerung (Dusk)
+        if (azimuth < noonAzimuth) {
+             currentState = this._localize('sun_state.dawn');
+             image = 'dammerung.png';
+        } else {
+             currentState = this._localize('sun_state.dusk');
+             image = 'dammerung.png';
+        }
       } else if (azimuth < morningAzimuth) {
         currentState = this._localize('sun_state.morning');
         image = 'morgen.png';

@@ -10,6 +10,7 @@ export default {
     sun_state: {
         below_horizon: "Sotto l'orizzonte",
         dawn: "Alba",
+        dusk: "Crepuscolo",
         morning: "Mattino",
         noon: "Mezzogiorno",
         afternoon: "Pomeriggio",
