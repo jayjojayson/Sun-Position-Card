@@ -2,6 +2,7 @@
 import de from './lang-de.js';
 import en from './lang-en.js';
 import ita from './lang-ita.js';
+import fr from './lang-fr.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
