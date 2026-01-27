@@ -1,11 +1,11 @@
 name: Upload Release Asset
 
-# Startet nur, wenn ein neues Release veröffentlicht ("published") wird
+# Startet nur, wenn ein neues Release veröffentlicht wird
 on:
   release:
     types: [published]
 
-# Schreibrechte sind notwendig, um Dateien an das Release anzuhängen
+# Schreibrechte sind notwendig für den Upload
 permissions:
   contents: write
 
@@ -14,22 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Code auschecken
+      # 1. Code auschecken (damit die Datei dist/sun-position-card.js verfügbar ist)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Node.js installieren
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # 3. Sicherheitshalber frisch bauen
-      # Damit garantieren wir, dass die Datei im Release exakt zum Code passt.
-      - name: Build Project
-        run: node build.js
-
-      # 4. Datei an das Release anhängen
+      # 2. Die existierende Datei aus dem dist-Ordner an das Release anhängen
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
