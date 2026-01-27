@@ -1,11 +1,12 @@
 // sun-position-card.js
 import de from './lang-de.js';
 import en from './lang-en.js';
-import ita from './lang-ita.js';
 import fr from './lang-fr.js';
+import ita from './lang-ita.js';
+import nl from './lang-nl.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.8 loaded",
+  "%c☀️ Sun-Position-Card v_1.9 loaded",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -22,7 +23,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita };
+    this.langs = { de, en, fr, it: ita, nl };
   }
   
   _localize(key, lang = this._hass?.locale?.language || 'en') {
@@ -170,6 +171,46 @@ class SunPositionCard extends HTMLElement {
     };
   }
 
+  _calculateNightPositionArc(sunState, hass, isCompact) {
+    const fallback = { left: '50%', top: '100%' };
+    
+    const riseEnt = hass.states['sensor.sun_next_rising'];
+    const setEnt  = hass.states['sensor.sun_next_setting'];
+    
+    if (!riseEnt || !setEnt) return fallback;
+
+    const riseNext = new Date(riseEnt.state);
+    const setNext  = new Date(setEnt.state);
+    const now = new Date();
+    
+    if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
+
+    // Logik: Wir befinden uns in der Nacht VOR riseNext.
+    const dayLength = setNext.getTime() - riseNext.getTime();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const nightLength = dayMs - dayLength;
+    
+    // Startzeitpunkt der aktuellen Nacht
+    const startOfNight = new Date(riseNext.getTime() - nightLength);
+    
+    const elapsed = now - startOfNight;
+    let percent = nightLength > 0 ? elapsed / nightLength : 0;
+    
+    percent = Math.max(0, Math.min(1, percent));
+
+    // Gleiche Geometrie wie bei der Sonne
+    const radius = isCompact ? 90 : 120; 
+    const rad = Math.PI * (1 - percent);
+    const xOffset = Math.cos(rad) * radius;
+    const yOffset = Math.sin(rad) * radius;
+    const baselineY = isCompact ? (70 + 90) : (50 + 120);
+
+    return {
+        left: `calc(50% + ${xOffset}px)`,
+        top: `calc(${baselineY}px - ${yOffset}px)`
+    };
+  }
+
   set hass(hass) {
     this._hass = hass;
     
@@ -201,14 +242,15 @@ class SunPositionCard extends HTMLElement {
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
     const showWeatherBadge = config.show_weather_badge ?? true;
 
-    // NEU: Temp Entity Support
+    // Temp Entity Support
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
 
-    // NEU: Hide Moon Config
+    // Hide Moon Config
     const hideMoonOnDay = config.hide_moon_phase_on_day ?? false;
     const showMoonIcon = config.show_moon_icon_in_text ?? false;
     const sunSize = config.sun_size || 50;
+    const showNightArc = config.show_night_arc ?? false;
 
     const sunState = state.state;
     const azimuth = state.attributes.azimuth || 0;
@@ -224,7 +266,6 @@ class SunPositionCard extends HTMLElement {
 
     if (sunState === 'above_horizon' && elevation > 0) {
       if (elevation < duskElevation) {
-        // NEUE LOGIK: Unterscheidung zwischen Morgendämmerung (Dawn) und Abenddämmerung (Dusk)
         if (azimuth < noonAzimuth) {
              currentState = this._localize('sun_state.dawn');
              image = 'dammerung.png';
@@ -297,7 +338,6 @@ class SunPositionCard extends HTMLElement {
         let temp = weatherStateObj.attributes.temperature;
         let unit = hass.config.unit_system.temperature || '°C';
         
-        // NEU: Override Temperature if Temp Entity is set and valid
         if (tempStateObj && !isNaN(tempStateObj.state)) {
             temp = tempStateObj.state;
             if (tempStateObj.attributes.unit_of_measurement) {
@@ -314,13 +354,11 @@ class SunPositionCard extends HTMLElement {
     
     let translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
     
-    // NEU: Logik zum Hinzufügen des Icons zum Mondtext mit neuer Klasse
     if (moonState && showMoonIcon) {
         const mIcon = this._getMoonIcon(moonState.state);
         translatedMoonPhase += ` <ha-icon class="moon-phase-icon" icon="${mIcon}"></ha-icon>`;
     }
     
-    // NEU: Logik zum Ausblenden des Mondtextes am Tag
     const isDay = elevation > 0;
     const showMoonPhaseText = moonState && !(hideMoonOnDay && isDay);
 
@@ -389,7 +427,7 @@ class SunPositionCard extends HTMLElement {
     const timeHtml = timeEntries.join(showDividers ? '<hr class="divider">' : '');
 
     if (!this._created) {
-        this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, config.view_mode);
+        this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, config.view_mode, showNightArc);
         this._created = true;
         this._lastImage = null;
     }
@@ -398,22 +436,17 @@ class SunPositionCard extends HTMLElement {
     if (stateEl) stateEl.innerText = currentState;
 
     const moonPhaseEl = this.querySelector('#moon-phase-text');
-    if (moonPhaseEl) moonPhaseEl.innerHTML = translatedMoonPhase; // WICHTIG: innerHTML statt innerText wegen Icon
+    if (moonPhaseEl) moonPhaseEl.innerHTML = translatedMoonPhase;
 
     const degreesEl = this.querySelector('#sun-degrees-text');
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
     
-    // UPDATE Badge Visibility and Background Color
     const badgeEl = this.querySelector('#weather-badge');
     if (badgeEl) {
         if (weatherStateObj && showWeatherBadge) {
             badgeEl.style.display = 'flex';
-            
-            // Logik für Hintergrundfarbe (Tag vs Nacht)
-            const isDay = elevation > 0;
             const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
             badgeEl.style.background = badgeBg;
-            
             badgeEl.innerHTML = `<ha-icon icon="${weatherIcon}"></ha-icon><span>${weatherTemp}</span>`;
         } else {
             badgeEl.style.display = 'none';
@@ -426,21 +459,32 @@ class SunPositionCard extends HTMLElement {
 
     if (imgEl && container && wrapperEl) {
         
-        if (config.view_mode === 'calculated' || config.view_mode === 'arc') {
+        // Logik zur Bestimmung des effektiven Modus
+        // Wir erzwingen den "calculated/arc" Pfad, wenn es Nacht ist und showNightArc aktiv ist
+        const forceNightArc = (elevation <= 0 && showNightArc);
+        const isCalculatedOrArc = (config.view_mode === 'calculated' || config.view_mode === 'arc');
+
+        if (isCalculatedOrArc || forceNightArc) {
             
-            // NEU: Sun Size dynamisch anwenden (im Bogen-Modus)
-            if (config.view_mode === 'arc') {
+            // WICHTIG: Falls wir im Classic Mode sind, aber NightArc erzwingen, 
+            // müssen wir die CSS-Klasse 'calculated' manuell setzen/sicherstellen
+            container.classList.add('calculated');
+
+            const effectiveViewMode = forceNightArc ? 'arc' : config.view_mode;
+            
+            // Sun Size dynamisch anwenden (im Bogen-Modus)
+            if (effectiveViewMode === 'arc') {
                 if (elevation <= 0) {
-                     // Nachts (Mond): Feste Größe 170px erzwingen
-                     imgEl.style.width = '170px';
-                     imgEl.style.maxWidth = '170px';
+                     // Nachts (Mond): Benutzerdefinierte Größe (oder fix, falls gewünscht - hier SunSize übernommen)
+                     imgEl.style.width = `${sunSize}px`;
+                     imgEl.style.maxWidth = `${sunSize}px`;
                 } else {
                      // Tagsüber (Sonne): Benutzerdefinierte Größe
                      imgEl.style.width = `${sunSize}px`;
                      imgEl.style.maxWidth = `${sunSize}px`;
                 }
             } else {
-                // Reset für andere Modi
+                // Reset für andere Modi (Calculated)
                 imgEl.style.width = '';
                 imgEl.style.maxWidth = '';
             }
@@ -452,8 +496,7 @@ class SunPositionCard extends HTMLElement {
             }
 
             if (elevation <= 0) {
-                // NACHT (Mond)
-                container.classList.remove('arc-mode');
+                // *** NACHT (Mond) ***
                 
                 let displayImage = image;
                 if (displayImage === 'unterHorizont.png') {
@@ -462,22 +505,46 @@ class SunPositionCard extends HTMLElement {
 
                 const newSrc = `/local/community/Sun-Position-Card/images/${displayImage}`;
                 if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
-
-                // Zentriert
-                wrapperEl.style.top = '50%';
-                wrapperEl.style.left = '50%';
-                wrapperEl.style.transform = 'translate(-50%, -50%)';
-                
-                if (arcEl) arcEl.style.display = 'none';
-
                 imgEl.classList.remove('sun-image-animated');
 
+                if (effectiveViewMode === 'arc' && showNightArc) {
+                    // --- MOND BOGEN MODUS ---
+                    container.classList.add('arc-mode');
+                    
+                    if (arcEl) arcEl.style.display = 'block';
+
+                    const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
+                    wrapperEl.style.left = left;
+                    wrapperEl.style.top = top;
+                    wrapperEl.style.transform = 'translate(-50%, -50%)';
+
+                } else {
+                    // --- STATIC NIGHT MODE ---
+                    container.classList.remove('arc-mode');
+                    
+                    // Feste Größe 170px erzwingen falls "calculated" mode nachts aktiv ist (ohne arc)
+                    // Damit das Bild zentriert und groß ist
+                    if (effectiveViewMode === 'arc' || effectiveViewMode === 'calculated') {
+                         imgEl.style.width = '170px';
+                         imgEl.style.maxWidth = '170px';
+                    }
+                    
+                    if (arcEl) arcEl.style.display = 'none';
+
+                    wrapperEl.style.top = '50%';
+                    wrapperEl.style.left = '50%';
+                    wrapperEl.style.transform = 'translate(-50%, -50%)';
+                }
+
             } else {
-                // TAG (Sonne)
+                // *** TAG (Sonne) ***
+                
+                // Hier greift der normale konfigurierte View Mode (weil forceNightArc false ist)
                 const sunSrc = `/local/community/Sun-Position-Card/images/calc-sun.png`;
                 if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
 
                 if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
+                else if (arcEl) arcEl.style.display = 'none'; // Bei 'calculated' ausblenden
 
                 if (config.view_mode === 'arc') {
                     // ARC MODUS
@@ -509,6 +576,10 @@ class SunPositionCard extends HTMLElement {
 
         } else {
             // CLASSIC MODE
+            // Hier landen wir nur, wenn wir TAG haben ODER Nacht OHNE NightArc.
+            
+            // Sicherstellen, dass die Klassen entfernt sind, falls wir von NightArc kommen
+            container.classList.remove('calculated');
             container.classList.remove('arc-mode');
 
              // Reset für Classic Mode
@@ -544,15 +615,19 @@ class SunPositionCard extends HTMLElement {
     }
   }
 
-  _buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, viewMode) {
+  _buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, viewMode, showNightArc) {
     const style = `
       <style>
+        .card-content {
+            padding: 15px 15px 5px 5px;
+        }
+		
         .sun-image-container.calculated {
             position: relative;
             overflow: hidden;
             min-height: 170px;
             padding: 0;
-			margin: 10px 0 8px 0;
+			margin: 10px 0 10px 0;
         }
         
         .sun-icon-wrapper {
@@ -624,7 +699,7 @@ class SunPositionCard extends HTMLElement {
             --mdc-icon-size: 18px;
         }
         
-        /* NEU: CSS für Mond-Icon */
+        /* CSS für Mond-Icon */
         .moon-phase-icon {
             --mdc-icon-size: 20px;
             vertical-align: text-bottom;
@@ -643,7 +718,7 @@ class SunPositionCard extends HTMLElement {
         
         .sun-image-container { text-align: center; padding: 16px; position: relative; display: flex; justify-content: center; } 
         .sun-image { max-width: 90%; height: auto; }
-        .times-container { padding: 8px 8px 0 8px; margin-top: 15px;}
+        .times-container { padding: 8px 8px 0 8px; margin-top: 20px;}
         .time-entry { padding: 4px 0; text-align: center; }
         .time-entry-block { display: flex; justify-content: space-between; padding: 4px 0; }
         .time-label { text-align: left; }
@@ -669,7 +744,8 @@ class SunPositionCard extends HTMLElement {
 
     let imageHtml = '';
     if (showImage) {
-        if (viewMode === 'calculated' || viewMode === 'arc') {
+        // Logik angepasst: Auch wenn viewMode classic ist, aber showNightArc aktiv ist, müssen wir das komplexe Layout bauen
+        if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
             imageHtml = `<div class="sun-image-container calculated">
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
@@ -757,6 +833,7 @@ class SunPositionCard extends HTMLElement {
         sun_size: 50,
         hide_moon_phase_on_day: false,
         show_moon_icon_in_text: false,
+        show_night_arc: false
     };
   }
 }

@@ -1,8 +1,9 @@
 // sun-position-card-editor.js
 import de from './lang-de.js';
 import en from './lang-en.js';
-import ita from './lang-ita.js';
 import fr from './lang-fr.js';
+import ita from './lang-ita.js';
+import nl from './lang-nl.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
@@ -20,7 +21,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita };
+    this.langs = { de, en, fr, it: ita, nl };
     this._initialized = false;
   }
     
@@ -169,8 +170,13 @@ class SunPositionCardEditor extends HTMLElement {
               <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
               <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
             </ha-select>
-            
+
             <div class="row" style="margin: 16px 0 10px 0;">
+                <ha-switch id="show_night_arc"></ha-switch>
+                <span style="margin-left: 16px;">${this._localize('editor.show_night_arc')}</span>
+            </div>
+            
+            <div class="row" style="margin: 10px 0 10px 0;">
                 <ha-switch id="hide_moon_phase_on_day"></ha-switch>
                 <span style="margin-left: 16px;">${this._localize('editor.hide_moon_phase_on_day')}</span>
             </div>
@@ -303,7 +309,8 @@ class SunPositionCardEditor extends HTMLElement {
     add('show_image', 'change');
     add('show_weather_badge', 'change');
     add('animate_images', 'change');
-    add('hide_moon_phase_on_day', 'change'); 
+    add('hide_moon_phase_on_day', 'change');
+    add('show_night_arc', 'change'); // NEU
     add('show_moon_icon_in_text', 'change'); 
     add('show_dividers', 'change');
     add('show_degrees', 'change');
@@ -359,6 +366,7 @@ class SunPositionCardEditor extends HTMLElement {
     setCheck('show_weather_badge', config.show_weather_badge ?? true); 
     setCheck('animate_images', config.animate_images ?? false);
     setCheck('hide_moon_phase_on_day', config.hide_moon_phase_on_day ?? false);
+    setCheck('show_night_arc', config.show_night_arc ?? false); // NEU
     setCheck('show_moon_icon_in_text', config.show_moon_icon_in_text ?? false); 
     setCheck('show_dividers', config.show_dividers ?? true);
     setCheck('show_degrees', config.show_degrees ?? true);
@@ -371,8 +379,8 @@ class SunPositionCardEditor extends HTMLElement {
 
     const sunSizeContainer = root.getElementById('sun_size_container');
 
-    // Sichtbarkeit des Sun Size Sliders nur bei 'arc'
-    if (config.view_mode === 'arc') {
+    // Sichtbarkeit des Sun Size Sliders wenn ViewMode 'arc' IST ODER wenn NightArc aktiviert ist
+    if (config.view_mode === 'arc' || config.show_night_arc) {
         sunSizeContainer.classList.remove('hidden');
     } else {
         sunSizeContainer.classList.add('hidden');
@@ -491,6 +499,7 @@ class SunPositionCardEditor extends HTMLElement {
          delete newConfig.moon_entity;
          delete newConfig.moon_phase_position;
          delete newConfig.hide_moon_phase_on_day;
+         delete newConfig.show_night_arc; // NEU
          delete newConfig.show_moon_icon_in_text;
     }
     // Cleanup Wetter wenn gelöscht

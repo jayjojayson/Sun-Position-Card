@@ -77,6 +77,7 @@ export default {
         state_pos_hide: "Nascondi",
         moon_phase_position: "Posizione della Fase Lunare",
         hide_moon_phase_on_day: "Nascondi la Fase Lunare di Giorno",
+        show_night_arc: "Mostra Arco Lunare (180°)",
         show_moon_icon_in_text: "Mostra Icona della Luna nel Testo",
         show_dividers: "Mostra Divisori",
         show_degrees: "Mostra Gradi (Azimut/Elevazione)",

@@ -77,6 +77,7 @@ export default {
         state_pos_hide: "Masquer",
         moon_phase_position: "Position de la phase lunaire",
         hide_moon_phase_on_day: "Masquer la phase lunaire en journée",
+        show_night_arc: "Afficher l'arc lunaire (180°)",
         show_moon_icon_in_text: "Afficher l’icône de la lune dans le texte",
         show_dividers: "Afficher les séparateurs",
         show_degrees: "Afficher les degrés (azimut/élévation)",
