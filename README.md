@@ -2,8 +2,8 @@
 [![HACS validation](https://img.shields.io/github/actions/workflow/status/jayjojayson/Sun-Position-Card/validate.yml?label=HACS%20Validation)](https://github.com/jayjojayson/Sun-Position-Card/actions?query=workflow%3Avalidate)
 [![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
 ![File size](https://img.shields.io/github/size/jayjojayson/Sun-Position-Card/dist/sun-position-card.js?label=Card%20Size)
-[![Support](https://img.shields.io/badge/%20-Support%20Me-steelblue?style=flat&logo=paypal&logoColor=white)](https://www.paypal.me/quadFlyerFW)
 [![README Deutsch](https://img.shields.io/badge/README-DE-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-de.md)
+[![Support](https://img.shields.io/badge/%20-Support%20Me-steelblue?style=flat&logo=paypal&logoColor=white)](https://www.paypal.me/quadFlyerFW)
 ![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
 
 <img width="100%" height="auto" alt="sun-position-card-ubersicht" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-ubersicht.png" />
