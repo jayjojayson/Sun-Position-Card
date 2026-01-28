@@ -1047,7 +1047,7 @@ customElements.define('sun-position-card-editor', SunPositionCardEditor);
 
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.9 loaded",
+  "%c☀️ Sun-Position-Card v_1.9 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -1875,3 +1875,4 @@ class SunPositionCard extends HTMLElement {
 }
 
 customElements.define('sun-position-card', SunPositionCard);
+
