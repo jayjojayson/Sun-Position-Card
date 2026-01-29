@@ -1,13 +1,17 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default%20✔-brightgreen.svg)](https://github.com/hacs/plugin)
 [![HACS validation](https://img.shields.io/github/actions/workflow/status/jayjojayson/Sun-Position-Card/validate.yml?label=HACS%20Validation)](https://github.com/jayjojayson/Sun-Position-Card/actions?query=workflow%3Avalidate)
+![Downloads](https://img.shields.io/github/downloads/jayjojayson/Sun-Position-Card/total?label=Downloads&color=blue) 
 [![GitHub release](https://img.shields.io/github/release/jayjojayson/Sun-Position-Card?include_prereleases=&sort=semver&color=blue)](https://github.com/jayjojayson/Sun-Position-Card/releases/)
+[![README Deutsch](https://img.shields.io/badge/README-DE-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/README-de.md)
+[![Support](https://img.shields.io/badge/%20-Support%20Me-steelblue?style=flat&logo=paypal&logoColor=white)](https://www.paypal.me/quadFlyerFW)
+![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)
+
+<img width="85%" height="auto" alt="sun-position-card-ubersicht" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-ubersicht.png" />
+
 ![File size](https://img.shields.io/github/size/jayjojayson/Sun-Position-Card/dist/sun-position-card.js?label=Card%20Size)
-![last commit](https://img.shields.io/github/last-commit/jayjojayson/Sun-Position-Card)
-[![README English](https://img.shields.io/badge/README-Eng-orange)](https://github.com/jayjojayson/Sun-Position-Card/blob/main/README.md)
-[![stars](https://img.shields.io/github/stars/jayjojayson/Sun-Position-Card)](https://github.com/jayjojayson/Sun-Position-Card/stargazers)
+[![HA Community thread](https://img.shields.io/badge/HA%20Community-Sun%20/%20Moon%20Position%20Card-blue?logo=discourse&logoColor=white)](https://community.home-assistant.io/t/sun-moon-position-card-another-implementation/965201)
+[![CSH Forum thread](https://img.shields.io/badge/Community%20Smart%20Home-Custom%20Sun%20Position%20Card-orange?logo=discourse&logoColor=white)](https://community-smarthome.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/9389)
 
-
-<img width="100%" height="auto" alt="sun-position-card-ubersicht" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-ubersicht.png" />
 
 ---
 
