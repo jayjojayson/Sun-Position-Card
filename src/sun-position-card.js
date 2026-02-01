@@ -6,7 +6,7 @@ import ita from './lang-ita.js';
 import nl from './lang-nl.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_1.9 ready",
+  "%c☀️ Sun-Position-Card v_2.0 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -211,6 +211,40 @@ class SunPositionCard extends HTMLElement {
     };
   }
 
+  /**
+   * Berechnet die astronomische Tageslänge in Millisekunden für ein bestimmtes Datum
+   */
+  _getSunDuration(date, lat) {
+    if (!lat) return 0;
+    
+    const rad = Math.PI / 180;
+    // Tag des Jahres berechnen
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = (date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    // Näherung der Deklination der Sonne
+    const axis = 23.44;
+    const declination = Math.asin(Math.sin(axis * rad) * Math.sin(rad * (360/365.24) * (dayOfYear - 81)));
+
+    // Standard-Elevation (-0.833 für Refraktion)
+    const elevation = -0.833;
+    
+    const numerator = Math.sin(elevation * rad) - Math.sin(lat * rad) * Math.sin(declination);
+    const denominator = Math.cos(lat * rad) * Math.cos(declination);
+    
+    let cosH = numerator / denominator;
+
+    if (cosH < -1.0) return 24 * 60 * 60 * 1000; 
+    if (cosH > 1.0) return 0; 
+
+    const H = Math.acos(cosH); 
+    const hours = (H * 180 / Math.PI) * (2 / 15); 
+
+    return hours * 60 * 60 * 1000; 
+  }
+
   set hass(hass) {
     this._hass = hass;
     
@@ -242,15 +276,15 @@ class SunPositionCard extends HTMLElement {
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
     const showWeatherBadge = config.show_weather_badge ?? true;
 
-    // Temp Entity Support
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
 
-    // Hide Moon Config
     const hideMoonOnDay = config.hide_moon_phase_on_day ?? false;
     const showMoonIcon = config.show_moon_icon_in_text ?? false;
     const sunSize = config.sun_size || 50;
     const showNightArc = config.show_night_arc ?? false;
+    
+    const use12hFormat = config.use_12h_format ?? false;
 
     const sunState = state.state;
     const azimuth = state.attributes.azimuth || 0;
@@ -307,7 +341,23 @@ class SunPositionCard extends HTMLElement {
     const formatTime = (isoString) => {
       if (!isoString) return '';
       const date = new Date(isoString);
-      return date.toLocaleTimeString(hass.locale?.language || 'en-US', { hour: '2-digit', minute: '2-digit' });
+      
+      const currentLang = (hass.locale?.language || 'en').split('-')[0];
+      const isEnglish = currentLang === 'en';
+      
+      if (isEnglish && use12hFormat) {
+        return date.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        });
+      } else {
+        return date.toLocaleTimeString(hass.locale?.language || 'en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: false 
+        });
+      }
     };
 
     const calculateDaylight = (sunrise, sunset) => {
@@ -319,10 +369,51 @@ class SunPositionCard extends HTMLElement {
       if (diff < 0) {
         diff += (24 * 60 * 60 * 1000);
       }
+      if (diff > (24 * 60 * 60 * 1000)) {
+         diff -= (24 * 60 * 60 * 1000);
+      }
       
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    };
+    
+    // UPDATE: Nutzt den Sensor-Text für die Mitte, berechnet Diffs relativ dazu
+    const calculateDaylightComparison = (currentDurationString) => {
+      const lat = hass.config.latitude;
+      if (!lat || !currentDurationString) return null;
+
+      // next_setting als Anker nutzen für das "aktuelle" Datum der angezeigten Tageslänge.
+      // Wenn next_setting "morgen" ist (weil es nacht ist), berechnet dies die Diffs für morgen.
+      // Das passt, da "Tageslänge" dann auch die von morgen anzeigt.
+      const nextSetting = state.attributes.next_setting;
+      if (!nextSetting) return null;
+      
+      const targetDate = new Date(nextSetting);
+      const oneDayMs = 24 * 60 * 60 * 1000;
+
+      // Berechnung der Dauern für Diffs
+      const targetLength = this._getSunDuration(targetDate, lat);
+      const prevLength = this._getSunDuration(new Date(targetDate.getTime() - oneDayMs), lat);
+      const nextLength = this._getSunDuration(new Date(targetDate.getTime() + oneDayMs), lat);
+
+      if (!targetLength || !prevLength || !nextLength) return null;
+
+      // Differenzen berechnen
+      const diffPrev = Math.round((targetLength - prevLength) / (1000 * 60 * -1));
+      const diffNext = Math.round((nextLength - targetLength) / (1000 * 60));
+
+      const formatDiff = (diff) => {
+        if (diff === 0) return '±0min';
+        const sign = diff > 0 ? '+' : '';
+        return `${sign}${diff}min`;
+      };
+      
+      return {
+        yesterday: formatDiff(diffPrev),
+        today: currentDurationString + 'h',
+        tomorrow: formatDiff(diffNext)
+      };
     };
     
     const translateMoonPhase = (phase) => {
@@ -351,6 +442,9 @@ class SunPositionCard extends HTMLElement {
     }
 
     const daylightDuration = calculateDaylight(state.attributes.next_rising, state.attributes.next_setting);
+    
+    // Übergebe den Sensor-String an die Vergleichsfunktion
+    const daylightComparison = calculateDaylightComparison(daylightDuration);
     
     let translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
     
@@ -387,6 +481,12 @@ class SunPositionCard extends HTMLElement {
                     content = daylightDuration;
                 }
                 break;
+            case 'day_comparison':
+                if (daylightComparison) {
+                    label = this._localize('time_entry.day_comparison');
+                    content = `${daylightComparison.yesterday} · ${daylightComparison.today} · ${daylightComparison.tomorrow}`;
+                }
+                break;
             case 'next_rising': label = this._localize('time_entry.next_rising'); break;
             case 'next_setting': label = this._localize('time_entry.next_setting'); break;
             case 'next_dawn': label = this._localize('time_entry.next_dawn'); break;
@@ -408,12 +508,12 @@ class SunPositionCard extends HTMLElement {
         }
 
         if (timeListFormat === 'block' && label) {
-            const timeValue = (timeKey === 'daylight_duration' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
+            const timeValue = (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
             if (timeValue) {
                  timeEntries.push(`<div class="time-entry-block"><span class="time-label">${label}</span><span class="time-value">${timeValue}</span></div>`);
             }
         } else if (label) {
-            if (timeKey === 'daylight_duration' || timeKey === 'moon_phase' || timeKey === 'weather') {
+            if (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') {
                 if (content) timeEntries.push(`<div class="time-entry">${label}: ${content}</div>`);
             } else {
                  const timeValue = state.attributes[timeKey];
@@ -459,32 +559,24 @@ class SunPositionCard extends HTMLElement {
 
     if (imgEl && container && wrapperEl) {
         
-        // Logik zur Bestimmung des effektiven Modus
-        // Wir erzwingen den "calculated/arc" Pfad, wenn es Nacht ist und showNightArc aktiv ist
         const forceNightArc = (elevation <= 0 && showNightArc);
         const isCalculatedOrArc = (config.view_mode === 'calculated' || config.view_mode === 'arc');
 
         if (isCalculatedOrArc || forceNightArc) {
             
-            // WICHTIG: Falls wir im Classic Mode sind, aber NightArc erzwingen, 
-            // müssen wir die CSS-Klasse 'calculated' manuell setzen/sicherstellen
             container.classList.add('calculated');
 
             const effectiveViewMode = forceNightArc ? 'arc' : config.view_mode;
             
-            // Sun Size dynamisch anwenden (im Bogen-Modus)
             if (effectiveViewMode === 'arc') {
                 if (elevation <= 0) {
-                     // Nachts (Mond): Benutzerdefinierte Größe (oder fix, falls gewünscht - hier SunSize übernommen)
                      imgEl.style.width = `${sunSize}px`;
                      imgEl.style.maxWidth = `${sunSize}px`;
                 } else {
-                     // Tagsüber (Sonne): Benutzerdefinierte Größe
                      imgEl.style.width = `${sunSize}px`;
                      imgEl.style.maxWidth = `${sunSize}px`;
                 }
             } else {
-                // Reset für andere Modi (Calculated)
                 imgEl.style.width = '';
                 imgEl.style.maxWidth = '';
             }
@@ -497,7 +589,6 @@ class SunPositionCard extends HTMLElement {
 
             if (elevation <= 0) {
                 // *** NACHT (Mond) ***
-                
                 let displayImage = image;
                 if (displayImage === 'unterHorizont.png') {
                     displayImage = 'full_moon.png';
@@ -508,9 +599,7 @@ class SunPositionCard extends HTMLElement {
                 imgEl.classList.remove('sun-image-animated');
 
                 if (effectiveViewMode === 'arc' && showNightArc) {
-                    // --- MOND BOGEN MODUS ---
                     container.classList.add('arc-mode');
-                    
                     if (arcEl) arcEl.style.display = 'block';
 
                     const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
@@ -519,16 +608,11 @@ class SunPositionCard extends HTMLElement {
                     wrapperEl.style.transform = 'translate(-50%, -50%)';
 
                 } else {
-                    // --- STATIC NIGHT MODE ---
                     container.classList.remove('arc-mode');
-                    
-                    // Feste Größe 170px erzwingen falls "calculated" mode nachts aktiv ist (ohne arc)
-                    // Damit das Bild zentriert und groß ist
                     if (effectiveViewMode === 'arc' || effectiveViewMode === 'calculated') {
                          imgEl.style.width = '170px';
                          imgEl.style.maxWidth = '170px';
                     }
-                    
                     if (arcEl) arcEl.style.display = 'none';
 
                     wrapperEl.style.top = '50%';
@@ -538,32 +622,24 @@ class SunPositionCard extends HTMLElement {
 
             } else {
                 // *** TAG (Sonne) ***
-                
-                // Hier greift der normale konfigurierte View Mode (weil forceNightArc false ist)
                 const sunSrc = `/local/community/Sun-Position-Card/images/calc-sun.png`;
                 if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
 
                 if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
-                else if (arcEl) arcEl.style.display = 'none'; // Bei 'calculated' ausblenden
+                else if (arcEl) arcEl.style.display = 'none'; 
 
                 if (config.view_mode === 'arc') {
-                    // ARC MODUS
                     container.classList.add('arc-mode');
-                    
                     const { left, top } = this._calculateSunPositionArc(state, hass, isCompact);
                     wrapperEl.style.left = left;
                     wrapperEl.style.top = top;
                     wrapperEl.style.transform = 'translate(-50%, -50%)'; 
-
                 } else {
-                    // CALCULATED MODUS
                     container.classList.remove('arc-mode');
-                    
                     const { top, clipPath } = this._calculateSunPosition(state, hass);
                     wrapperEl.style.left = '50%';
                     wrapperEl.style.top = top;
                     wrapperEl.style.transform = 'translateX(-50%)'; 
-                    
                     imgEl.style.clipPath = clipPath; 
                 }
 
@@ -575,14 +651,9 @@ class SunPositionCard extends HTMLElement {
             }
 
         } else {
-            // CLASSIC MODE
-            // Hier landen wir nur, wenn wir TAG haben ODER Nacht OHNE NightArc.
-            
-            // Sicherstellen, dass die Klassen entfernt sind, falls wir von NightArc kommen
             container.classList.remove('calculated');
             container.classList.remove('arc-mode');
 
-             // Reset für Classic Mode
             imgEl.style.width = '';
             imgEl.style.maxWidth = '';
 
@@ -619,7 +690,7 @@ class SunPositionCard extends HTMLElement {
     const style = `
       <style>
         .card-content {
-            padding: 15px 15px 5px 5px;
+            padding: 15px 10px 5px 10px;
         }
 		
         .sun-image-container.calculated {
@@ -640,14 +711,12 @@ class SunPositionCard extends HTMLElement {
             transition: top 0.5s ease, left 0.5s ease;
         }
 
-        /* 170px für große Sonne/Mond */
         .calculated-sun {
             width: 170px;
             max-width: 170px;
             height: auto;
         }
 
-        /* Kleine Sonne im Arc-Modus */
         .sun-image-container.arc-mode .calculated-sun {
             width: 50px;
             max-width: 50px;
@@ -681,7 +750,6 @@ class SunPositionCard extends HTMLElement {
             position: absolute;
             top: 10px;
             right: 10px;
-            /* Default background wird dynamisch überschrieben */
             background: rgba(0, 0, 0, 0.4); 
             color: #fff;
             padding: 4px 8px;
@@ -689,7 +757,7 @@ class SunPositionCard extends HTMLElement {
             display: none; 
             align-items: center;
             gap: 6px;
-            font-size: 1em; /* UPDATE: Größere Schrift */
+            font-size: 1em; 
             pointer-events: none;
             backdrop-filter: blur(2px);
             z-index: 5;
@@ -699,7 +767,6 @@ class SunPositionCard extends HTMLElement {
             --mdc-icon-size: 18px;
         }
         
-        /* CSS für Mond-Icon */
         .moon-phase-icon {
             --mdc-icon-size: 20px;
             vertical-align: text-bottom;
@@ -744,7 +811,6 @@ class SunPositionCard extends HTMLElement {
 
     let imageHtml = '';
     if (showImage) {
-        // Logik angepasst: Auch wenn viewMode classic ist, aber showNightArc aktiv ist, müssen wir das komplexe Layout bauen
         if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
             imageHtml = `<div class="sun-image-container calculated">
                            <div class="weather-badge" id="weather-badge"></div>
@@ -833,7 +899,8 @@ class SunPositionCard extends HTMLElement {
         sun_size: 50,
         hide_moon_phase_on_day: false,
         show_moon_icon_in_text: false,
-        show_night_arc: false
+        show_night_arc: false,
+        use_12h_format: false
     };
   }
 }

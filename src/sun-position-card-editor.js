@@ -47,6 +47,19 @@ class SunPositionCardEditor extends HTMLElement {
                 picker.hass = hass;
             }
         });
+        
+        // Aktualisiere Sichtbarkeit des 12h-Schalters basierend auf Sprache
+        const use12hContainer = this.shadowRoot.getElementById('use_12h_format_container');
+        if (use12hContainer) {
+            const currentLang = (hass?.locale?.language || 'en').split('-')[0];
+            const isEnglish = currentLang === 'en';
+            
+            if (isEnglish) {
+                use12hContainer.classList.remove('hidden');
+            } else {
+                use12hContainer.classList.add('hidden');
+            }
+        }
     }
   }
   
@@ -88,6 +101,7 @@ class SunPositionCardEditor extends HTMLElement {
         ha-textfield, ha-select, ha-selector { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
         .hidden { display: none; }
+        .lang-specific { display: flex; }
       </style>
 
       <div class="card-config">
@@ -223,9 +237,15 @@ class SunPositionCardEditor extends HTMLElement {
           <mwc-list-item value="block">${this._localize('editor.time_format_block')}</mwc-list-item>
         </ha-select>
 
+        <div class="row" id="use_12h_format_container">
+          <ha-switch id="use_12h_format"></ha-switch>
+          <span style="margin-left: 16px;">${this._localize('editor.use_12h_format')}</span>
+        </div>
+
         <h4>${this._localize('editor.times_to_show')}</h4>
         <div class="checkbox-group">
             ${this._renderCheckbox('daylight_duration', this._localize('time_entry.daylight_duration'))}
+            ${this._renderCheckbox('day_comparison', this._localize('time_entry.day_comparison'))}
             ${this._renderCheckbox('next_rising', this._localize('time_entry.next_rising'))}
             ${this._renderCheckbox('next_setting', this._localize('time_entry.next_setting'))}
             ${this._renderCheckbox('next_dawn', this._localize('time_entry.next_dawn'))}
@@ -298,7 +318,7 @@ class SunPositionCardEditor extends HTMLElement {
     add('entity', 'value-changed');
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
-    add('temp_entity', 'value-changed'); // NEU
+    add('temp_entity', 'value-changed');
     add('view_mode', 'selected');
     add('sun_size', 'value-changed');
     add('state_position', 'selected');
@@ -310,11 +330,12 @@ class SunPositionCardEditor extends HTMLElement {
     add('show_weather_badge', 'change');
     add('animate_images', 'change');
     add('hide_moon_phase_on_day', 'change');
-    add('show_night_arc', 'change'); // NEU
+    add('show_night_arc', 'change');
     add('show_moon_icon_in_text', 'change'); 
     add('show_dividers', 'change');
     add('show_degrees', 'change');
     add('show_degrees_in_list', 'change');
+    add('use_12h_format', 'change');
 
     add('morning_azimuth', 'change');
     add('noon_azimuth', 'change');
@@ -353,7 +374,7 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('entity', config.entity);
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
-    setVal('temp_entity', config.temp_entity || ''); // NEU
+    setVal('temp_entity', config.temp_entity || '');
     setVal('sun_size', config.sun_size || 50);
     
     setSelect('view_mode', config.view_mode || 'classic');
@@ -366,11 +387,12 @@ class SunPositionCardEditor extends HTMLElement {
     setCheck('show_weather_badge', config.show_weather_badge ?? true); 
     setCheck('animate_images', config.animate_images ?? false);
     setCheck('hide_moon_phase_on_day', config.hide_moon_phase_on_day ?? false);
-    setCheck('show_night_arc', config.show_night_arc ?? false); // NEU
+    setCheck('show_night_arc', config.show_night_arc ?? false);
     setCheck('show_moon_icon_in_text', config.show_moon_icon_in_text ?? false); 
     setCheck('show_dividers', config.show_dividers ?? true);
     setCheck('show_degrees', config.show_degrees ?? true);
     setCheck('show_degrees_in_list', config.show_degrees_in_list ?? false);
+    setCheck('use_12h_format', config.use_12h_format ?? false);
 
     setVal('morning_azimuth', config.morning_azimuth || 150);
     setVal('noon_azimuth', config.noon_azimuth || 200);
@@ -384,6 +406,19 @@ class SunPositionCardEditor extends HTMLElement {
         sunSizeContainer.classList.remove('hidden');
     } else {
         sunSizeContainer.classList.add('hidden');
+    }
+
+    // Sichtbarkeit des 12h Format Schalters nur für Englisch
+    const use12hContainer = root.getElementById('use_12h_format_container');
+    if (use12hContainer) {
+        const currentLang = (this._hass?.locale?.language || 'en').split('-')[0];
+        const isEnglish = currentLang === 'en';
+        
+        if (isEnglish) {
+            use12hContainer.classList.remove('hidden');
+        } else {
+            use12hContainer.classList.add('hidden');
+        }
     }
 
     // Steuerung der Sichtbarkeit für alle Mond-Optionen
@@ -405,11 +440,11 @@ class SunPositionCardEditor extends HTMLElement {
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
-        tempEntityContainer.classList.remove('hidden'); // NEU
+        tempEntityContainer.classList.remove('hidden');
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
-        tempEntityContainer.classList.add('hidden'); // NEU
+        tempEntityContainer.classList.add('hidden');
     }
 
     const times = config.times_to_show || [];
@@ -499,7 +534,7 @@ class SunPositionCardEditor extends HTMLElement {
          delete newConfig.moon_entity;
          delete newConfig.moon_phase_position;
          delete newConfig.hide_moon_phase_on_day;
-         delete newConfig.show_night_arc; // NEU
+         delete newConfig.show_night_arc;
          delete newConfig.show_moon_icon_in_text;
     }
     // Cleanup Wetter wenn gelöscht

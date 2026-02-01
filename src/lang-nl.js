@@ -48,6 +48,7 @@ export default {
 		azimuth: "Azimuth",
 		elevation: "Hoogte",
 		daylight_duration: "Daglichtduur",
+		day_comparison: "Daglichtduur Vergelijking",
 		next_rising: "Zonsopkomst",
 		next_setting: "Zonsondergang",
 		next_dawn: "Dageraad",

@@ -48,6 +48,7 @@ export default {
         azimuth: "Azimut",
         elevation: "Elevazione",
         daylight_duration: "Durata del Giorno",
+        day_comparison: "Confronto Durata del Giorno",
         next_rising: "Alba",
         next_setting: "Tramonto",
         next_dawn: "Aurora",
