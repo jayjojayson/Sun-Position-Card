@@ -4,6 +4,7 @@ import en from './lang-en.js';
 import fr from './lang-fr.js';
 import ita from './lang-ita.js';
 import nl from './lang-nl.js';
+import pl from './lang-pl.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
@@ -21,7 +22,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita, nl };
+    this.langs = { de, en, fr, it: ita, nl, pl };
     this._initialized = false;
   }
     

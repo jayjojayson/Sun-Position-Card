@@ -4,9 +4,10 @@ import en from './lang-en.js';
 import fr from './lang-fr.js';
 import ita from './lang-ita.js';
 import nl from './lang-nl.js';
+import pl from './lang-pl.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_2.0 ready",
+  "%c☀️ Sun-Position-Card v_2.1 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -23,57 +24,57 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl };
+    this.langs = { de, en, fr, it: ita, nl, pl };
   }
-  
+
   _localize(key, lang = this._hass?.locale?.language || 'en') {
     const code = lang.split('-')[0];
     const keys = key.split('.');
-    
+
     let a = this.langs[code];
     if (!a) a = this.langs['en'];
 
     for (const k of keys) {
-        if (typeof a[k] === 'undefined') {
-            if(keys[0] === 'weather_state') return keys[1];
-            return this.langs['en'][keys[0]][keys[1]];
-        }
-        a = a[k];
+      if (typeof a[k] === 'undefined') {
+        if (keys[0] === 'weather_state') return keys[1];
+        return this.langs['en'][keys[0]][keys[1]];
+      }
+      a = a[k];
     }
     return a;
   }
 
   _getWeatherIcon(state) {
     const mapping = {
-        'clear-night': 'mdi:weather-night',
-        'cloudy': 'mdi:weather-cloudy',
-        'fog': 'mdi:weather-fog',
-        'hail': 'mdi:weather-hail',
-        'lightning': 'mdi:weather-lightning',
-        'lightning-rainy': 'mdi:weather-lightning-rainy',
-        'partlycloudy': 'mdi:weather-partly-cloudy',
-        'pouring': 'mdi:weather-pouring',
-        'rainy': 'mdi:weather-rainy',
-        'snowy': 'mdi:weather-snowy',
-        'snowy-rainy': 'mdi:weather-snowy-rainy',
-        'sunny': 'mdi:weather-sunny',
-        'windy': 'mdi:weather-windy',
-        'windy-variant': 'mdi:weather-windy-variant',
-        'exceptional': 'mdi:alert-circle-outline'
+      'clear-night': 'mdi:weather-night',
+      'cloudy': 'mdi:weather-cloudy',
+      'fog': 'mdi:weather-fog',
+      'hail': 'mdi:weather-hail',
+      'lightning': 'mdi:weather-lightning',
+      'lightning-rainy': 'mdi:weather-lightning-rainy',
+      'partlycloudy': 'mdi:weather-partly-cloudy',
+      'pouring': 'mdi:weather-pouring',
+      'rainy': 'mdi:weather-rainy',
+      'snowy': 'mdi:weather-snowy',
+      'snowy-rainy': 'mdi:weather-snowy-rainy',
+      'sunny': 'mdi:weather-sunny',
+      'windy': 'mdi:weather-windy',
+      'windy-variant': 'mdi:weather-windy-variant',
+      'exceptional': 'mdi:alert-circle-outline'
     };
     return mapping[state] || 'mdi:weather-cloudy';
   }
 
   _getMoonIcon(state) {
     const mapping = {
-        'new_moon': 'mdi:moon-new',
-        'waxing_crescent': 'mdi:moon-waxing-crescent',
-        'first_quarter': 'mdi:moon-first-quarter',
-        'waxing_gibbous': 'mdi:moon-waxing-gibbous',
-        'full_moon': 'mdi:moon-full',
-        'waning_gibbous': 'mdi:moon-waning-gibbous',
-        'last_quarter': 'mdi:moon-last-quarter',
-        'waning_crescent': 'mdi:moon-waning-crescent'
+      'new_moon': 'mdi:moon-new',
+      'waxing_crescent': 'mdi:moon-waxing-crescent',
+      'first_quarter': 'mdi:moon-first-quarter',
+      'waxing_gibbous': 'mdi:moon-waxing-gibbous',
+      'full_moon': 'mdi:moon-full',
+      'waning_gibbous': 'mdi:moon-waning-gibbous',
+      'last_quarter': 'mdi:moon-last-quarter',
+      'waning_crescent': 'mdi:moon-waning-crescent'
     };
     return mapping[state] || 'mdi:moon-waning-crescent';
   }
@@ -84,14 +85,14 @@ class SunPositionCard extends HTMLElement {
 
     const riseEnt = hass.states['sensor.sun_next_rising'];
     const noonEnt = hass.states['sensor.sun_next_noon'];
-    const setEnt  = hass.states['sensor.sun_next_setting'];
-    
+    const setEnt = hass.states['sensor.sun_next_setting'];
+
     if (!riseEnt || !noonEnt || !setEnt) return fallback;
 
     const riseNext = new Date(riseEnt.state);
     const noonNext = new Date(noonEnt.state);
-    const setNext  = new Date(setEnt.state);
-    
+    const setNext = new Date(setEnt.state);
+
     if ([riseNext, noonNext, setNext].some(d => isNaN(d.getTime()))) return fallback;
 
     const now = new Date();
@@ -100,8 +101,8 @@ class SunPositionCard extends HTMLElement {
     const rise = new Date(riseNext.getTime() - dayMs);
     let noon = noonNext <= set ? noonNext : new Date(noonNext.getTime() - dayMs);
 
-    const h = 170; 
-    const posAtHorizon = h - 40; 
+    const h = 170;
+    const posAtHorizon = h - 40;
     const posAtNoon = 0;
     let phase = 0;
 
@@ -126,36 +127,36 @@ class SunPositionCard extends HTMLElement {
 
   _calculateSunPositionArc(sunState, hass, isCompact) {
     const fallback = { left: '50%', top: '100%', clipPath: 'none' };
-    
+
     if (!sunState || sunState.state !== 'above_horizon') return fallback;
 
     const riseEnt = hass.states['sensor.sun_next_rising'];
-    const setEnt  = hass.states['sensor.sun_next_setting'];
-    
+    const setEnt = hass.states['sensor.sun_next_setting'];
+
     if (!riseEnt || !setEnt) return fallback;
 
     const riseNext = new Date(riseEnt.state);
-    const setNext  = new Date(setEnt.state);
-    
+    const setNext = new Date(setEnt.state);
+
     if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
 
     const now = new Date();
     const dayMs = 24 * 60 * 60 * 1000;
-    
+
     const set = setNext;
     const rise = new Date(riseNext.getTime() - dayMs);
-    
+
     const totalDay = set - rise;
     const elapsed = now - rise;
     let percent = totalDay > 0 ? elapsed / totalDay : 0;
-    
+
     percent = Math.max(0, Math.min(1, percent));
 
     // Radius Logik: Compact 90px, Groß 120px
-    const radius = isCompact ? 90 : 120; 
-    
+    const radius = isCompact ? 90 : 120;
+
     const rad = Math.PI * (1 - percent);
-    
+
     const xOffset = Math.cos(rad) * radius;
     const yOffset = Math.sin(rad) * radius;
 
@@ -165,49 +166,49 @@ class SunPositionCard extends HTMLElement {
     const baselineY = isCompact ? (70 + 90) : (50 + 120); // 160px oder 170px
 
     return {
-        left: `calc(50% + ${xOffset}px)`,
-        top: `calc(${baselineY}px - ${yOffset}px)`,
-        clipPath: 'none'
+      left: `calc(50% + ${xOffset}px)`,
+      top: `calc(${baselineY}px - ${yOffset}px)`,
+      clipPath: 'none'
     };
   }
 
   _calculateNightPositionArc(sunState, hass, isCompact) {
     const fallback = { left: '50%', top: '100%' };
-    
+
     const riseEnt = hass.states['sensor.sun_next_rising'];
-    const setEnt  = hass.states['sensor.sun_next_setting'];
-    
+    const setEnt = hass.states['sensor.sun_next_setting'];
+
     if (!riseEnt || !setEnt) return fallback;
 
     const riseNext = new Date(riseEnt.state);
-    const setNext  = new Date(setEnt.state);
+    const setNext = new Date(setEnt.state);
     const now = new Date();
-    
+
     if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
 
     // Logik: Wir befinden uns in der Nacht VOR riseNext.
     const dayLength = setNext.getTime() - riseNext.getTime();
     const dayMs = 24 * 60 * 60 * 1000;
     const nightLength = dayMs - dayLength;
-    
+
     // Startzeitpunkt der aktuellen Nacht
     const startOfNight = new Date(riseNext.getTime() - nightLength);
-    
+
     const elapsed = now - startOfNight;
     let percent = nightLength > 0 ? elapsed / nightLength : 0;
-    
+
     percent = Math.max(0, Math.min(1, percent));
 
     // Gleiche Geometrie wie bei der Sonne
-    const radius = isCompact ? 90 : 120; 
+    const radius = isCompact ? 90 : 120;
     const rad = Math.PI * (1 - percent);
     const xOffset = Math.cos(rad) * radius;
     const yOffset = Math.sin(rad) * radius;
     const baselineY = isCompact ? (70 + 90) : (50 + 120);
 
     return {
-        left: `calc(50% + ${xOffset}px)`,
-        top: `calc(${baselineY}px - ${yOffset}px)`
+      left: `calc(50% + ${xOffset}px)`,
+      top: `calc(${baselineY}px - ${yOffset}px)`
     };
   }
 
@@ -216,7 +217,7 @@ class SunPositionCard extends HTMLElement {
    */
   _getSunDuration(date, lat) {
     if (!lat) return 0;
-    
+
     const rad = Math.PI / 180;
     // Tag des Jahres berechnen
     const start = new Date(date.getFullYear(), 0, 0);
@@ -226,28 +227,28 @@ class SunPositionCard extends HTMLElement {
 
     // Näherung der Deklination der Sonne
     const axis = 23.44;
-    const declination = Math.asin(Math.sin(axis * rad) * Math.sin(rad * (360/365.24) * (dayOfYear - 81)));
+    const declination = Math.asin(Math.sin(axis * rad) * Math.sin(rad * (360 / 365.24) * (dayOfYear - 81)));
 
     // Standard-Elevation (-0.833 für Refraktion)
     const elevation = -0.833;
-    
+
     const numerator = Math.sin(elevation * rad) - Math.sin(lat * rad) * Math.sin(declination);
     const denominator = Math.cos(lat * rad) * Math.cos(declination);
-    
+
     let cosH = numerator / denominator;
 
-    if (cosH < -1.0) return 24 * 60 * 60 * 1000; 
-    if (cosH > 1.0) return 0; 
+    if (cosH < -1.0) return 24 * 60 * 60 * 1000;
+    if (cosH > 1.0) return 0;
 
-    const H = Math.acos(cosH); 
-    const hours = (H * 180 / Math.PI) * (2 / 15); 
+    const H = Math.acos(cosH);
+    const hours = (H * 180 / Math.PI) * (2 / 15);
 
-    return hours * 60 * 60 * 1000; 
+    return hours * 60 * 60 * 1000;
   }
 
   set hass(hass) {
     this._hass = hass;
-    
+
     if (!this.content) {
       this.innerHTML = `
         <ha-card>
@@ -267,11 +268,11 @@ class SunPositionCard extends HTMLElement {
       this.content.innerHTML = `${this._localize('error.entity_not_found')}${entityId}`;
       return;
     }
-    
+
     const moonEntityId = config.moon_entity;
     const moonState = moonEntityId ? hass.states[moonEntityId] : null;
     const moonPhasePosition = config.moon_phase_position || 'in_list';
-    
+
     const weatherEntityId = config.weather_entity;
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
     const showWeatherBadge = config.show_weather_badge ?? true;
@@ -283,7 +284,7 @@ class SunPositionCard extends HTMLElement {
     const showMoonIcon = config.show_moon_icon_in_text ?? false;
     const sunSize = config.sun_size || 50;
     const showNightArc = config.show_night_arc ?? false;
-    
+
     const use12hFormat = config.use_12h_format ?? false;
 
     const sunState = state.state;
@@ -301,11 +302,11 @@ class SunPositionCard extends HTMLElement {
     if (sunState === 'above_horizon' && elevation > 0) {
       if (elevation < duskElevation) {
         if (azimuth < noonAzimuth) {
-             currentState = this._localize('sun_state.dawn');
-             image = 'dammerung.png';
+          currentState = this._localize('sun_state.dawn');
+          image = 'dammerung.png';
         } else {
-             currentState = this._localize('sun_state.dusk');
-             image = 'dammerung.png';
+          currentState = this._localize('sun_state.dusk');
+          image = 'dammerung.png';
         }
       } else if (azimuth < morningAzimuth) {
         currentState = this._localize('sun_state.morning');
@@ -321,9 +322,9 @@ class SunPositionCard extends HTMLElement {
         image = 'abend.png';
       }
     } else {
-        if (moonState) {
-            image = `${moonState.state}.png`;
-        }
+      if (moonState) {
+        image = `${moonState.state}.png`;
+      }
     }
 
     let statePosition = config.state_position || 'in_list';
@@ -341,21 +342,21 @@ class SunPositionCard extends HTMLElement {
     const formatTime = (isoString) => {
       if (!isoString) return '';
       const date = new Date(isoString);
-      
+
       const currentLang = (hass.locale?.language || 'en').split('-')[0];
       const isEnglish = currentLang === 'en';
-      
+
       if (isEnglish && use12hFormat) {
-        return date.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
+        return date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
           minute: '2-digit',
-          hour12: true 
+          hour12: true
         });
       } else {
-        return date.toLocaleTimeString(hass.locale?.language || 'en-US', { 
-          hour: '2-digit', 
+        return date.toLocaleTimeString(hass.locale?.language || 'en-US', {
+          hour: '2-digit',
           minute: '2-digit',
-          hour12: false 
+          hour12: false
         });
       }
     };
@@ -364,20 +365,20 @@ class SunPositionCard extends HTMLElement {
       if (!sunrise || !sunset) return null;
       const sunriseDate = new Date(sunrise);
       const sunsetDate = new Date(sunset);
-      
-      let diff = sunsetDate.getTime() - sunriseDate.getTime();      
+
+      let diff = sunsetDate.getTime() - sunriseDate.getTime();
       if (diff < 0) {
         diff += (24 * 60 * 60 * 1000);
       }
       if (diff > (24 * 60 * 60 * 1000)) {
-         diff -= (24 * 60 * 60 * 1000);
+        diff -= (24 * 60 * 60 * 1000);
       }
-      
+
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     };
-    
+
     // UPDATE: Nutzt den Sensor-Text für die Mitte, berechnet Diffs relativ dazu
     const calculateDaylightComparison = (currentDurationString) => {
       const lat = hass.config.latitude;
@@ -388,7 +389,7 @@ class SunPositionCard extends HTMLElement {
       // Das passt, da "Tageslänge" dann auch die von morgen anzeigt.
       const nextSetting = state.attributes.next_setting;
       if (!nextSetting) return null;
-      
+
       const targetDate = new Date(nextSetting);
       const oneDayMs = 24 * 60 * 60 * 1000;
 
@@ -399,139 +400,142 @@ class SunPositionCard extends HTMLElement {
 
       if (!targetLength || !prevLength || !nextLength) return null;
 
-      // Differenzen berechnen
-      const diffPrev = Math.round((targetLength - prevLength) / (1000 * 60 * -1));
-      const diffNext = Math.round((nextLength - targetLength) / (1000 * 60));
+      // Differenzen berechnen (in Millisekunden)
+      const diffPrevMs = (targetLength - prevLength) * -1;
+      const diffNextMs = nextLength - targetLength;
 
-      const formatDiff = (diff) => {
-        if (diff === 0) return '±0min';
-        const sign = diff > 0 ? '+' : '';
-        return `${sign}${diff}min`;
+      const formatDiff = (diffMs) => {
+        if (diffMs === 0) return '±0:00m';
+        const sign = diffMs > 0 ? '+' : '-';
+        const absDiffMs = Math.abs(diffMs);
+        const minutes = Math.floor(absDiffMs / (1000 * 60));
+        const seconds = Math.floor((absDiffMs % (1000 * 60)) / 1000);
+        return `${sign}${minutes}:${String(seconds).padStart(2, '0')}m`;
       };
-      
+
       return {
-        yesterday: formatDiff(diffPrev),
+        yesterday: formatDiff(diffPrevMs),
         today: currentDurationString + 'h',
-        tomorrow: formatDiff(diffNext)
+        tomorrow: formatDiff(diffNextMs)
       };
     };
-    
+
     const translateMoonPhase = (phase) => {
-        return this._localize(`moon_phase.${phase}`) || phase;
+      return this._localize(`moon_phase.${phase}`) || phase;
     }
-    
+
     let weatherText = '';
     let weatherIcon = '';
     let weatherTemp = '';
-    
-    if (weatherStateObj) {
-        const cond = this._localize(`weather_state.${weatherStateObj.state}`);
-        let temp = weatherStateObj.attributes.temperature;
-        let unit = hass.config.unit_system.temperature || '°C';
-        
-        if (tempStateObj && !isNaN(tempStateObj.state)) {
-            temp = tempStateObj.state;
-            if (tempStateObj.attributes.unit_of_measurement) {
-                unit = tempStateObj.attributes.unit_of_measurement;
-            }
-        }
 
-        weatherTemp = `${temp}${unit}`;
-        weatherText = `${cond}, ${weatherTemp}`;
-        weatherIcon = this._getWeatherIcon(weatherStateObj.state);
+    if (weatherStateObj) {
+      const cond = this._localize(`weather_state.${weatherStateObj.state}`);
+      let temp = weatherStateObj.attributes.temperature;
+      let unit = hass.config.unit_system.temperature || '°C';
+
+      if (tempStateObj && !isNaN(tempStateObj.state)) {
+        temp = tempStateObj.state;
+        if (tempStateObj.attributes.unit_of_measurement) {
+          unit = tempStateObj.attributes.unit_of_measurement;
+        }
+      }
+
+      weatherTemp = `${temp}${unit}`;
+      weatherText = `${cond}, ${weatherTemp}`;
+      weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
 
     const daylightDuration = calculateDaylight(state.attributes.next_rising, state.attributes.next_setting);
-    
+
     // Übergebe den Sensor-String an die Vergleichsfunktion
     const daylightComparison = calculateDaylightComparison(daylightDuration);
-    
+
     let translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
-    
+
     if (moonState && showMoonIcon) {
-        const mIcon = this._getMoonIcon(moonState.state);
-        translatedMoonPhase += ` <ha-icon class="moon-phase-icon" icon="${mIcon}"></ha-icon>`;
+      const mIcon = this._getMoonIcon(moonState.state);
+      translatedMoonPhase += ` <ha-icon class="moon-phase-icon" icon="${mIcon}"></ha-icon>`;
     }
-    
+
     const isDay = elevation > 0;
     const showMoonPhaseText = moonState && !(hideMoonOnDay && isDay);
 
     const showMoonPhaseAbove = showMoonPhaseText && moonPhasePosition === 'above' && timesToShow.includes('moon_phase');
 
     if (showMoonPhaseAbove) {
-        timesToShow = timesToShow.filter(t => t !== 'moon_phase');
+      timesToShow = timesToShow.filter(t => t !== 'moon_phase');
     }
-    
+
     let timeEntries = [];
     if (statePosition === 'in_list') {
-        timeEntries.push(`<div class="time-entry">${this._localize('time_entry.current')}: ${currentState}</div>`);
+      timeEntries.push(`<div class="time-entry">${this._localize('time_entry.current')}: ${currentState}</div>`);
     }
     if (showDegrees && showDegreesInList) {
-        timeEntries.push(`<div class="time-entry degrees-in-list">${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°</div>`);
+      timeEntries.push(`<div class="time-entry degrees-in-list">${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°</div>`);
     }
 
     timesToShow.forEach(timeKey => {
-        let label = '';
-        let content = '';
-        
-        switch(timeKey) {
-            case 'daylight_duration':
-                if (daylightDuration) {
-                    label = this._localize('time_entry.daylight_duration');
-                    content = daylightDuration;
-                }
-                break;
-            case 'day_comparison':
-                if (daylightComparison) {
-                    label = this._localize('time_entry.day_comparison');
-                    content = `${daylightComparison.yesterday} · ${daylightComparison.today} · ${daylightComparison.tomorrow}`;
-                }
-                break;
-            case 'next_rising': label = this._localize('time_entry.next_rising'); break;
-            case 'next_setting': label = this._localize('time_entry.next_setting'); break;
-            case 'next_dawn': label = this._localize('time_entry.next_dawn'); break;
-            case 'next_dusk': label = this._localize('time_entry.next_dusk'); break;
-            case 'next_noon': label = this._localize('time_entry.next_noon'); break;
-            case 'next_midnight': label = this._localize('time_entry.next_midnight'); break;
-            case 'moon_phase':
-                if (showMoonPhaseText) { 
-                    label = this._localize('time_entry.moon_phase');
-                    content = translatedMoonPhase;
-                }
-                break;
-            case 'weather':
-                if (weatherStateObj) {
-                    label = this._localize('time_entry.weather');
-                    content = weatherText;
-                }
-                break;
-        }
+      let label = '';
+      let content = '';
 
-        if (timeListFormat === 'block' && label) {
-            const timeValue = (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
-            if (timeValue) {
-                 timeEntries.push(`<div class="time-entry-block"><span class="time-label">${label}</span><span class="time-value">${timeValue}</span></div>`);
-            }
-        } else if (label) {
-            if (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') {
-                if (content) timeEntries.push(`<div class="time-entry">${label}: ${content}</div>`);
-            } else {
-                 const timeValue = state.attributes[timeKey];
-                 if (timeValue) {
-                    timeEntries.push(`<div class="time-entry">${label}: ${formatTime(timeValue)}</div>`);
-                 }
-            }
+      switch (timeKey) {
+        case 'daylight_duration':
+          if (daylightDuration) {
+            label = this._localize('time_entry.daylight_duration');
+            content = daylightDuration;
+          }
+          break;
+        case 'day_comparison':
+          if (daylightComparison) {
+            label = this._localize('time_entry.day_comparison');
+            content = `${daylightComparison.yesterday} · ${daylightComparison.today} · ${daylightComparison.tomorrow}`;
+          }
+          break;
+        case 'next_rising': label = this._localize('time_entry.next_rising'); break;
+        case 'next_setting': label = this._localize('time_entry.next_setting'); break;
+        case 'next_dawn': label = this._localize('time_entry.next_dawn'); break;
+        case 'next_dusk': label = this._localize('time_entry.next_dusk'); break;
+        case 'next_noon': label = this._localize('time_entry.next_noon'); break;
+        case 'next_midnight': label = this._localize('time_entry.next_midnight'); break;
+        case 'moon_phase':
+          if (showMoonPhaseText) {
+            label = this._localize('time_entry.moon_phase');
+            content = translatedMoonPhase;
+          }
+          break;
+        case 'weather':
+          if (weatherStateObj) {
+            label = this._localize('time_entry.weather');
+            content = weatherText;
+          }
+          break;
+      }
+
+      if (timeListFormat === 'block' && label) {
+        const timeValue = (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
+        if (timeValue) {
+          timeEntries.push(`<div class="time-entry-block"><span class="time-label">${label}</span><span class="time-value">${timeValue}</span></div>`);
         }
+      } else if (label) {
+        if (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') {
+          if (content) timeEntries.push(`<div class="time-entry">${label}: ${content}</div>`);
+        } else {
+          const timeValue = state.attributes[timeKey];
+          if (timeValue) {
+            timeEntries.push(`<div class="time-entry">${label}: ${formatTime(timeValue)}</div>`);
+          }
+        }
+      }
     });
 
     const timeHtml = timeEntries.join(showDividers ? '<hr class="divider">' : '');
 
     if (!this._created) {
-        this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, config.view_mode, showNightArc);
-        this._created = true;
-        this._lastImage = null;
+      this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, config.view_mode, showNightArc);
+      this._created = true;
+      this._lastImage = null;
     }
-    
+
     const stateEl = this.querySelector('#sun-state-text');
     if (stateEl) stateEl.innerText = currentState;
 
@@ -540,17 +544,17 @@ class SunPositionCard extends HTMLElement {
 
     const degreesEl = this.querySelector('#sun-degrees-text');
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
-    
+
     const badgeEl = this.querySelector('#weather-badge');
     if (badgeEl) {
-        if (weatherStateObj && showWeatherBadge) {
-            badgeEl.style.display = 'flex';
-            const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
-            badgeEl.style.background = badgeBg;
-            badgeEl.innerHTML = `<ha-icon icon="${weatherIcon}"></ha-icon><span>${weatherTemp}</span>`;
-        } else {
-            badgeEl.style.display = 'none';
-        }
+      if (weatherStateObj && showWeatherBadge) {
+        badgeEl.style.display = 'flex';
+        const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+        badgeEl.style.background = badgeBg;
+        badgeEl.innerHTML = `<ha-icon icon="${weatherIcon}"></ha-icon><span>${weatherTemp}</span>`;
+      } else {
+        badgeEl.style.display = 'none';
+      }
     }
 
     const imgEl = this.querySelector('#sun-card-image');
@@ -558,131 +562,131 @@ class SunPositionCard extends HTMLElement {
     const container = this.querySelector('.sun-image-container');
 
     if (imgEl && container && wrapperEl) {
-        
-        const forceNightArc = (elevation <= 0 && showNightArc);
-        const isCalculatedOrArc = (config.view_mode === 'calculated' || config.view_mode === 'arc');
 
-        if (isCalculatedOrArc || forceNightArc) {
-            
-            container.classList.add('calculated');
+      const forceNightArc = (elevation <= 0 && showNightArc);
+      const isCalculatedOrArc = (config.view_mode === 'calculated' || config.view_mode === 'arc');
 
-            const effectiveViewMode = forceNightArc ? 'arc' : config.view_mode;
-            
-            if (effectiveViewMode === 'arc') {
-                if (elevation <= 0) {
-                     imgEl.style.width = `${sunSize}px`;
-                     imgEl.style.maxWidth = `${sunSize}px`;
-                } else {
-                     imgEl.style.width = `${sunSize}px`;
-                     imgEl.style.maxWidth = `${sunSize}px`;
-                }
-            } else {
-                imgEl.style.width = '';
-                imgEl.style.maxWidth = '';
+      if (isCalculatedOrArc || forceNightArc) {
+
+        container.classList.add('calculated');
+
+        const effectiveViewMode = forceNightArc ? 'arc' : config.view_mode;
+
+        if (effectiveViewMode === 'arc') {
+          if (elevation <= 0) {
+            imgEl.style.width = `${sunSize}px`;
+            imgEl.style.maxWidth = `${sunSize}px`;
+          } else {
+            imgEl.style.width = `${sunSize}px`;
+            imgEl.style.maxWidth = `${sunSize}px`;
+          }
+        } else {
+          imgEl.style.width = '';
+          imgEl.style.maxWidth = '';
+        }
+
+        const arcEl = this.querySelector('.sun-arc-path');
+        if (arcEl) {
+          if (isCompact) arcEl.classList.add('compact');
+          else arcEl.classList.remove('compact');
+        }
+
+        if (elevation <= 0) {
+          // *** NACHT (Mond) ***
+          let displayImage = image;
+          if (displayImage === 'unterHorizont.png') {
+            displayImage = 'full_moon.png';
+          }
+
+          const newSrc = `/local/community/Sun-Position-Card/images/${displayImage}`;
+          if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
+          imgEl.classList.remove('sun-image-animated');
+
+          if (effectiveViewMode === 'arc' && showNightArc) {
+            container.classList.add('arc-mode');
+            if (arcEl) arcEl.style.display = 'block';
+
+            const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
+            wrapperEl.style.left = left;
+            wrapperEl.style.top = top;
+            wrapperEl.style.transform = 'translate(-50%, -50%)';
+
+          } else {
+            container.classList.remove('arc-mode');
+            if (effectiveViewMode === 'arc' || effectiveViewMode === 'calculated') {
+              imgEl.style.width = '170px';
+              imgEl.style.maxWidth = '170px';
             }
+            if (arcEl) arcEl.style.display = 'none';
 
-            const arcEl = this.querySelector('.sun-arc-path');
-            if(arcEl) {
-                if(isCompact) arcEl.classList.add('compact');
-                else arcEl.classList.remove('compact');
-            }
-
-            if (elevation <= 0) {
-                // *** NACHT (Mond) ***
-                let displayImage = image;
-                if (displayImage === 'unterHorizont.png') {
-                    displayImage = 'full_moon.png';
-                }
-
-                const newSrc = `/local/community/Sun-Position-Card/images/${displayImage}`;
-                if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
-                imgEl.classList.remove('sun-image-animated');
-
-                if (effectiveViewMode === 'arc' && showNightArc) {
-                    container.classList.add('arc-mode');
-                    if (arcEl) arcEl.style.display = 'block';
-
-                    const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
-                    wrapperEl.style.left = left;
-                    wrapperEl.style.top = top;
-                    wrapperEl.style.transform = 'translate(-50%, -50%)';
-
-                } else {
-                    container.classList.remove('arc-mode');
-                    if (effectiveViewMode === 'arc' || effectiveViewMode === 'calculated') {
-                         imgEl.style.width = '170px';
-                         imgEl.style.maxWidth = '170px';
-                    }
-                    if (arcEl) arcEl.style.display = 'none';
-
-                    wrapperEl.style.top = '50%';
-                    wrapperEl.style.left = '50%';
-                    wrapperEl.style.transform = 'translate(-50%, -50%)';
-                }
-
-            } else {
-                // *** TAG (Sonne) ***
-                const sunSrc = `/local/community/Sun-Position-Card/images/calc-sun.png`;
-                if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
-
-                if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
-                else if (arcEl) arcEl.style.display = 'none'; 
-
-                if (config.view_mode === 'arc') {
-                    container.classList.add('arc-mode');
-                    const { left, top } = this._calculateSunPositionArc(state, hass, isCompact);
-                    wrapperEl.style.left = left;
-                    wrapperEl.style.top = top;
-                    wrapperEl.style.transform = 'translate(-50%, -50%)'; 
-                } else {
-                    container.classList.remove('arc-mode');
-                    const { top, clipPath } = this._calculateSunPosition(state, hass);
-                    wrapperEl.style.left = '50%';
-                    wrapperEl.style.top = top;
-                    wrapperEl.style.transform = 'translateX(-50%)'; 
-                    imgEl.style.clipPath = clipPath; 
-                }
-
-                if (config.animate_images) {
-                    imgEl.classList.add('sun-image-animated');
-                } else {
-                    imgEl.classList.remove('sun-image-animated');
-                }
-            }
+            wrapperEl.style.top = '50%';
+            wrapperEl.style.left = '50%';
+            wrapperEl.style.transform = 'translate(-50%, -50%)';
+          }
 
         } else {
-            container.classList.remove('calculated');
+          // *** TAG (Sonne) ***
+          const sunSrc = `/local/community/Sun-Position-Card/images/calc-sun.png`;
+          if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
+
+          if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
+          else if (arcEl) arcEl.style.display = 'none';
+
+          if (config.view_mode === 'arc') {
+            container.classList.add('arc-mode');
+            const { left, top } = this._calculateSunPositionArc(state, hass, isCompact);
+            wrapperEl.style.left = left;
+            wrapperEl.style.top = top;
+            wrapperEl.style.transform = 'translate(-50%, -50%)';
+          } else {
             container.classList.remove('arc-mode');
+            const { top, clipPath } = this._calculateSunPosition(state, hass);
+            wrapperEl.style.left = '50%';
+            wrapperEl.style.top = top;
+            wrapperEl.style.transform = 'translateX(-50%)';
+            imgEl.style.clipPath = clipPath;
+          }
 
-            imgEl.style.width = '';
-            imgEl.style.maxWidth = '';
-
-            const newSrc = `/local/community/Sun-Position-Card/images/${image}`;
-            if (this._lastImage !== image) {
-                imgEl.src = newSrc;
-                imgEl.alt = currentState;
-                this._lastImage = image;
-            }
-            
-            wrapperEl.style.top = '';
-            wrapperEl.style.left = '';
-            wrapperEl.style.transform = '';
-            imgEl.style.clipPath = '';
-            
-            const shouldAnimate = config.animate_images && ['morgen.png', 'mittag.png', 'nachmittag.png'].includes(image);
-            if (shouldAnimate) {
-                imgEl.classList.add('sun-image-animated');
-            } else {
-                imgEl.classList.remove('sun-image-animated');
-            }
+          if (config.animate_images) {
+            imgEl.classList.add('sun-image-animated');
+          } else {
+            imgEl.classList.remove('sun-image-animated');
+          }
         }
+
+      } else {
+        container.classList.remove('calculated');
+        container.classList.remove('arc-mode');
+
+        imgEl.style.width = '';
+        imgEl.style.maxWidth = '';
+
+        const newSrc = `/local/community/Sun-Position-Card/images/${image}`;
+        if (this._lastImage !== image) {
+          imgEl.src = newSrc;
+          imgEl.alt = currentState;
+          this._lastImage = image;
+        }
+
+        wrapperEl.style.top = '';
+        wrapperEl.style.left = '';
+        wrapperEl.style.transform = '';
+        imgEl.style.clipPath = '';
+
+        const shouldAnimate = config.animate_images && ['morgen.png', 'mittag.png', 'nachmittag.png'].includes(image);
+        if (shouldAnimate) {
+          imgEl.classList.add('sun-image-animated');
+        } else {
+          imgEl.classList.remove('sun-image-animated');
+        }
+      }
     }
 
     const timesEl = this.querySelector('#sun-card-times');
     if (timesEl) {
-        if (timesEl.innerHTML !== timeHtml) {
-             timesEl.innerHTML = timeHtml;
-        }
+      if (timesEl.innerHTML !== timeHtml) {
+        timesEl.innerHTML = timeHtml;
+      }
     }
   }
 
@@ -811,38 +815,38 @@ class SunPositionCard extends HTMLElement {
 
     let imageHtml = '';
     if (showImage) {
-        if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
-            imageHtml = `<div class="sun-image-container calculated">
+      if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
+        imageHtml = `<div class="sun-image-container calculated">
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
                            </div>
                          </div>`;
-        } else {
-            imageHtml = `<div class="sun-image-container">
+      } else {
+        imageHtml = `<div class="sun-image-container">
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="sun-image" src="" alt="">
                            </div>
                          </div>`;
-        }
+      }
     }
 
     const timesContainer = `<div class="times-container" id="sun-card-times"></div>`;
 
     let cardLayout = '';
-    switch(timePosition) {
-        case 'above':
-            cardLayout = `${timesContainer}${imageHtml}`;
-            break;
-        case 'right':
-            cardLayout = `<div class="flex-container">${imageHtml}${timesContainer}</div>`;
-            break;
-        case 'below':
-        default:
-            cardLayout = `${imageHtml}${timesContainer}`;
-            break;
+    switch (timePosition) {
+      case 'above':
+        cardLayout = `${timesContainer}${imageHtml}`;
+        break;
+      case 'right':
+        cardLayout = `<div class="flex-container">${imageHtml}${timesContainer}</div>`;
+        break;
+      case 'below':
+      default:
+        cardLayout = `${imageHtml}${timesContainer}`;
+        break;
     }
 
     this.content.innerHTML = `
@@ -859,9 +863,9 @@ class SunPositionCard extends HTMLElement {
       throw new Error(this._localize('error.no_sun_entity'));
     }
     this.config = config;
-    this._created = false; 
-    
-    if (this._hass) this.hass = this._hass; 
+    this._created = false;
+
+    if (this._hass) this.hass = this._hass;
   }
 
   getCardSize() {
@@ -877,30 +881,30 @@ class SunPositionCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-        type: 'custom:sun-position-card',
-        entity: 'sun.sun',
-        animate_images: true,
-        show_image: true,
-        state_position: 'above',
-        show_dividers: true,
-        show_degrees: true,
-        show_degrees_in_list: false,
-        times_to_show: [
-          'next_rising',
-          'next_setting',
-          'daylight_duration',
-        ],
-        time_position: 'right',
-        time_list_format: 'block',
-        morning_azimuth: 155,
-        dusk_elevation: 5,
-        noon_azimuth: 200,
-        afternoon_azimuth: 255,
-        sun_size: 50,
-        hide_moon_phase_on_day: false,
-        show_moon_icon_in_text: false,
-        show_night_arc: false,
-        use_12h_format: false
+      type: 'custom:sun-position-card',
+      entity: 'sun.sun',
+      animate_images: true,
+      show_image: true,
+      state_position: 'above',
+      show_dividers: true,
+      show_degrees: true,
+      show_degrees_in_list: false,
+      times_to_show: [
+        'next_rising',
+        'next_setting',
+        'daylight_duration',
+      ],
+      time_position: 'right',
+      time_list_format: 'block',
+      morning_azimuth: 155,
+      dusk_elevation: 5,
+      noon_azimuth: 200,
+      afternoon_azimuth: 255,
+      sun_size: 50,
+      hide_moon_phase_on_day: false,
+      show_moon_icon_in_text: false,
+      show_night_arc: false,
+      use_12h_format: false
     };
   }
 }
