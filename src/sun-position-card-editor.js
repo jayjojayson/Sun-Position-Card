@@ -52,7 +52,7 @@ class SunPositionCardEditor extends HTMLElement {
         // Aktualisiere Sichtbarkeit des 12h-Schalters basierend auf Sprache
         const use12hContainer = this.shadowRoot.getElementById('use_12h_format_container');
         if (use12hContainer) {
-            const currentLang = (hass?.locale?.language || 'en').split('-')[0];
+            const currentLang = (this._config?.language || hass?.locale?.language || 'en').split('-')[0];
             const isEnglish = currentLang === 'en';
             
             if (isEnglish) {
@@ -64,7 +64,7 @@ class SunPositionCardEditor extends HTMLElement {
     }
   }
   
-  _localize(key, lang = this._hass?.locale?.language || 'en') {
+  _localize(key, lang = this._config?.language || this._hass?.locale?.language || 'en') {
     const code = lang.split('-')[0];
     const keys = key.split('.');
     let a = this.langs[code];
@@ -99,7 +99,7 @@ class SunPositionCardEditor extends HTMLElement {
         .card-config { display: flex; flex-direction: column; gap: 15px; padding: 8px; }
         .row { display: flex; align-items: center; margin-bottom: 3px; }
         .checkbox-group { display: flex; flex-direction: column; gap: 3px; margin-left: 16px; }
-        ha-textfield, ha-select, ha-selector { width: 100%; display: block; }
+        ha-textfield, ha-selector { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
         .hidden { display: none; }
         .lang-specific { display: flex; }
@@ -129,18 +129,19 @@ class SunPositionCardEditor extends HTMLElement {
             ></ha-selector>
         </div>
 
+        <div id="solar_entity_container" class="hidden">
+             <ha-selector
+              id="solar_entity"
+              label="${this._localize('editor.solar_entity')}"
+            ></ha-selector>
+        </div>
+
         <h4>${this._localize('editor.main_options')}</h4>
 
-        <ha-select
+        <ha-selector
           id="view_mode"
           label="${this._localize('editor.view_mode')}"
-          fixedMenuPosition
-          naturalMenuWidth
-        >
-          <mwc-list-item value="classic">${this._localize('editor.view_mode_classic')}</mwc-list-item>
-          <mwc-list-item value="calculated">${this._localize('editor.view_mode_calculated')}</mwc-list-item>
-          <mwc-list-item value="arc">${this._localize('editor.view_mode_arc')}</mwc-list-item>
-        </ha-select>
+        ></ha-selector>
         
         <div id="sun_size_container" class="hidden">
              <ha-selector
@@ -159,32 +160,26 @@ class SunPositionCardEditor extends HTMLElement {
           <span style="margin-left: 16px;">${this._localize('editor.show_weather_badge')}</span>
         </div>
 
+        <div id="solar_badge_toggle_container" class="row hidden">
+          <ha-switch id="show_solar_badge"></ha-switch>
+          <span style="margin-left: 16px;">${this._localize('editor.show_solar_badge')}</span>
+        </div>
+
         <div id="animate_images_container" class="row">
           <ha-switch id="animate_images"></ha-switch>
           <span style="margin-left: 16px;">${this._localize('editor.animate_images')}</span>
         </div>
 
-        <ha-select
+        <ha-selector
           id="state_position"
           label="${this._localize('editor.state_position')}"
-          fixedMenuPosition
-          naturalMenuWidth
-        >
-          <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
-          <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
-          <mwc-list-item value="hide">${this._localize('editor.state_pos_hide')}</mwc-list-item>
-        </ha-select>
+        ></ha-selector>
         
         <div id="moon_phase_position_container" class="hidden">
-            <ha-select
+            <ha-selector
               id="moon_phase_position"
               label="${this._localize('editor.moon_phase_position')}"
-              fixedMenuPosition
-              naturalMenuWidth
-            >
-              <mwc-list-item value="in_list">${this._localize('editor.state_pos_in_list')}</mwc-list-item>
-              <mwc-list-item value="above">${this._localize('editor.state_pos_above')}</mwc-list-item>
-            </ha-select>
+            ></ha-selector>
 
             <div class="row" style="margin: 16px 0 10px 0;">
                 <ha-switch id="show_night_arc"></ha-switch>
@@ -217,31 +212,25 @@ class SunPositionCardEditor extends HTMLElement {
           <span style="margin-left: 16px;">${this._localize('editor.show_degrees_in_list')}</span>
         </div>
 
-        <ha-select
+        <ha-selector
           id="time_position"
           label="${this._localize('editor.time_position')}"
-          fixedMenuPosition
-          naturalMenuWidth
-        >
-          <mwc-list-item value="below">${this._localize('editor.time_pos_below')}</mwc-list-item>
-          <mwc-list-item value="above">${this._localize('editor.time_pos_above')}</mwc-list-item>
-          <mwc-list-item value="right">${this._localize('editor.time_pos_right')}</mwc-list-item>
-        </ha-select>
+        ></ha-selector>
         
-        <ha-select
+        <ha-selector
           id="time_list_format"
           label="${this._localize('editor.time_list_format')}"
-          fixedMenuPosition
-          naturalMenuWidth
-        >
-          <mwc-list-item value="centered">${this._localize('editor.time_format_centered')}</mwc-list-item>
-          <mwc-list-item value="block">${this._localize('editor.time_format_block')}</mwc-list-item>
-        </ha-select>
+        ></ha-selector>
 
         <div class="row" id="use_12h_format_container">
           <ha-switch id="use_12h_format"></ha-switch>
           <span style="margin-left: 16px;">${this._localize('editor.use_12h_format')}</span>
         </div>
+
+        <ha-selector
+          id="language"
+          label="${this._localize('editor.language')}"
+        ></ha-selector>
 
         <h4>${this._localize('editor.times_to_show')}</h4>
         <div class="checkbox-group">
@@ -300,6 +289,70 @@ class SunPositionCardEditor extends HTMLElement {
         sunSizeSelector.selector = { number: { min: 20, max: 120, mode: "slider", unit_of_measurement: "px" } };
     }
 
+    // Solarleistung Selector (alle Sensoren, z.B. Power oder Irradiance)
+    const solarSelector = this.shadowRoot.getElementById('solar_entity');
+    if (solarSelector) {
+        solarSelector.selector = { entity: { domain: "sensor" } };
+        solarSelector.required = false;
+    }
+
+    // Dropdown-Selektoren konfigurieren (ha-selector mit select-Typ)
+    const viewModeSelector = this.shadowRoot.getElementById('view_mode');
+    if (viewModeSelector) {
+        viewModeSelector.selector = { select: { options: [
+            { value: "classic", label: this._localize('editor.view_mode_classic') },
+            { value: "calculated", label: this._localize('editor.view_mode_calculated') },
+            { value: "arc", label: this._localize('editor.view_mode_arc') }
+        ], mode: "dropdown" } };
+    }
+
+    const statePositionSelector = this.shadowRoot.getElementById('state_position');
+    if (statePositionSelector) {
+        statePositionSelector.selector = { select: { options: [
+            { value: "above", label: this._localize('editor.state_pos_above') },
+            { value: "in_list", label: this._localize('editor.state_pos_in_list') },
+            { value: "hide", label: this._localize('editor.state_pos_hide') }
+        ], mode: "dropdown" } };
+    }
+
+    const moonPhasePositionSelector = this.shadowRoot.getElementById('moon_phase_position');
+    if (moonPhasePositionSelector) {
+        moonPhasePositionSelector.selector = { select: { options: [
+            { value: "in_list", label: this._localize('editor.state_pos_in_list') },
+            { value: "above", label: this._localize('editor.state_pos_above') }
+        ], mode: "dropdown" } };
+    }
+
+    const timePositionSelector = this.shadowRoot.getElementById('time_position');
+    if (timePositionSelector) {
+        timePositionSelector.selector = { select: { options: [
+            { value: "below", label: this._localize('editor.time_pos_below') },
+            { value: "above", label: this._localize('editor.time_pos_above') },
+            { value: "right", label: this._localize('editor.time_pos_right') }
+        ], mode: "dropdown" } };
+    }
+
+    const timeListFormatSelector = this.shadowRoot.getElementById('time_list_format');
+    if (timeListFormatSelector) {
+        timeListFormatSelector.selector = { select: { options: [
+            { value: "centered", label: this._localize('editor.time_format_centered') },
+            { value: "block", label: this._localize('editor.time_format_block') }
+        ], mode: "dropdown" } };
+    }
+
+    const languageSelector = this.shadowRoot.getElementById('language');
+    if (languageSelector) {
+        languageSelector.selector = { select: { options: [
+            { value: "", label: this._localize('editor.language_auto') },
+            { value: "de", label: "Deutsch" },
+            { value: "en", label: "English" },
+            { value: "fr", label: "Français" },
+            { value: "it", label: "Italiano" },
+            { value: "nl", label: "Nederlands" },
+            { value: "pl", label: "Polski" }
+        ], mode: "dropdown" } };
+    }
+
     this._attachListeners();
     this._initialized = true;
     this._updateValues();
@@ -320,15 +373,18 @@ class SunPositionCardEditor extends HTMLElement {
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
     add('temp_entity', 'value-changed');
-    add('view_mode', 'selected');
+    add('solar_entity', 'value-changed');
+    add('view_mode', 'value-changed');
     add('sun_size', 'value-changed');
-    add('state_position', 'selected');
-    add('moon_phase_position', 'selected');
-    add('time_position', 'selected');
-    add('time_list_format', 'selected');
+    add('state_position', 'value-changed');
+    add('moon_phase_position', 'value-changed');
+    add('time_position', 'value-changed');
+    add('time_list_format', 'value-changed');
+    add('language', 'value-changed');
     
     add('show_image', 'change');
     add('show_weather_badge', 'change');
+    add('show_solar_badge', 'change');
     add('animate_images', 'change');
     add('hide_moon_phase_on_day', 'change');
     add('show_night_arc', 'change');
@@ -347,10 +403,6 @@ class SunPositionCardEditor extends HTMLElement {
     checkboxes.forEach(cb => {
         cb.addEventListener('change', this._timeCheckboxChanged.bind(this));
     });
-    
-    root.querySelectorAll('ha-select').forEach(el => {
-        el.addEventListener('closed', (e) => e.stopPropagation());
-    });
   }
 
   _updateValues() {
@@ -367,25 +419,23 @@ class SunPositionCardEditor extends HTMLElement {
         if(el) el.checked = val;
     };
 
-    const setSelect = (id, val) => {
-        const el = root.getElementById(id);
-        if(el) el.value = val;
-    }
-
     setVal('entity', config.entity);
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
     setVal('temp_entity', config.temp_entity || '');
+    setVal('solar_entity', config.solar_entity || '');
     setVal('sun_size', config.sun_size || 50);
     
-    setSelect('view_mode', config.view_mode || 'classic');
-    setSelect('state_position', config.state_position || 'in_list');
-    setSelect('moon_phase_position', config.moon_phase_position || 'in_list');
-    setSelect('time_position', config.time_position || 'right');
-    setSelect('time_list_format', config.time_list_format || 'centered');
+    setVal('view_mode', config.view_mode || 'classic');
+    setVal('state_position', config.state_position || 'in_list');
+    setVal('moon_phase_position', config.moon_phase_position || 'in_list');
+    setVal('time_position', config.time_position || 'right');
+    setVal('time_list_format', config.time_list_format || 'centered');
+    setVal('language', config.language || '');
 
     setCheck('show_image', config.show_image ?? true);
-    setCheck('show_weather_badge', config.show_weather_badge ?? true); 
+    setCheck('show_weather_badge', config.show_weather_badge ?? true);
+    setCheck('show_solar_badge', config.show_solar_badge ?? true); 
     setCheck('animate_images', config.animate_images ?? false);
     setCheck('hide_moon_phase_on_day', config.hide_moon_phase_on_day ?? false);
     setCheck('show_night_arc', config.show_night_arc ?? false);
@@ -412,7 +462,7 @@ class SunPositionCardEditor extends HTMLElement {
     // Sichtbarkeit des 12h Format Schalters nur für Englisch
     const use12hContainer = root.getElementById('use_12h_format_container');
     if (use12hContainer) {
-        const currentLang = (this._hass?.locale?.language || 'en').split('-')[0];
+        const currentLang = (config.language || this._hass?.locale?.language || 'en').split('-')[0];
         const isEnglish = currentLang === 'en';
         
         if (isEnglish) {
@@ -437,15 +487,25 @@ class SunPositionCardEditor extends HTMLElement {
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
     const tempEntityContainer = root.getElementById('temp_entity_container');
+    const solarEntityContainer = root.getElementById('solar_entity_container');
+    const solarBadgeToggleContainer = root.getElementById('solar_badge_toggle_container');
     
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
         tempEntityContainer.classList.remove('hidden');
+        solarEntityContainer.classList.remove('hidden');
+        if (config.solar_entity) {
+            solarBadgeToggleContainer.classList.remove('hidden');
+        } else {
+            solarBadgeToggleContainer.classList.add('hidden');
+        }
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
         tempEntityContainer.classList.add('hidden');
+        solarEntityContainer.classList.add('hidden');
+        solarBadgeToggleContainer.classList.add('hidden');
     }
 
     const times = config.times_to_show || [];
@@ -545,7 +605,19 @@ class SunPositionCardEditor extends HTMLElement {
          }
          delete newConfig.weather_entity;
          delete newConfig.show_weather_badge; 
-         delete newConfig.temp_entity; 
+         delete newConfig.temp_entity;
+         delete newConfig.solar_entity;
+         delete newConfig.show_solar_badge;
+    }
+    // Cleanup Solar Entity wenn gelöscht
+    if (configValue === 'solar_entity' && !newConfig.solar_entity) {
+         delete newConfig.solar_entity;
+         delete newConfig.show_solar_badge;
+    }
+
+    // Wenn Sprache geändert wird, Editor neu rendern für aktualisierte Labels
+    if (configValue === 'language') {
+        this._initialized = false;
     }
 
     fireEvent(this, "config-changed", { config: newConfig });

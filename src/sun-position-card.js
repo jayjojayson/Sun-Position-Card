@@ -7,7 +7,7 @@ import nl from './lang-nl.js';
 import pl from './lang-pl.js';
 
 console.log(
-  "%c☀️ Sun-Position-Card v_2.1 ready",
+  "%c☀️ Sun-Position-Card v_2.2 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -27,7 +27,7 @@ class SunPositionCard extends HTMLElement {
     this.langs = { de, en, fr, it: ita, nl, pl };
   }
 
-  _localize(key, lang = this._hass?.locale?.language || 'en') {
+  _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
     const code = lang.split('-')[0];
     const keys = key.split('.');
 
@@ -277,6 +277,10 @@ class SunPositionCard extends HTMLElement {
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
     const showWeatherBadge = config.show_weather_badge ?? true;
 
+    const solarEntityId = config.solar_entity;
+    const solarStateObj = solarEntityId ? hass.states[solarEntityId] : null;
+    const showSolarBadge = config.show_solar_badge ?? true;
+
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
 
@@ -343,7 +347,7 @@ class SunPositionCard extends HTMLElement {
       if (!isoString) return '';
       const date = new Date(isoString);
 
-      const currentLang = (hass.locale?.language || 'en').split('-')[0];
+      const currentLang = (config.language || hass.locale?.language || 'en').split('-')[0];
       const isEnglish = currentLang === 'en';
 
       if (isEnglish && use12hFormat) {
@@ -471,7 +475,13 @@ class SunPositionCard extends HTMLElement {
       timeEntries.push(`<div class="time-entry">${this._localize('time_entry.current')}: ${currentState}</div>`);
     }
     if (showDegrees && showDegreesInList) {
-      timeEntries.push(`<div class="time-entry degrees-in-list">${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°</div>`);
+      if (timeListFormat === 'block') {
+        timeEntries.push(`<div class="time-entry-block"><span class="time-label">${this._localize('time_entry.azimuth')}</span><span class="time-value">${azimuth.toFixed(2)}°</span></div>`);
+        timeEntries.push(`<div class="time-entry-block"><span class="time-label">${this._localize('time_entry.elevation')}</span><span class="time-value">${elevation.toFixed(2)}°</span></div>`);
+      } else {
+        timeEntries.push(`<div class="time-entry">${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}°</div>`);
+        timeEntries.push(`<div class="time-entry">${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°</div>`);
+      }
     }
 
     timesToShow.forEach(timeKey => {
@@ -554,6 +564,20 @@ class SunPositionCard extends HTMLElement {
         badgeEl.innerHTML = `<ha-icon icon="${weatherIcon}"></ha-icon><span>${weatherTemp}</span>`;
       } else {
         badgeEl.style.display = 'none';
+      }
+    }
+
+    const solarBadgeEl = this.querySelector('#solar-badge');
+    if (solarBadgeEl) {
+      if (solarStateObj && showSolarBadge) {
+        solarBadgeEl.style.display = 'flex';
+        const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+        solarBadgeEl.style.background = badgeBg;
+        const solarValue = solarStateObj.state;
+        const solarUnit = solarStateObj.attributes.unit_of_measurement || 'W';
+        solarBadgeEl.innerHTML = `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`;
+      } else {
+        solarBadgeEl.style.display = 'none';
       }
     }
 
@@ -770,6 +794,27 @@ class SunPositionCard extends HTMLElement {
         .weather-badge ha-icon {
             --mdc-icon-size: 18px;
         }
+
+        .solar-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.4); 
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: none; 
+            align-items: center;
+            gap: 6px;
+            font-size: 1em; 
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+            z-index: 5;
+            transition: background 0.5s ease;
+        }
+        .solar-badge ha-icon {
+            --mdc-icon-size: 18px;
+        }
         
         .moon-phase-icon {
             --mdc-icon-size: 20px;
@@ -817,6 +862,7 @@ class SunPositionCard extends HTMLElement {
     if (showImage) {
       if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
         imageHtml = `<div class="sun-image-container calculated">
+                           <div class="solar-badge" id="solar-badge"></div>
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
@@ -825,6 +871,7 @@ class SunPositionCard extends HTMLElement {
                          </div>`;
       } else {
         imageHtml = `<div class="sun-image-container">
+                           <div class="solar-badge" id="solar-badge"></div>
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="sun-image" src="" alt="">

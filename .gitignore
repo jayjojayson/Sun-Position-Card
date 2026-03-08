@@ -2,8 +2,5 @@
 .vscode/
 .idea/
 
-hacs.json.tmp
-
-# Dateien und Ordner, die bei Releases ausgeschlossen werden sollen:
-# /docs
+info.md
 /FUNDING.yml
