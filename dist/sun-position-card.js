@@ -1630,17 +1630,21 @@ class SunPositionCard extends HTMLElement {
       const currentLang = (config.language || hass.locale?.language || 'en').split('-')[0];
       const isEnglish = currentLang === 'en';
 
+      const serverTimeZone = hass.config?.time_zone;
+
       if (isEnglish && use12hFormat) {
         return date.toLocaleTimeString('en-US', {
           hour: 'numeric',
           minute: '2-digit',
-          hour12: true
+          hour12: true,
+          ...(serverTimeZone && { timeZone: serverTimeZone })
         });
       } else {
         return date.toLocaleTimeString(hass.locale?.language || 'en-US', {
           hour: '2-digit',
           minute: '2-digit',
-          hour12: false
+          hour12: false,
+          ...(serverTimeZone && { timeZone: serverTimeZone })
         });
       }
     };
