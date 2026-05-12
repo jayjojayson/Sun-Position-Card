@@ -6,6 +6,7 @@ import ita from './lang-ita.js';
 import nl from './lang-nl.js';
 import pl from './lang-pl.js';
 import cs from './lang-cs.js';
+import ru from './lang-ru.js';
 
 console.log(
   "%c☀️ Sun-Position-Card v_2.2 ready",
