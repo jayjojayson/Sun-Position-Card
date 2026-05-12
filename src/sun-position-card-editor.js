@@ -9,6 +9,7 @@ import cs from './lang-cs.js';
 import cs from './lang-ru.js';
 import br from './lang-br.js';
 import se from './lang-se.js';
+import es from './lang-es.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
@@ -26,7 +27,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, br, se };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, br, se, es };
     this._initialized = false;
   }
     
@@ -357,7 +358,8 @@ class SunPositionCardEditor extends HTMLElement {
             { value: "cs", label: "Čeština" },
             { value: "ru", label: "Русский" },
             { value: "se", label: "Svenska" },
-            { value: "br", label: "português do Brasil" }           
+            { value: "es", label: "Svenska" },
+            { value: "br", label: "Español" }           
         ], mode: "dropdown" } };
     }
 
