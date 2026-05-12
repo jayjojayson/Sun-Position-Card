@@ -358,8 +358,8 @@ class SunPositionCardEditor extends HTMLElement {
             { value: "cs", label: "Čeština" },
             { value: "ru", label: "Русский" },
             { value: "se", label: "Svenska" },
-            { value: "es", label: "Svenska" },
-            { value: "br", label: "Español" }           
+            { value: "es", label: "Español" },
+            { value: "br", label: "Português do Brasil" }           
         ], mode: "dropdown" } };
     }
 
