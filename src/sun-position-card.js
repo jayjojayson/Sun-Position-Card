@@ -9,6 +9,7 @@ import cs from './lang-cs.js';
 import ru from './lang-ru.js';
 import br from './lang-br.js';
 import se from './lang-se.js';
+import es from './lang-es.js';
 
 console.log(
   "%c☀️ Sun-Position-Card v_2.2 ready",
