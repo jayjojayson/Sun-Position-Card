@@ -7,6 +7,8 @@ import nl from './lang-nl.js';
 import pl from './lang-pl.js';
 import cs from './lang-cs.js';
 import ru from './lang-ru.js';
+import br from './lang-br.js';
+import se from './lang-se.js';
 
 console.log(
   "%c☀️ Sun-Position-Card v_2.2 ready",
@@ -26,7 +28,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl, pl, cs };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, br, se };
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
