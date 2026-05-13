@@ -447,7 +447,7 @@ class SunPositionCard extends HTMLElement {
         '°C';
 
       // temp_entity имеет приоритет
-      if (tempStateObj && !isNaN(tempStateObj.state)) {
+      if (tempStateObj && !isNaN(parseFloat(tempStateObj.state))) {
         temp = tempStateObj.state;
 
         if (tempStateObj.attributes.unit_of_measurement) {
@@ -455,7 +455,7 @@ class SunPositionCard extends HTMLElement {
         }
       }
 
-      weatherTemp = `${temp}${unit}`;
+      weatherTemp = `${parseFloat(temp).toFixed(1)}${unit}`;
       weatherText = `${cond}, ${weatherTemp}`;
       weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
