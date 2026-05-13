@@ -444,10 +444,18 @@ class SunPositionCard extends HTMLElement {
     if (weatherStateObj) {
       const cond = this._localize(`weather_state.${weatherStateObj.state}`);
       let temp = weatherStateObj.attributes.temperature;
-      let unit = hass.config.unit_system.temperature || '°C';
 
+     // Берем unit из weather entity если есть
+      let unit =
+        weatherStateObj.attributes.temperature_unit ||
+        weatherStateObj.attributes.unit_of_measurement ||
+        hass.config.unit_system.temperature ||
+        '°C';
+
+      // temp_entity имеет приоритет
       if (tempStateObj && !isNaN(tempStateObj.state)) {
         temp = tempStateObj.state;
+
         if (tempStateObj.attributes.unit_of_measurement) {
           unit = tempStateObj.attributes.unit_of_measurement;
         }
