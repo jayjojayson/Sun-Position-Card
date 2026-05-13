@@ -6,7 +6,7 @@ import ita from './lang-ita.js';
 import nl from './lang-nl.js';
 import pl from './lang-pl.js';
 import cs from './lang-cs.js';
-import cs from './lang-ru.js';
+import ru from './lang-ru.js';
 import br from './lang-br.js';
 import se from './lang-se.js';
 import es from './lang-es.js';
