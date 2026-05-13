@@ -350,28 +350,22 @@ class SunPositionCard extends HTMLElement {
 
     const formatTime = (isoString) => {
       if (!isoString) return '';
+
       const date = new Date(isoString);
 
-      const currentLang = (config.language || hass.locale?.language || 'en').split('-')[0];
+      const locale = hass.locale?.language || 'en-US';
+      const currentLang = (config.language || locale).split('-')[0];
       const isEnglish = currentLang === 'en';
+      const timeZone =
+        hass.config?.time_zone ||
+        Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      const serverTimeZone = hass.config?.time_zone;
-
-      if (isEnglish && use12hFormat) {
-        return date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-          ...(serverTimeZone && { timeZone: serverTimeZone })
-        });
-      } else {
-        return date.toLocaleTimeString(hass.locale?.language || 'en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-          ...(serverTimeZone && { timeZone: serverTimeZone })
-        });
-      }
+      return date.toLocaleTimeString(locale, {
+        hour: use12hFormat ? 'numeric' : '2-digit',
+        minute: '2-digit',
+        hour12: use12hFormat,
+        timeZone
+      });
     };
 
     const calculateDaylight = (sunrise, sunset) => {
