@@ -29,7 +29,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, br, se, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, br, se, es };
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
@@ -351,11 +351,14 @@ class SunPositionCard extends HTMLElement {
     const formatTime = (isoString) => {
       if (!isoString) return '';
 
-      const date = new Date(isoString);
+      const date = new Date(Date.parse(isoString));
 
-      const locale = hass.locale?.language || 'en-US';
-      const currentLang = (config.language || locale).split('-')[0];
-      const isEnglish = currentLang === 'en';
+      const locale =
+        config.language ||
+        hass.locale?.language ||
+        navigator.language ||
+        'en-US';
+      
       const timeZone =
         hass.config?.time_zone ||
         Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -455,7 +458,12 @@ class SunPositionCard extends HTMLElement {
         }
       }
 
-      weatherTemp = `${parseFloat(temp).toFixed(1)}${unit}`;
+      const parsedTemp = parseFloat(temp);
+
+      weatherTemp = !isNaN(parsedTemp)
+        ? `${parsedTemp.toFixed(1)}${unit}`
+        : `--${unit}`;
+		
       weatherText = `${cond}, ${weatherTemp}`;
       weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
@@ -584,7 +592,13 @@ class SunPositionCard extends HTMLElement {
         solarBadgeEl.style.display = 'flex';
         const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
         solarBadgeEl.style.background = badgeBg;
-        const solarValue = solarStateObj.state;
+        const solarValue = parseFloat(solarStateObj.state);
+
+        solarBadgeEl.innerHTML =
+          !isNaN(solarValue)
+            ? `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`
+            : `<ha-icon icon="mdi:solar-power"></ha-icon><span>--</span>`;
+		  
         const solarUnit = solarStateObj.attributes.unit_of_measurement || 'W';
         solarBadgeEl.innerHTML = `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`;
       } else {
