@@ -63,6 +63,7 @@ export default {
 		moon_entity: "Maan-entiteit (optioneel)",
 		weather_entity: "Weer-entiteit (optioneel)",
 		temp_entity: "Temperatuur-entiteit (optioneel, overschrijft weer)",
+		temperature_decimals: "Temperatuur Afronding (optioneel, standaard is geen afronding)",
 		main_options: "Weergave-opties",
 		view_mode: "Weergavemodus",
 		view_mode_classic: "Klassiek (6 afbeeldingen)",
