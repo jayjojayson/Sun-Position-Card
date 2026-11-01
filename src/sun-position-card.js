@@ -6,6 +6,10 @@ import ita from './lang-ita.js';
 import nl from './lang-nl.js';
 import pl from './lang-pl.js';
 import cs from './lang-cs.js';
+import ru from './lang-ru.js';
+import br from './lang-br.js';
+import se from './lang-se.js';
+import es from './lang-es.js';
 
 console.log(
   "%c☀️ Sun-Position-Card v_2.2 ready",
@@ -25,7 +29,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl, pl, cs };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
@@ -347,28 +351,25 @@ class SunPositionCard extends HTMLElement {
 
     const formatTime = (isoString) => {
       if (!isoString) return '';
-      const date = new Date(isoString);
 
-      const currentLang = (config.language || hass.locale?.language || 'en').split('-')[0];
-      const isEnglish = currentLang === 'en';
+      const date = new Date(Date.parse(isoString));
 
-      const serverTimeZone = hass.config?.time_zone;
+      const locale =
+        config.language ||
+        hass.locale?.language ||
+        navigator.language ||
+        'en-US';
+      
+      const timeZone =
+        hass.config?.time_zone ||
+        Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      if (isEnglish && use12hFormat) {
-        return date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-          ...(serverTimeZone && { timeZone: serverTimeZone })
-        });
-      } else {
-        return date.toLocaleTimeString(hass.locale?.language || 'en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-          ...(serverTimeZone && { timeZone: serverTimeZone })
-        });
-      }
+      return date.toLocaleTimeString(locale, {
+        hour: use12hFormat ? 'numeric' : '2-digit',
+        minute: '2-digit',
+        hour12: use12hFormat,
+        timeZone
+      });
     };
 
     const calculateDaylight = (sunrise, sunset) => {
@@ -441,21 +442,33 @@ class SunPositionCard extends HTMLElement {
     if (weatherStateObj) {
       const cond = this._localize(`weather_state.${weatherStateObj.state}`);
       let temp = weatherStateObj.attributes.temperature;
-      let unit = hass.config.unit_system.temperature || '°C';
 
-      if (tempStateObj && !isNaN(tempStateObj.state)) {
+      // Einheit bevorzugt aus der Weather-Entity
+      let unit =
+        weatherStateObj.attributes.temperature_unit ||
+        weatherStateObj.attributes.unit_of_measurement ||
+        hass.config.unit_system.temperature ||
+        '°C';
+
+      // temp_entity hat Priorität
+      if (tempStateObj && !isNaN(parseFloat(tempStateObj.state))) {
         temp = tempStateObj.state;
+
         if (tempStateObj.attributes.unit_of_measurement) {
           unit = tempStateObj.attributes.unit_of_measurement;
         }
       }
 
-      let tempNum = parseFloat(temp)
-      if (!isNaN(tempNum) && typeof tempDecimals === 'number') {
-        temp = tempNum.toFixed(tempDecimals);
+      const parsedTemp = parseFloat(temp);
+
+      if (isNaN(parsedTemp)) {
+        weatherTemp = `--${unit}`;
+      } else if (typeof tempDecimals === 'number') {
+        weatherTemp = `${parsedTemp.toFixed(tempDecimals)}${unit}`;
+      } else {
+        weatherTemp = `${temp}${unit}`;
       }
 
-      weatherTemp = `${temp}${unit}`;
       weatherText = `${cond}, ${weatherTemp}`;
       weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
@@ -584,9 +597,11 @@ class SunPositionCard extends HTMLElement {
         solarBadgeEl.style.display = 'flex';
         const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
         solarBadgeEl.style.background = badgeBg;
-        const solarValue = solarStateObj.state;
+        const solarValue = parseFloat(solarStateObj.state);
         const solarUnit = solarStateObj.attributes.unit_of_measurement || 'W';
-        solarBadgeEl.innerHTML = `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`;
+        solarBadgeEl.innerHTML = !isNaN(solarValue)
+          ? `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`
+          : `<ha-icon icon="mdi:solar-power"></ha-icon><span>--</span>`;
       } else {
         solarBadgeEl.style.display = 'none';
       }
