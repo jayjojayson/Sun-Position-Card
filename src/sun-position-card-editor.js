@@ -128,6 +128,11 @@ class SunPositionCardEditor extends HTMLElement {
               id="temp_entity"
               label="${this._localize('editor.temp_entity')}"
             ></ha-selector>
+            
+             <ha-selector 
+              id="temperature_decimals" 
+              label="${this._localize('editor.temperature_decimals')}"
+            ></ha-selector>
         </div>
 
         <div id="solar_entity_container" class="hidden">
@@ -284,6 +289,13 @@ class SunPositionCardEditor extends HTMLElement {
         tempSelector.required = false; 
     }
 
+    // Temperature Decimals Selector
+    const tempDecimalsSelector = this.shadowRoot.getElementById('temperature_decimals');
+    if (tempDecimalsSelector) {
+      tempDecimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
+      tempDecimalsSelector.required = false;
+    }
+
     // Slider Konfiguration für Sun Size
     const sunSizeSelector = this.shadowRoot.getElementById('sun_size');
     if (sunSizeSelector) {
@@ -375,6 +387,7 @@ class SunPositionCardEditor extends HTMLElement {
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
     add('temp_entity', 'value-changed');
+    add('temperature_decimals', 'value-changed');
     add('solar_entity', 'value-changed');
     add('view_mode', 'value-changed');
     add('sun_size', 'value-changed');
@@ -425,6 +438,7 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
     setVal('temp_entity', config.temp_entity || '');
+    setVal('temperature_decimals', config.temperature_decimals ?? '');
     setVal('solar_entity', config.solar_entity || '');
     setVal('sun_size', config.sun_size || 50);
     

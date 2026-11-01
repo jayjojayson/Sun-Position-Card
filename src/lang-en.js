@@ -63,6 +63,7 @@ export default {
         moon_entity: "Moon Entity (Optional)",
         weather_entity: "Weather Entity (Optional)",
         temp_entity: "Temperature Entity (Optional, overrides weather)",
+        temperature_decimals: "Round Temperature (Optional, defaults to no rounding)",
         main_options: "Display Options",
         view_mode: "View Mode",
         view_mode_classic: "Classic (6 Images)",

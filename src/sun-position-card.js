@@ -284,6 +284,7 @@ class SunPositionCard extends HTMLElement {
 
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
+    const tempDecimals = config.temperature_decimals;
 
     const hideMoonOnDay = config.hide_moon_phase_on_day ?? false;
     const showMoonIcon = config.show_moon_icon_in_text ?? false;
@@ -447,6 +448,11 @@ class SunPositionCard extends HTMLElement {
         if (tempStateObj.attributes.unit_of_measurement) {
           unit = tempStateObj.attributes.unit_of_measurement;
         }
+      }
+
+      let tempNum = parseFloat(temp)
+      if (!isNaN(tempNum) && typeof tempDecimals === 'number') {
+        temp = tempNum.toFixed(tempDecimals);
       }
 
       weatherTemp = `${temp}${unit}`;
