@@ -68,6 +68,7 @@ const br = {
         moon_entity: "Entidade Lunar (Opcional)",
         weather_entity: "Entidade de Clima (Opcional)",
         temp_entity: "Entidade de Temperatura (Opcional, substitui clima)",
+        temperature_decimals: "Arredondar temperatura (Opcional, padrão: sem arredondamento)",
         main_options: "Opções de Exibição",
         view_mode: "Modo de Visualização",
         view_mode_classic: "Clássico (6 Imagens)",
@@ -173,6 +174,7 @@ const cs = {
         moon_entity: "Entita měsíce (volitelné)",
         weather_entity: "Entita počasí (volitelné)",
         temp_entity: "Entita teploty (volitelné, přepíše počasí)",
+        temperature_decimals: "Zaokrouhlení teploty (volitelné, výchozí: bez zaokrouhlení)",
         main_options: "Možnosti zobrazení",
         view_mode: "Režim zobrazení",
         view_mode_classic: "Klasický (6 obrázků)",
@@ -278,6 +280,7 @@ const de = {
         moon_entity: "Mond-Entität (Optional)",
         weather_entity: "Wetter-Entität (Optional)",
         temp_entity: "Temperatur-Entität (Optional, überschreibt Wetter)",
+        temperature_decimals: "Temperatur runden (Optional, Standard: keine Rundung)",
         main_options: "Anzeigeoptionen",
         view_mode: "Ansichtsmodus",
         view_mode_classic: "Klassisch (6 Bilder)",
@@ -383,6 +386,7 @@ const en = {
         moon_entity: "Moon Entity (Optional)",
         weather_entity: "Weather Entity (Optional)",
         temp_entity: "Temperature Entity (Optional, overrides weather)",
+        temperature_decimals: "Round Temperature (Optional, defaults to no rounding)",
         main_options: "Display Options",
         view_mode: "View Mode",
         view_mode_classic: "Classic (6 Images)",
@@ -488,6 +492,7 @@ const es = {
       moon_entity: "Entidad de Luna (Opcional)",
       weather_entity: "Entidad de Tiempo (Opcional)",
       temp_entity: "Entidad de Temperatura (Opcional, anula el tiempo)",
+      temperature_decimals: "Redondear temperatura (Opcional, por defecto sin redondeo)",
       main_options: "Opciones de visualización",
       view_mode: "Modo de vista",
       view_mode_classic: "Clásico (6 Imágenes)",
@@ -593,6 +598,7 @@ const fr = {
         moon_entity: "Entité Lune (optionnel)",
         weather_entity: "Entité Météo (optionnel)",
         temp_entity: "Entité Température (optionnel, remplace la météo)",
+        temperature_decimals: "Arrondir la température (facultatif, par défaut : pas d'arrondi)",
         main_options: "Options d’affichage",
         view_mode: "Mode d’affichage",
         view_mode_classic: "Classique (6 images)",
@@ -697,6 +703,7 @@ const ita = {
         moon_entity: "Entità Luna (Opzionale)",
         weather_entity: "Entità Meteo (Opzionale)",
         temp_entity: "Entità Temperatura (Opzionale, sovrascrive il meteo)",
+        temperature_decimals: "Arrotonda temperatura (opzionale, predefinito: nessun arrotondamento)",
         main_options: "Opzioni di Visualizzazione",
         view_mode: "Modalità di Visualizzazione",
         view_mode_classic: "Classica (6 Immagini)",
@@ -801,6 +808,7 @@ const nl = {
 		moon_entity: "Maan-entiteit (optioneel)",
 		weather_entity: "Weer-entiteit (optioneel)",
 		temp_entity: "Temperatuur-entiteit (optioneel, overschrijft weer)",
+		temperature_decimals: "Temperatuur Afronding (optioneel, standaard is geen afronding)",
 		main_options: "Weergave-opties",
 		view_mode: "Weergavemodus",
 		view_mode_classic: "Klassiek (6 afbeeldingen)",
@@ -905,6 +913,7 @@ const pl = {
         moon_entity: "Encja księżyca (opcjonalnie)",
         weather_entity: "Encja pogody (opcjonalnie)",
         temp_entity: "Encja temperatury (opcjonalnie, nadpisuje pogodę)",
+        temperature_decimals: "Zaokrąglenie temperatury (opcjonalne, domyślnie: bez zaokrąglania)",
         main_options: "Opcje wyświetlania",
         view_mode: "Tryb widoku",
         view_mode_classic: "Klasyczny (6 obrazów)",
@@ -1009,6 +1018,7 @@ const ru = {
         moon_entity: "Объект луны (опционально)",
         weather_entity: "Объект погоды (опционально)",
         temp_entity: "Объект температуры (Опционально, приоритетнее погоды)",
+        temperature_decimals: "Округление температуры (необязательно, по умолчанию без округления)",
         main_options: "Параметры отображения",
         view_mode: "Режим вида",
         view_mode_classic: "Классический (6 изображений)",
@@ -1114,6 +1124,7 @@ const se = {
         moon_entity: "Mån-entitet (valfri)",
         weather_entity: "Väder-entitet (valfri)",
         temp_entity: "Temperatur-entitet (valfri, ersätter väder)",
+        temperature_decimals: "Avrunda temperatur (valfritt, standard: ingen avrundning)",
         main_options: "Visningsalternativ",
         view_mode: "Visningsläge",
         view_mode_classic: "Klassisk (6 bilder)",
@@ -1203,7 +1214,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, br, se, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
     this._initialized = false;
   }
     
@@ -1307,6 +1318,11 @@ class SunPositionCardEditor extends HTMLElement {
              <ha-selector
               id="temp_entity"
               label="${this._localize('editor.temp_entity')}"
+            ></ha-selector>
+            
+             <ha-selector 
+              id="temperature_decimals" 
+              label="${this._localize('editor.temperature_decimals')}"
             ></ha-selector>
         </div>
 
@@ -1464,6 +1480,13 @@ class SunPositionCardEditor extends HTMLElement {
         tempSelector.required = false; 
     }
 
+    // Temperature Decimals Selector
+    const tempDecimalsSelector = this.shadowRoot.getElementById('temperature_decimals');
+    if (tempDecimalsSelector) {
+      tempDecimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
+      tempDecimalsSelector.required = false;
+    }
+
     // Slider Konfiguration für Sun Size
     const sunSizeSelector = this.shadowRoot.getElementById('sun_size');
     if (sunSizeSelector) {
@@ -1533,9 +1556,9 @@ class SunPositionCardEditor extends HTMLElement {
             { value: "pl", label: "Polski" },
             { value: "cs", label: "Čeština" },
             { value: "ru", label: "Русский" },
-            { value: "se", label: "Svenska" },
+            { value: "sv", label: "Svenska" },
             { value: "es", label: "Español" },
-            { value: "br", label: "Português do Brasil" }           
+            { value: "pt", label: "Português do Brasil" }
         ], mode: "dropdown" } };
     }
 
@@ -1559,6 +1582,7 @@ class SunPositionCardEditor extends HTMLElement {
     add('moon_entity', 'value-changed');
     add('weather_entity', 'value-changed');
     add('temp_entity', 'value-changed');
+    add('temperature_decimals', 'value-changed');
     add('solar_entity', 'value-changed');
     add('view_mode', 'value-changed');
     add('sun_size', 'value-changed');
@@ -1609,6 +1633,7 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('moon_entity', config.moon_entity || '');
     setVal('weather_entity', config.weather_entity || '');
     setVal('temp_entity', config.temp_entity || '');
+    setVal('temperature_decimals', config.temperature_decimals ?? '');
     setVal('solar_entity', config.solar_entity || '');
     setVal('sun_size', config.sun_size || 50);
     
@@ -1844,7 +1869,7 @@ class SunPositionCard extends HTMLElement {
     super();
     this._created = false;
     this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, br, se, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
@@ -2103,6 +2128,7 @@ class SunPositionCard extends HTMLElement {
 
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
+    const tempDecimals = config.temperature_decimals;
 
     const hideMoonOnDay = config.hide_moon_phase_on_day ?? false;
     const showMoonIcon = config.show_moon_icon_in_text ?? false;
@@ -2257,14 +2283,14 @@ class SunPositionCard extends HTMLElement {
       const cond = this._localize(`weather_state.${weatherStateObj.state}`);
       let temp = weatherStateObj.attributes.temperature;
 
-     // Берем unit из weather entity если есть
+      // Einheit bevorzugt aus der Weather-Entity
       let unit =
         weatherStateObj.attributes.temperature_unit ||
         weatherStateObj.attributes.unit_of_measurement ||
         hass.config.unit_system.temperature ||
         '°C';
 
-      // temp_entity имеет приоритет
+      // temp_entity hat Priorität
       if (tempStateObj && !isNaN(parseFloat(tempStateObj.state))) {
         temp = tempStateObj.state;
 
@@ -2275,10 +2301,14 @@ class SunPositionCard extends HTMLElement {
 
       const parsedTemp = parseFloat(temp);
 
-      weatherTemp = !isNaN(parsedTemp)
-        ? `${parsedTemp.toFixed(1)}${unit}`
-        : `--${unit}`;
-		
+      if (isNaN(parsedTemp)) {
+        weatherTemp = `--${unit}`;
+      } else if (typeof tempDecimals === 'number') {
+        weatherTemp = `${parsedTemp.toFixed(tempDecimals)}${unit}`;
+      } else {
+        weatherTemp = `${temp}${unit}`;
+      }
+
       weatherText = `${cond}, ${weatherTemp}`;
       weatherIcon = this._getWeatherIcon(weatherStateObj.state);
     }
@@ -2408,14 +2438,10 @@ class SunPositionCard extends HTMLElement {
         const badgeBg = isDay ? 'rgba(21, 67, 108, 0.8)' : 'rgba(0, 0, 0, 0.8)';
         solarBadgeEl.style.background = badgeBg;
         const solarValue = parseFloat(solarStateObj.state);
-
-        solarBadgeEl.innerHTML =
-          !isNaN(solarValue)
-            ? `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`
-            : `<ha-icon icon="mdi:solar-power"></ha-icon><span>--</span>`;
-		  
         const solarUnit = solarStateObj.attributes.unit_of_measurement || 'W';
-        solarBadgeEl.innerHTML = `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`;
+        solarBadgeEl.innerHTML = !isNaN(solarValue)
+          ? `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`
+          : `<ha-icon icon="mdi:solar-power"></ha-icon><span>--</span>`;
       } else {
         solarBadgeEl.style.display = 'none';
       }
