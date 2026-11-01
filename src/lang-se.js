@@ -63,6 +63,7 @@ export default {
         moon_entity: "Mån-entitet (valfri)",
         weather_entity: "Väder-entitet (valfri)",
         temp_entity: "Temperatur-entitet (valfri, ersätter väder)",
+        temperature_decimals: "Avrunda temperatur (valfritt, standard: ingen avrundning)",
         main_options: "Visningsalternativ",
         view_mode: "Visningsläge",
         view_mode_classic: "Klassisk (6 bilder)",

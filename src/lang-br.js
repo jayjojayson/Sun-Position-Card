@@ -63,6 +63,7 @@ export default {
         moon_entity: "Entidade Lunar (Opcional)",
         weather_entity: "Entidade de Clima (Opcional)",
         temp_entity: "Entidade de Temperatura (Opcional, substitui clima)",
+        temperature_decimals: "Arredondar temperatura (Opcional, padrão: sem arredondamento)",
         main_options: "Opções de Exibição",
         view_mode: "Modo de Visualização",
         view_mode_classic: "Clássico (6 Imagens)",

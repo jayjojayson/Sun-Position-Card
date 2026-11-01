@@ -63,6 +63,7 @@ export default {
         moon_entity: "Entita měsíce (volitelné)",
         weather_entity: "Entita počasí (volitelné)",
         temp_entity: "Entita teploty (volitelné, přepíše počasí)",
+        temperature_decimals: "Zaokrouhlení teploty (volitelné, výchozí: bez zaokrouhlení)",
         main_options: "Možnosti zobrazení",
         view_mode: "Režim zobrazení",
         view_mode_classic: "Klasický (6 obrázků)",

@@ -63,6 +63,7 @@ export default {
         moon_entity: "Entità Luna (Opzionale)",
         weather_entity: "Entità Meteo (Opzionale)",
         temp_entity: "Entità Temperatura (Opzionale, sovrascrive il meteo)",
+        temperature_decimals: "Arrotonda temperatura (opzionale, predefinito: nessun arrotondamento)",
         main_options: "Opzioni di Visualizzazione",
         view_mode: "Modalità di Visualizzazione",
         view_mode_classic: "Classica (6 Immagini)",

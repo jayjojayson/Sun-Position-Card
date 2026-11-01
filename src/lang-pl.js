@@ -63,6 +63,7 @@ export default {
         moon_entity: "Encja księżyca (opcjonalnie)",
         weather_entity: "Encja pogody (opcjonalnie)",
         temp_entity: "Encja temperatury (opcjonalnie, nadpisuje pogodę)",
+        temperature_decimals: "Zaokrąglenie temperatury (opcjonalne, domyślnie: bez zaokrąglania)",
         main_options: "Opcje wyświetlania",
         view_mode: "Tryb widoku",
         view_mode_classic: "Klasyczny (6 obrazów)",
