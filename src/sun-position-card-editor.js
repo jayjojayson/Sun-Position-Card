@@ -10,6 +10,7 @@ import ru from './lang-ru.js';
 import br from './lang-br.js';
 import se from './lang-se.js';
 import es from './lang-es.js';
+import da from './lang-da.js';
 
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
@@ -27,7 +28,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es, da };
     this._initialized = false;
   }
     
@@ -41,31 +42,10 @@ class SunPositionCardEditor extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this.shadowRoot) {
-        // Aktualisiere hass auch für die neuen ha-selector Elemente
+        // hass an alle ha-selector Elemente weitergeben
         this.shadowRoot.querySelectorAll("ha-selector").forEach(picker => {
-            if (picker) {
-                picker.hass = hass;
-            }
+            picker.hass = hass;
         });
-        // Fallback für verbleibende Picker, falls vorhanden
-        this.shadowRoot.querySelectorAll("ha-entity-picker").forEach(picker => {
-            if (picker) {
-                picker.hass = hass;
-            }
-        });
-        
-        // Aktualisiere Sichtbarkeit des 12h-Schalters basierend auf Sprache
-        const use12hContainer = this.shadowRoot.getElementById('use_12h_format_container');
-        if (use12hContainer) {
-            const currentLang = (this._config?.language || hass?.locale?.language || 'en').split('-')[0];
-            const isEnglish = currentLang === 'en';
-            
-            if (isEnglish) {
-                use12hContainer.classList.remove('hidden');
-            } else {
-                use12hContainer.classList.add('hidden');
-            }
-        }
     }
   }
   
@@ -107,7 +87,6 @@ class SunPositionCardEditor extends HTMLElement {
         ha-textfield, ha-selector { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
         .hidden { display: none; }
-        .lang-specific { display: flex; }
       </style>
 
       <div class="card-config">
@@ -139,10 +118,15 @@ class SunPositionCardEditor extends HTMLElement {
             ></ha-selector>
         </div>
 
-        <div id="solar_entity_container" class="hidden">
+        <ha-selector
+          id="solar_entity"
+          label="${this._localize('editor.solar_entity')}"
+        ></ha-selector>
+
+        <div id="solar_decimals_container" class="hidden">
              <ha-selector
-              id="solar_entity"
-              label="${this._localize('editor.solar_entity')}"
+              id="solar_decimals"
+              label="${this._localize('editor.solar_decimals')}"
             ></ha-selector>
         </div>
 
@@ -293,12 +277,14 @@ class SunPositionCardEditor extends HTMLElement {
         tempSelector.required = false; 
     }
 
-    // Temperature Decimals Selector
-    const tempDecimalsSelector = this.shadowRoot.getElementById('temperature_decimals');
-    if (tempDecimalsSelector) {
-      tempDecimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
-      tempDecimalsSelector.required = false;
-    }
+    // Nachkommastellen für Temperatur und Solarleistung (leer = keine Rundung)
+    ['temperature_decimals', 'solar_decimals'].forEach(id => {
+        const decimalsSelector = this.shadowRoot.getElementById(id);
+        if (decimalsSelector) {
+            decimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
+            decimalsSelector.required = false;
+        }
+    });
 
     // Slider Konfiguration für Sun Size
     const sunSizeSelector = this.shadowRoot.getElementById('sun_size');
@@ -371,7 +357,8 @@ class SunPositionCardEditor extends HTMLElement {
             { value: "ru", label: "Русский" },
             { value: "sv", label: "Svenska" },
             { value: "es", label: "Español" },
-            { value: "pt", label: "Português do Brasil" }
+            { value: "pt", label: "Português do Brasil" },
+            { value: "da", label: "Dansk" }
         ], mode: "dropdown" } };
     }
 
@@ -397,6 +384,7 @@ class SunPositionCardEditor extends HTMLElement {
     add('temp_entity', 'value-changed');
     add('temperature_decimals', 'value-changed');
     add('solar_entity', 'value-changed');
+    add('solar_decimals', 'value-changed');
     add('view_mode', 'value-changed');
     add('sun_size', 'value-changed');
     add('state_position', 'value-changed');
@@ -448,12 +436,14 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('temp_entity', config.temp_entity || '');
     setVal('temperature_decimals', config.temperature_decimals ?? '');
     setVal('solar_entity', config.solar_entity || '');
+    setVal('solar_decimals', config.solar_decimals ?? '');
     setVal('sun_size', config.sun_size || 50);
-    
+
+    // Standardwerte identisch zur Card
     setVal('view_mode', config.view_mode || 'classic');
     setVal('state_position', config.state_position || 'in_list');
     setVal('moon_phase_position', config.moon_phase_position || 'in_list');
-    setVal('time_position', config.time_position || 'right');
+    setVal('time_position', config.time_position || 'below');
     setVal('time_list_format', config.time_list_format || 'centered');
     setVal('language', config.language || '');
 
@@ -465,14 +455,14 @@ class SunPositionCardEditor extends HTMLElement {
     setCheck('show_night_arc', config.show_night_arc ?? false);
     setCheck('show_moon_icon_in_text', config.show_moon_icon_in_text ?? false); 
     setCheck('show_dividers', config.show_dividers ?? true);
-    setCheck('show_degrees', config.show_degrees ?? true);
+    setCheck('show_degrees', config.show_degrees ?? false);
     setCheck('show_degrees_in_list', config.show_degrees_in_list ?? false);
     setCheck('use_12h_format', config.use_12h_format ?? false);
 
     setVal('morning_azimuth', config.morning_azimuth || 150);
     setVal('noon_azimuth', config.noon_azimuth || 200);
     setVal('afternoon_azimuth', config.afternoon_azimuth || 255);
-    setVal('dusk_elevation', config.dusk_elevation || 9);
+    setVal('dusk_elevation', config.dusk_elevation || 10);
 
     const sunSizeContainer = root.getElementById('sun_size_container');
 
@@ -481,19 +471,6 @@ class SunPositionCardEditor extends HTMLElement {
         sunSizeContainer.classList.remove('hidden');
     } else {
         sunSizeContainer.classList.add('hidden');
-    }
-
-    // Sichtbarkeit des 12h Format Schalters nur für Englisch
-    const use12hContainer = root.getElementById('use_12h_format_container');
-    if (use12hContainer) {
-        const currentLang = (config.language || this._hass?.locale?.language || 'en').split('-')[0];
-        const isEnglish = currentLang === 'en';
-        
-        if (isEnglish) {
-            use12hContainer.classList.remove('hidden');
-        } else {
-            use12hContainer.classList.add('hidden');
-        }
     }
 
     // Steuerung der Sichtbarkeit für alle Mond-Optionen
@@ -511,24 +488,25 @@ class SunPositionCardEditor extends HTMLElement {
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
     const tempEntityContainer = root.getElementById('temp_entity_container');
-    const solarEntityContainer = root.getElementById('solar_entity_container');
-    const solarBadgeToggleContainer = root.getElementById('solar_badge_toggle_container');
-    
+
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
         tempEntityContainer.classList.remove('hidden');
-        solarEntityContainer.classList.remove('hidden');
-        if (config.solar_entity) {
-            solarBadgeToggleContainer.classList.remove('hidden');
-        } else {
-            solarBadgeToggleContainer.classList.add('hidden');
-        }
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
         tempEntityContainer.classList.add('hidden');
-        solarEntityContainer.classList.add('hidden');
+    }
+
+    // Solar-Badge ist unabhängig von der Wetter-Entität
+    const solarDecimalsContainer = root.getElementById('solar_decimals_container');
+    const solarBadgeToggleContainer = root.getElementById('solar_badge_toggle_container');
+    if (config.solar_entity) {
+        solarDecimalsContainer.classList.remove('hidden');
+        solarBadgeToggleContainer.classList.remove('hidden');
+    } else {
+        solarDecimalsContainer.classList.add('hidden');
         solarBadgeToggleContainer.classList.add('hidden');
     }
 
@@ -542,9 +520,6 @@ class SunPositionCardEditor extends HTMLElement {
     if (this._hass) {
         // hass auch an Selektoren übergeben
         root.querySelectorAll("ha-selector").forEach(picker => {
-            picker.hass = this._hass;
-        });
-        root.querySelectorAll("ha-entity-picker").forEach(picker => {
             picker.hass = this._hass;
         });
     }
@@ -628,15 +603,15 @@ class SunPositionCardEditor extends HTMLElement {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'weather');
          }
          delete newConfig.weather_entity;
-         delete newConfig.show_weather_badge; 
+         delete newConfig.show_weather_badge;
          delete newConfig.temp_entity;
-         delete newConfig.solar_entity;
-         delete newConfig.show_solar_badge;
+         delete newConfig.temperature_decimals;
     }
     // Cleanup Solar Entity wenn gelöscht
     if (configValue === 'solar_entity' && !newConfig.solar_entity) {
          delete newConfig.solar_entity;
          delete newConfig.show_solar_badge;
+         delete newConfig.solar_decimals;
     }
 
     // Wenn Sprache geändert wird, Editor neu rendern für aktualisierte Labels
