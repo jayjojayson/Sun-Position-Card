@@ -96,6 +96,7 @@ export default {
         language: "Språk",
         language_auto: "Automatiskt (Home Assistant)",
         solar_entity: "Solenergi-entitet (valfri, t.ex. vädersensor)",
+        solar_decimals: "Avrunda solenergi (valfritt, standard: ingen avrundning)",
         show_solar_badge: "Visa solenergi-indikator",
         advanced_options: "Tröskelvärden (avancerat)",
         morning_azimuth: "Morgon-azimut",

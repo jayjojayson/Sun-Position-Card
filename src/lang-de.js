@@ -96,6 +96,7 @@ export default {
         language: "Sprache",
         language_auto: "Automatisch (Home Assistant)",
         solar_entity: "Solarleistung-Entität (Optional, z.B. Wetter-Sensor)",
+        solar_decimals: "Solarleistung runden (Optional, Standard: keine Rundung)",
         show_solar_badge: "Solarleistungs-Badge im Bild anzeigen",
         advanced_options: "Schwellwerte (Erweitert)",
         morning_azimuth: "Morgen Azimut",

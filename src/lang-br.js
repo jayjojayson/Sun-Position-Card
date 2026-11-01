@@ -96,6 +96,7 @@ export default {
         language: "Idioma",
         language_auto: "Automático (Home Assistant)",
         solar_entity: "Entidade de Energia Solar (Opcional, ex: sensor de clima)",
+        solar_decimals: "Arredondar energia solar (Opcional, padrão: sem arredondamento)",
         show_solar_badge: "Mostrar Badge de Energia Solar",
         advanced_options: "Limites (Avançado)",
         morning_azimuth: "Azimute da Manhã",

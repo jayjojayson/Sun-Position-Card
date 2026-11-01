@@ -96,6 +96,7 @@ export default {
       language: "Idioma",
       language_auto: "Automático (Home Assistant)",
       solar_entity: "Entidad de energía solar (Opcional)",
+      solar_decimals: "Redondear potencia solar (Opcional, por defecto sin redondeo)",
       show_solar_badge: "Mostrar insignia de energía solar",
       advanced_options: "Umbrales (Avanzado)",
       morning_azimuth: "Azimut de la mañana",

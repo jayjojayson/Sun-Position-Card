@@ -96,6 +96,7 @@ export default {
         language: "Язык",
         language_auto: "Автоматически (Home Assistant)",
         solar_entity: "Объект солнечной мощности (Опционально, напр. сенсор погоды)",
+        solar_decimals: "Округление солнечной мощности (необязательно, по умолчанию без округления)",
         show_solar_badge: "Показывать солнечную мощность",
         advanced_options: "Пороги (Расширенные)",
         morning_azimuth: "Азимут утром",
