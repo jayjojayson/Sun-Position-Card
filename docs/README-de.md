@@ -290,6 +290,15 @@ card_mod:
 
 ---
 
+## Mitwirkende
+
+Danke an alle, die zu dieser Card beigetragen haben:
+
+- [@undel-gh](https://github.com/undel-gh) – Übersetzungen Russisch, Spanisch, Schwedisch und Brasilianisches Portugiesisch, verbesserte Zeit-, Temperatur- und Solar-Badge-Darstellung
+- [@gerd-goemans](https://github.com/gerd-goemans) – Option zum Runden der Temperatur
+
+---
+
 ## Forum-Discussion 
 
 [![Forum smarthome-community](https://img.shields.io/badge/Forum-smarthome--community-blue)](https://community-smarthome.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/9389) [![Forum simon42-community](https://img.shields.io/badge/Forum-simon42--community-blue)](https://community.simon42.com/t/custom-sun-position-card-fuer-home-assistant-sonnenstand-card-hacs/72199)

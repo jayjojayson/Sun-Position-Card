@@ -25,7 +25,7 @@ The `moon.phase` entity is optional and is only required to display the current 
 
 To get the moon sensor, go to Settings → Devices & Services → Add integration and search for "Moon." This is Home Assistant's built-in moon integration.
 
-Translation for English, German, French, Italian and Dutch are included. If you need other translation, tell me.
+Translations for English, German, French, Italian, Dutch, Polish, Czech, Russian, Spanish, Swedish and Brazilian Portuguese are included. If you need other translation, tell me.
 
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
@@ -124,6 +124,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
 | `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
 | `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
+| `temperature_decimals`| `number` | No         | Anzahl der Nachkommastellen für die Temperatur im Wetter-Badge. Ohne Angabe wird nicht gerundet.            | `0` – `3`                                |
 
 
 simple example:
@@ -249,3 +250,12 @@ card_mod:
       border-top: 2px dashed red;
     }
 ```
+
+---
+
+## Contributors
+
+Thanks to everyone who contributed to this card:
+
+- [@undel-gh](https://github.com/undel-gh) – Russian, Spanish, Swedish and Brazilian Portuguese translations, improved time, temperature and solar badge handling
+- [@gerd-goemans](https://github.com/gerd-goemans) – option to round the temperature
