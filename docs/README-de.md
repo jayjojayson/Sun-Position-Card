@@ -22,6 +22,8 @@ Die Karte ist vollständig über die Benutzeroberfläche des Karteneditors konfi
 Du benötigst die sun.sun-Entität, die von Home Assistant bereitgestellt wird, sobald dein Home-Standort konfiguriert ist. Die moon.phase-Entität ist optional und wird nur benötigt, um die aktuelle Mondphase anzuzeigen.
 Um den Mond-Sensor zu erhalten, gehe zu Einstellungen → Geräte & Dienste → Integration hinzufügen und suche nach Mond. Dies ist die integrierte Mond-Integration von Home Assistant.
 
+Übersetzungen für Englisch, Deutsch, Französisch, Italienisch, Niederländisch, Polnisch, Tschechisch, Russisch, Spanisch, Schwedisch, Brasilianisches Portugiesisch und Dänisch sind enthalten. Für weitere Sprachen kannst du ein Issue mit der [Übersetzungs-Vorlage](https://github.com/jayjojayson/Sun-Position-Card/issues/new?template=add-translation.md) erstellen.
+
 Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewertung ⭐ freuen. 🤗
 
 ## Features
@@ -38,6 +40,8 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 - ### ⚙️ **UI-Konfiguration**
 - ### 🌐 **Manuelle Sprachauswahl** 
 - ### 🔋 **Solarleistungs-Badge** 
+- ### 🌏 **Unterstützung für die Südhalbkugel**
+- ### 🔢 **Rundung für Temperatur und Solarleistung**
 - ### 🆕 **Dropdowns kompatibel mit HA 2026.3+**
 ---
 
@@ -83,25 +87,21 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
   <summary> <b>Manuelle Installation in HA</b></summary>  
  
 ### Manuelle Installation in HA
-1.  **Dateien herunterladen:**
-    *   Lade die `sun-position-card.js`, `sun-position-card-editor.js` und die PNG-Bilddateien aus diesem Repository herunter.
+1.  **Datei herunterladen:**
+    *   Lade die `sun-position-card.js` aus dem [aktuellen Release](https://github.com/jayjojayson/Sun-Position-Card/releases/latest) (oder aus dem Ordner `dist`) herunter. Diese eine Datei enthält bereits den Editor, alle Übersetzungen und alle Bilder.
 
-2.  **Dateien in Home Assistant hochladen:**
-    *   Erstelle einen neuen Ordner namens `Sun-Position-Card` im `www`-Verzeichnis deiner Home Assistant-Konfiguration. (Das `www`-Verzeichnis befindet sich im selben Ordner wie deine `configuration.yaml`).
-    *   Kopiere **alle heruntergeladenen Dateien** in diesen neuen Ordner. Deine Ordnerstruktur sollte wie folgt aussehen:
+2.  **Datei in Home Assistant hochladen:**
+    *   Erstelle die Ordner `community/Sun-Position-Card` im `www`-Verzeichnis deiner Home Assistant-Konfiguration. (Das `www`-Verzeichnis befindet sich im selben Ordner wie deine `configuration.yaml`).
+    *   Kopiere die Datei in diesen Ordner:
         ```
-        /config/www/Sun-Position-Card/sun-position-card.js
-        /config/www/Sun-Position-Card/sun-position-card-editor.js
-        /config/www/Sun-Position-Card/images/morgen.png
-        /config/www/Sun-Position-Card/images/mittag.png
-        ... (alle anderen Bilder)
+        /config/www/community/Sun-Position-Card/sun-position-card.js
         ```
 
 3.  **Ressource zu Home Assistant hinzufügen:**
     *   Gehe in Home Assistant zu **Einstellungen > Dashboards**.
     *   Klicke auf das Menü mit den drei Punkten oben rechts und wähle **Ressourcen**.
     *   Klicke auf **+ Ressource hinzufügen**.
-    *   Gebe als URL `/local/Sun-Position-Card/sun-position-card.js` ein.
+    *   Gebe als URL `/local/community/Sun-Position-Card/sun-position-card.js` ein.
     *   Wähle als Ressourcentyp **JavaScript-Modul**.
     *   Klicke auf **Erstellen**.
 </details>
@@ -135,25 +135,49 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 
 ### Optionen
 
-| name                  | typ      | required   | description                                                                                                 | standard                                 |
-| --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
-| `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
-| `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
-| `moon_phase_position` | `string` | No         | Position Text Mondphase im Verhältnis zum Bild. 											                  | `above`, `in_list`   					 |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. 														  | `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`       |
-| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. 											                  | `above`, `below`, `right`                |
-| `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste).							 				  | `above`, `in_list` 						 |
-| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation. 																  | `true`, `false`                          |
-| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
-| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
-| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
-| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`, `arc`			 |
-| `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
-| `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
-| `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
-| `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
+| Name                     | Typ       | Standard                      | Beschreibung |
+| ------------------------ | --------- | ----------------------------- | ------------ |
+| `type`                   | `string`  | **Pflicht**                   | `custom:sun-position-card` |
+| `entity`                 | `string`  | **Pflicht**                   | Die Entität Sonne, normalerweise `sun.sun`. |
+| `moon_entity`            | `string`  |                               | Mondphasen-Sensor, normalerweise `sensor.moon_phase`. |
+| `weather_entity`         | `string`  |                               | Wetter-Entität für das Wetter-Badge und den Eintrag `weather`. |
+| `temp_entity`            | `string`  |                               | Temperatursensor, überschreibt die Temperatur der Wetter-Entität. |
+| `temperature_decimals`   | `number`  | keine Rundung                 | Nachkommastellen der Temperatur (`0` – `3`). |
+| `solar_entity`           | `string`  |                               | Sensor für die Solarleistung (Solar-Badge). |
+| `solar_decimals`         | `number`  | keine Rundung                 | Nachkommastellen der Solarleistung (`0` – `3`). |
+| `show_weather_badge`     | `boolean` | `true`                        | Wetter-Badge auf dem Bild anzeigen. |
+| `show_solar_badge`       | `boolean` | `true`                        | Solar-Badge auf dem Bild anzeigen. |
+| `view_mode`              | `string`  | `classic`                     | `classic` (6 Bilder), `calculated` (Höhe) oder `arc` (180°-Bogen). |
+| `sun_size`               | `number`  | `50`                          | Größe von Sonne/Mond in px (nur Bogen-Ansicht). |
+| `show_image`             | `boolean` | `true`                        | Bild des Sonnenstands anzeigen. |
+| `animate_images`         | `boolean` | `false`                       | Sonnenbilder animieren. |
+| `state_position`         | `string`  | `in_list`                     | Position des aktuellen Status: `above`, `in_list`, `hide`. |
+| `moon_phase_position`    | `string`  | `in_list`                     | Position des Mondphasen-Textes: `above`, `in_list`. |
+| `hide_moon_phase_on_day` | `boolean` | `false`                       | Mondphase tagsüber ausblenden. |
+| `show_night_arc`         | `boolean` | `false`                       | Mond nachts auf einem Bogen anzeigen. |
+| `show_moon_icon_in_text` | `boolean` | `false`                       | Mond-Icon neben dem Mondphasen-Text anzeigen. |
+| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `moon_phase`, `weather` |
+| `time_position`          | `string`  | `below`                       | Position der Zeitangaben: `above`, `below`, `right`. |
+| `time_list_format`       | `string`  | `centered`                    | Ausrichtung der Zeitliste: `centered`, `block`. |
+| `show_degrees`           | `boolean` | `false`                       | Azimut und Höhe anzeigen. |
+| `show_degrees_in_list`   | `boolean` | `false`                       | Azimut und Höhe in der Zeitliste anzeigen. |
+| `show_dividers`          | `boolean` | `true`                        | Trennlinien zwischen den Zeiten anzeigen. |
+| `use_12h_format`         | `boolean` | `false`                       | 12-Stunden-Format (AM/PM) verwenden. |
+| `language`               | `string`  | Sprache von Home Assistant    | `de`, `en`, `fr`, `it`, `nl`, `pl`, `cs`, `ru`, `sv`, `es`, `pt`, `da` |
+| `hemisphere`             | `string`  | `auto`                        | `auto` (aus dem Breitengrad des HA-Standorts), `north` oder `south`. Nur per YAML. |
+| `morning_azimuth`        | `number`  | `150`                         | Azimut-Grenzwert für den Morgen. |
+| `noon_azimuth`           | `number`  | `200`                         | Azimut-Grenzwert für den Mittag. |
+| `afternoon_azimuth`      | `number`  | `255`                         | Azimut-Grenzwert für den Nachmittag. |
+| `dusk_elevation`         | `number`  | `10`                          | Höhen-Grenzwert für die Dämmerung. |
+
+#### Südhalbkugel
+
+Die Card erkennt die Südhalbkugel automatisch über den Breitengrad deines Home-Assistant-Standorts:
+
+- Die Tageszeit (Morgen, Mittag, Nachmittag, Abend) wird korrekt bestimmt, obwohl die Sonne mittags im Norden steht. Die Azimut-Grenzwerte behalten dieselben Werte wie auf der Nordhalbkugel.
+- Mondbilder und Mond-Icons werden um 180° gedreht dargestellt, so wie der Mond von der Südhalbkugel aus zu sehen ist.
+
+Falls die Erkennung nicht passt, kann sie per YAML mit `hemisphere: north` oder `hemisphere: south` festgelegt werden.
 
 
 ### Beispielkonfiguration
@@ -294,8 +318,19 @@ card_mod:
 
 Danke an alle, die zu dieser Card beigetragen haben:
 
-- [@undel-gh](https://github.com/undel-gh) – Übersetzungen Russisch, Spanisch, Schwedisch und Brasilianisches Portugiesisch, verbesserte Zeit-, Temperatur- und Solar-Badge-Darstellung
+- [@undel-gh](https://github.com/undel-gh) – Russische Übersetzung, Einbindung der Übersetzungen Spanisch, Schwedisch und Brasilianisches Portugiesisch, verbesserte Zeit-, Temperatur- und Solar-Badge-Darstellung
 - [@gerd-goemans](https://github.com/gerd-goemans) – Option zum Runden der Temperatur
+
+### Übersetzungen
+
+- Tschechisch: [@Tarasa24](https://github.com/Tarasa24), [@krenstik](https://github.com/krenstik)
+- Spanisch: [@Kepinardo](https://github.com/Kepinardo)
+- Brasilianisches Portugiesisch: [@vodikus](https://github.com/vodikus)
+- Schwedisch: [@MatAhman](https://github.com/MatAhman)
+- Dänisch: [@strickeraxelsen](https://github.com/strickeraxelsen)
+- Russisch: [@undel-gh](https://github.com/undel-gh)
+
+Danke auch an alle, die Fehler gemeldet und Ideen beigesteuert haben.
 
 ---
 

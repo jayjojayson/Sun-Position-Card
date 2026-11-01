@@ -21,11 +21,11 @@
 
 The Sun Position Card is a custom Lovelace Card that visualizes the current sun position with various options, as well as the current moon phase and other relevant solar times. 
 The card is fully configurable via the card editor interface. You will need the `sun.sun` entity, which is provided by Home Assistant once your home location is configured. 
-The `moon.phase` entity is optional and is only required to display the current moon phase.
+The moon phase sensor (usually `sensor.moon_phase`) is optional and is only required to display the current moon phase.
 
 To get the moon sensor, go to Settings → Devices & Services → Add integration and search for "Moon." This is Home Assistant's built-in moon integration.
 
-Translations for English, German, French, Italian, Dutch, Polish, Czech, Russian, Spanish, Swedish and Brazilian Portuguese are included. If you need other translation, tell me.
+Translations for English, German, French, Italian, Dutch, Polish, Czech, Russian, Spanish, Swedish, Brazilian Portuguese and Danish are included. If you need another translation, open an issue with the [translation template](https://github.com/jayjojayson/Sun-Position-Card/issues/new?template=add-translation.md).
 
 If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
@@ -42,6 +42,8 @@ If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 - ### ⚙️ **UI Configuration**
 - ### 🌐 **Manual Language Selection** 
 - ### 🔋 **Solar Power Badge**
+- ### 🌏 **Southern Hemisphere Support**
+- ### 🔢 **Rounding for Temperature and Solar Power**
 - ### 🆕 **Dropdowns compatible with HA 2026.3+** 
 ---
 
@@ -84,8 +86,8 @@ If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 
 ### Manual Installation
 
-1.  Download the `sun-position-card.js`, `sun-position-card-editor.js` and the `images` folder from the repo in github.
-2.  Place the `sun-position-card.js` and `sun-position-card-editor.js` files and the `images` folder in `config/www/community/Sun-Position-Card/`. You will have to create the `community` and `Sun-Position-Card` folders.
+1.  Download `sun-position-card.js` from the [latest release](https://github.com/jayjojayson/Sun-Position-Card/releases/latest) (or from the `dist` folder). This single file already contains the editor, all translations and all images.
+2.  Place `sun-position-card.js` in `config/www/community/Sun-Position-Card/`. You will have to create the `community` and `Sun-Position-Card` folders.
 3.  Add the resource to your Lovelace configuration through the Home Assistant UI:
     a. Go to "Settings" -> "Dashboards".
     b. Click on the three dots in the top right corner and select "Resources".
@@ -105,26 +107,49 @@ Although the UI configuration is recommended, the card can also be configured ma
 
 ### Options
 
-| name                  | typ      | required   | description                                                                                                 | standard                                 |
-| --------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `type`                | `string` | Yes        | `custom:sun-position-card`                                                                                  |                                          |
-| `entity`              | `string` | Yes        | Die Entität Sonne, normalerweise `sun.sun`.                                         		                  |                                          |
-| `moon_entity`			| `string` | No         | Die Entität Mond, normalerweise `sensor.moon_phase`. 										                  | 										 |
-| `moon_phase_position` | `string` | No         | Position Text Mondphase im Verhältnis zum Bild. 											                  | `above`, `in_list`   					 |
-| `times_to_show`       | `list`   | No         | Eine Liste von Zeiten, die angezeigt werden sollen. 														  | `daylight_duration, next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`       |
-| `time_position`       | `string` | No         | Position der Zeitangaben im Verhältnis zum Bild. 											                  | `above`, `below`, `right`                |
-| `time_list_format`	| `string` | No         | Format der Zeitangaben Blocksatz oder Zentriert											 				  | `block`, `centered`  					 |
-| `state_position` 		| `string` | No         | Position des aktuellen Status (über dem Bild, in der Time-Liste).							 				  | `above`, `in_list` 						 |
-| `show_degrees` 		| `boolean` | No         | Zeige Gradzahlen für Azimuth und Elevation. 																  | `true`, `false`                          |
-| `show_degrees_in_list`| `boolean` | No         | Zeige Gradzahlen in der Timeliste.																		  | `true`, `false`                          |
-| `show_dividers` 		| `boolean` | No         | Zeige Trennlinien zwischen den Zeiten. 																	  | `true`, `false`                          |
-| `animate_images` 		| `boolean` | No         | Animiere die Sonnenstandsbilder.																			  | `true`, `false`                          |
-| `view_mode`			| `string` | No         | Ansichtsoption klassich mit Bildern oder berechneter Sonnenstand. 										  | `classic`, `calculated`, `arc`			 |
-| `morning_azimuth`     | `number` | No         | Azimut-Grenzwert für den Morgen.                                                                            | `150`                                    |
-| `noon_azimuth`        | `number` | No         | Azimut-Grenzwert für den Mittag.                                                                            | `200`                                    |
-| `afternoon_azimuth`   | `number` | No         | Azimut-Grenzwert für den Nachmittag.                                                                        | `255`                                    |
-| `dusk_elevation`      | `number` | No         | Höhen-Grenzwert für die Dämmerung.                                                                          | `10`                                     |
-| `temperature_decimals`| `number` | No         | Anzahl der Nachkommastellen für die Temperatur im Wetter-Badge. Ohne Angabe wird nicht gerundet.            | `0` – `3`                                |
+| Name                     | Type      | Default                       | Description |
+| ------------------------ | --------- | ----------------------------- | ----------- |
+| `type`                   | `string`  | **required**                  | `custom:sun-position-card` |
+| `entity`                 | `string`  | **required**                  | The sun entity, usually `sun.sun`. |
+| `moon_entity`            | `string`  |                               | Moon phase sensor, usually `sensor.moon_phase`. |
+| `weather_entity`         | `string`  |                               | Weather entity for the weather badge and the `weather` entry. |
+| `temp_entity`            | `string`  |                               | Temperature sensor, overrides the temperature of the weather entity. |
+| `temperature_decimals`   | `number`  | no rounding                   | Decimal places for the temperature (`0` – `3`). |
+| `solar_entity`           | `string`  |                               | Solar power sensor for the solar badge. |
+| `solar_decimals`         | `number`  | no rounding                   | Decimal places for the solar power (`0` – `3`). |
+| `show_weather_badge`     | `boolean` | `true`                        | Show the weather badge on the image. |
+| `show_solar_badge`       | `boolean` | `true`                        | Show the solar power badge on the image. |
+| `view_mode`              | `string`  | `classic`                     | `classic` (6 images), `calculated` (elevation) or `arc` (180° arc). |
+| `sun_size`               | `number`  | `50`                          | Size of sun/moon in px (arc view only). |
+| `show_image`             | `boolean` | `true`                        | Show the sun position image. |
+| `animate_images`         | `boolean` | `false`                       | Animate the sun images. |
+| `state_position`         | `string`  | `in_list`                     | Position of the current state: `above`, `in_list`, `hide`. |
+| `moon_phase_position`    | `string`  | `in_list`                     | Position of the moon phase text: `above`, `in_list`. |
+| `hide_moon_phase_on_day` | `boolean` | `false`                       | Hide the moon phase during the day. |
+| `show_night_arc`         | `boolean` | `false`                       | Show the moon on an arc at night. |
+| `show_moon_icon_in_text` | `boolean` | `false`                       | Show a moon icon next to the moon phase text. |
+| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `moon_phase`, `weather` |
+| `time_position`          | `string`  | `below`                       | Position of the times: `above`, `below`, `right`. |
+| `time_list_format`       | `string`  | `centered`                    | Alignment of the time list: `centered`, `block`. |
+| `show_degrees`           | `boolean` | `false`                       | Show azimuth and elevation. |
+| `show_degrees_in_list`   | `boolean` | `false`                       | Show azimuth and elevation in the time list. |
+| `show_dividers`          | `boolean` | `true`                        | Show dividers between the times. |
+| `use_12h_format`         | `boolean` | `false`                       | Use the 12-hour format (AM/PM). |
+| `language`               | `string`  | Home Assistant language       | `de`, `en`, `fr`, `it`, `nl`, `pl`, `cs`, `ru`, `sv`, `es`, `pt`, `da` |
+| `hemisphere`             | `string`  | `auto`                        | `auto` (from the latitude of your HA location), `north` or `south`. YAML only. |
+| `morning_azimuth`        | `number`  | `150`                         | Azimuth threshold for morning. |
+| `noon_azimuth`           | `number`  | `200`                         | Azimuth threshold for noon. |
+| `afternoon_azimuth`      | `number`  | `255`                         | Azimuth threshold for afternoon. |
+| `dusk_elevation`         | `number`  | `10`                          | Elevation threshold for dawn/dusk. |
+
+#### Southern hemisphere
+
+The card detects the southern hemisphere automatically from the latitude of your Home Assistant location:
+
+- The time of day (morning, noon, afternoon, evening) is calculated correctly, although the sun is in the north at noon. The azimuth thresholds keep the same values as on the northern hemisphere.
+- Moon images and moon icons are shown rotated by 180°, as the moon is seen from the southern hemisphere.
+
+If the detection does not fit your setup, you can force it in YAML with `hemisphere: north` or `hemisphere: south`.
 
 
 simple example:
@@ -257,5 +282,16 @@ card_mod:
 
 Thanks to everyone who contributed to this card:
 
-- [@undel-gh](https://github.com/undel-gh) – Russian, Spanish, Swedish and Brazilian Portuguese translations, improved time, temperature and solar badge handling
+- [@undel-gh](https://github.com/undel-gh) – Russian translation, integration of the Spanish, Swedish and Brazilian Portuguese translations, improved time, temperature and solar badge handling
 - [@gerd-goemans](https://github.com/gerd-goemans) – option to round the temperature
+
+### Translations
+
+- Czech: [@Tarasa24](https://github.com/Tarasa24), [@krenstik](https://github.com/krenstik)
+- Spanish: [@Kepinardo](https://github.com/Kepinardo)
+- Brazilian Portuguese: [@vodikus](https://github.com/vodikus)
+- Swedish: [@MatAhman](https://github.com/MatAhman)
+- Danish: [@strickeraxelsen](https://github.com/strickeraxelsen)
+- Russian: [@undel-gh](https://github.com/undel-gh)
+
+Thanks also to everyone who reported bugs and shared ideas.

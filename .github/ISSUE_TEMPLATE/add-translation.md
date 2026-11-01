@@ -112,6 +112,7 @@ export default {
         language: "Language",
         language_auto: "Automatic (Home Assistant)",
         solar_entity: "Solar Power Entity (Optional, e.g. weather sensor)",
+        solar_decimals: "Round Solar Power (Optional, defaults to no rounding)",
         show_solar_badge: "Show Solar Power Badge",
         advanced_options: "Thresholds (Advanced)",
         morning_azimuth: "Morning Azimuth",
