@@ -101,6 +101,7 @@ const br = {
         language: "Idioma",
         language_auto: "Automático (Home Assistant)",
         solar_entity: "Entidade de Energia Solar (Opcional, ex: sensor de clima)",
+        solar_decimals: "Arredondar energia solar (Opcional, padrão: sem arredondamento)",
         show_solar_badge: "Mostrar Badge de Energia Solar",
         advanced_options: "Limites (Avançado)",
         morning_azimuth: "Azimute da Manhã",
@@ -115,8 +116,8 @@ const cs = {
         description: "Poloha Slunce a Měsíce s vlastními obrázky."
     },
     error: {
-        no_sun_entity: "Prosím definujte entitu slunce.",
-        entity_not_found: "Entita nenalezena: "
+        no_sun_entity: "Zadejte entitu Slunce.",
+        entity_not_found: "Entita nebyla nalezena: "
     },
     sun_state: {
         below_horizon: "Pod obzorem",
@@ -130,89 +131,197 @@ const cs = {
     moon_phase: {
         new_moon: "Nov",
         waxing_crescent: "Dorůstající srpek",
-        first_quarter: "První čtvrt",
-        waxing_gibbous: "Dorůstající měsíc",
+        first_quarter: "První čtvrť",
+        waxing_gibbous: "Dorůstající Měsíc",
         full_moon: "Úplněk",
-        waning_gibbous: "Ubývající měsíc",
-        last_quarter: "Poslední čtvrt",
-        waning_crescent: "Ubývající srpek"
+        waning_gibbous: "Couvající Měsíc",
+        last_quarter: "Poslední čtvrť",
+        waning_crescent: "Couvající srpek"
     },
     weather_state: {
         "clear-night": "Jasná noc",
-        "cloudy": "Oblačno",
+        "cloudy": "Zataženo",
         "fog": "Mlha",
-        "hail": "Kroupy",
+        "hail": "Krupobití",
         "lightning": "Bouřka",
         "lightning-rainy": "Bouřka s deštěm",
-        "partlycloudy": "Částečně oblačno",
-        "pouring": "Liják",
-        "rainy": "Deštivo",
+        "partlycloudy": "Polojasno",
+        "pouring": "Silný déšť",
+        "rainy": "Déšť",
         "snowy": "Sněžení",
         "snowy-rainy": "Déšť se sněhem",
         "sunny": "Slunečno",
         "windy": "Větrno",
         "windy-variant": "Větrno",
-        "exceptional": "Výjimečné"
+        "exceptional": "Mimořádné počasí"
     },
     time_entry: {
-        current: "Aktuální",
+        current: "Aktuálně",
         azimuth: "Azimut",
-        elevation: "Výška",
+        elevation: "Výška nad obzorem",
         daylight_duration: "Délka dne",
-        day_comparison: "Porovnání dne",
-        next_rising: "Východ slunce",
-        next_setting: "Západ slunce",
+        day_comparison: "Porovnání délky dne",
+        next_rising: "Východ Slunce",
+        next_setting: "Západ Slunce",
         next_dawn: "Svítání",
         next_dusk: "Soumrak",
         next_noon: "Poledne",
         next_midnight: "Půlnoc",
-        moon_phase: "Fáze měsíce",
+        moon_phase: "Fáze Měsíce",
         weather: "Počasí"
     },
     editor: {
-        entity: "Entita slunce",
-        moon_entity: "Entita měsíce (volitelné)",
+        entity: "Entita Slunce",
+        moon_entity: "Entita Měsíce (volitelné)",
         weather_entity: "Entita počasí (volitelné)",
-        temp_entity: "Entita teploty (volitelné, přepíše počasí)",
+        temp_entity: "Entita teploty (volitelné, nahradí údaj z počasí)",
         temperature_decimals: "Zaokrouhlení teploty (volitelné, výchozí: bez zaokrouhlení)",
         main_options: "Možnosti zobrazení",
         view_mode: "Režim zobrazení",
         view_mode_classic: "Klasický (6 obrázků)",
-        view_mode_calculated: "Vypočítaný (pouze výška)",
-        view_mode_arc: "Oblouk (pohyb 180°)",
-        show_image: "Zobrazit polohu slunce (obrázek)",
+        view_mode_calculated: "Vypočítaný (pouze výška nad obzorem)",
+        view_mode_arc: "Oblouk (pohyb v rozsahu 180°)",
+        show_image: "Zobrazit polohu Slunce (obrázek)",
         show_weather_badge: "Zobrazit odznak počasí",
-        animate_images: "Animovat obrázky (kromě ranního/soumrakového obrázku)",
+        animate_images: "Animovat obrázky (kromě obrázku rána a soumraku)",
         sun_size: "Velikost Slunce/Měsíce (pouze oblouk)",
-        state_position: "Pozice stavu",
+        state_position: "Umístění stavu",
         state_pos_above: "Nad obrázkem",
         state_pos_in_list: "V seznamu",
         state_pos_hide: "Skrýt",
-        moon_phase_position: "Pozice fáze měsíce",
-        hide_moon_phase_on_day: "Skrýt fázi měsíce přes den",
-        show_night_arc: "Zobrazit oblouk měsíce (180°)",
-        show_moon_icon_in_text: "Zobrazit ikonu měsíce v textu",
+        moon_phase_position: "Umístění fáze Měsíce",
+        hide_moon_phase_on_day: "Skrýt fázi Měsíce během dne",
+        show_night_arc: "Zobrazit oblouk Měsíce (180°)",
+        show_moon_icon_in_text: "Zobrazit ikonu Měsíce v textu",
         show_dividers: "Zobrazit oddělovače",
-        show_degrees: "Zobrazit stupně (Azimut/Výška)",
+        show_degrees: "Zobrazit stupně (azimut/výška)",
         show_degrees_in_list: "Zobrazit stupně v seznamu",
-        time_position: "Pozice časů",
+        time_position: "Umístění času",
         time_pos_below: "Pod obrázkem",
         time_pos_above: "Nad obrázkem",
-        time_pos_right: "Napravo od obrázku",
+        time_pos_right: "Vpravo od obrázku",
         time_list_format: "Zarovnání seznamu časů",
-        time_format_centered: "Vystředěno",
-        time_format_block: "Blokové",
-        times_to_show: "Vybrat časy",
+        time_format_centered: "Na střed",
+        time_format_block: "Do bloku",
+        times_to_show: "Vyberte časy",
         use_12h_format: "Použít 12hodinový formát (AM/PM)",
         language: "Jazyk",
-        language_auto: "Automaticky (Home Assistant)",
+        language_auto: "Automaticky podle Home Assistantu",
         solar_entity: "Entita solárního výkonu (volitelné, např. senzor počasí)",
+        solar_decimals: "Zaokrouhlení solárního výkonu (volitelné, výchozí: bez zaokrouhlení)",
         show_solar_badge: "Zobrazit odznak solárního výkonu",
-        advanced_options: "Prahové hodnoty (Pokročilé)",
+        advanced_options: "Prahové hodnoty (pokročilé)",
         morning_azimuth: "Ranní azimut",
         noon_azimuth: "Polední azimut",
         afternoon_azimuth: "Odpolední azimut",
-        dusk_elevation: "Výška při soumraku"
+        dusk_elevation: "Výška Slunce při soumraku"
+    }
+};
+const da = {
+    card: {
+        name: "Solpositionskort",
+        description: "Solens og månens position med tilpassede billeder."
+    },
+    error: {
+        no_sun_entity: "Angiv venligst en sol-entitet.",
+        entity_not_found: "Entitet ikke fundet: "
+    },
+    sun_state: {
+        below_horizon: "Under horisonten",
+        dawn: "Daggry",
+        dusk: "Skumring",
+        morning: "Morgen",
+        noon: "Middag",
+        afternoon: "Eftermiddag",
+        evening: "Aften"
+    },
+    moon_phase: {
+        new_moon: 'Nymåne',
+        waxing_crescent: 'Tiltagende månesegl',
+        first_quarter: 'Første kvarter',
+        waxing_gibbous: 'Tiltagende halvmåne',
+        full_moon: 'Fuldmåne',
+        waning_gibbous: 'Aftagende halvmåne',
+        last_quarter: 'Sidste kvarter',
+        waning_crescent: 'Aftagende måne'
+    },
+    weather_state: {
+        'clear-night': 'Klar nat',
+        'cloudy': 'Skyet',
+        'fog': 'Tåge',
+        'hail': 'Hagl',
+        'lightning': 'Lynnedslag',
+        'lightning-rainy': 'Torden med regn',
+        'partlycloudy': 'Delvist skyet',
+        'pouring': 'Skybrud',
+        'rainy': 'Regn',
+        'snowy': 'Sne',
+        'snowy-rainy': 'Slud',
+        'sunny': 'Solrigt',
+        'windy': 'Blæsende',
+        'windy-variant': 'Blæsende (variabel)',
+        'exceptional': 'Ekstremt vejr'
+    },
+    time_entry: {
+        current: "Aktuel",
+        azimuth: "Azimut",
+        elevation: "Elevation",
+        daylight_duration: "Dagslys varighed",
+        day_comparison: "Sammenligning af dagslys",
+        next_rising: "Solopgang",
+        next_setting: "Solnedgang",
+        next_dawn: "Daggry",
+        next_dusk: "Skumring",
+        next_noon: "Middag",
+        next_midnight: "Midnat",
+        moon_phase: "Månefase",
+        weather: "Vejr"
+    },
+    editor: {
+        entity: "Sol-entitet",
+        moon_entity: "Måne-entitet (valgfri)",
+        weather_entity: "Vejr-entitet (valgfri)",
+        temp_entity: "Temperatur-entitet (valgfri, tilsidesætter vejr)",
+        temperature_decimals: "Afrund temperatur (valgfri, standard: ingen afrunding)",
+        main_options: "Visningsindstillinger",
+        view_mode: "Visningstilstand",
+        view_mode_classic: "Klassisk (6 billeder)",
+        view_mode_calculated: "Beregnet (kun elevation)",
+        view_mode_arc: "Bue (180° bevægelse)",
+        show_image: "Vis solposition (billede)",
+        show_weather_badge: "Vis vejr-badge",
+        animate_images: "Animér billeder (undtagen morgen-/skumringsbillede)",
+        sun_size: "Sol-/månestørrelse (kun bue)",
+        state_position: "Placering af status",
+        state_pos_above: "Over billedet",
+        state_pos_in_list: "I listen",
+        state_pos_hide: "Skjul",
+        moon_phase_position: "Placering af månefase",
+        hide_moon_phase_on_day: "Skjul månefase om dagen",
+        show_night_arc: "Vis månebue (180°)",
+        show_moon_icon_in_text: "Vis måneikon i teksten",
+        show_dividers: "Vis skillelinjer",
+        show_degrees: "Vis grader (azimut/elevation)",
+        show_degrees_in_list: "Vis grader i listen",
+        time_position: "Placering af tider",
+        time_pos_below: "Under billedet",
+        time_pos_above: "Over billedet",
+        time_pos_right: "Til højre for billedet",
+        time_list_format: "Justering af tidsliste",
+        time_format_centered: "Centreret",
+        time_format_block: "Blok",
+        times_to_show: "Vælg tider",
+        use_12h_format: "Brug 12-timers format (AM/PM)",
+        language: "Sprog",
+        language_auto: "Automatisk (Home Assistant)",
+        solar_entity: "Solenergi-entitet (valgfri)",
+        solar_decimals: "Afrund solenergi (valgfri, standard: ingen afrunding)",
+        show_solar_badge: "Vis solenergi-badge",
+        advanced_options: "Grænseværdier (avanceret)",
+        morning_azimuth: "Morgen-azimut",
+        noon_azimuth: "Middags-azimut",
+        afternoon_azimuth: "Eftermiddags-azimut",
+        dusk_elevation: "Skumrings-elevation"
     }
 };
 const de = {
@@ -313,6 +422,7 @@ const de = {
         language: "Sprache",
         language_auto: "Automatisch (Home Assistant)",
         solar_entity: "Solarleistung-Entität (Optional, z.B. Wetter-Sensor)",
+        solar_decimals: "Solarleistung runden (Optional, Standard: keine Rundung)",
         show_solar_badge: "Solarleistungs-Badge im Bild anzeigen",
         advanced_options: "Schwellwerte (Erweitert)",
         morning_azimuth: "Morgen Azimut",
@@ -419,6 +529,7 @@ const en = {
         language: "Language",
         language_auto: "Automatic (Home Assistant)",
         solar_entity: "Solar Power Entity (Optional, e.g. weather sensor)",
+        solar_decimals: "Round Solar Power (Optional, defaults to no rounding)",
         show_solar_badge: "Show Solar Power Badge",
         advanced_options: "Thresholds (Advanced)",
         morning_azimuth: "Morning Azimuth",
@@ -525,6 +636,7 @@ const es = {
       language: "Idioma",
       language_auto: "Automático (Home Assistant)",
       solar_entity: "Entidad de energía solar (Opcional)",
+      solar_decimals: "Redondear potencia solar (Opcional, por defecto sin redondeo)",
       show_solar_badge: "Mostrar insignia de energía solar",
       advanced_options: "Umbrales (Avanzado)",
       morning_azimuth: "Azimut de la mañana",
@@ -627,9 +739,11 @@ const fr = {
         time_format_centered: "Centré",
         time_format_block: "Bloc",
         times_to_show: "Sélectionner les horaires",
+        use_12h_format: "Utiliser le format 12 heures (AM/PM)",
         language: "Langue",
         language_auto: "Automatique (Home Assistant)",
         solar_entity: "Entité énergie solaire (optionnel)",
+        solar_decimals: "Arrondir la puissance solaire (facultatif, par défaut : pas d'arrondi)",
         show_solar_badge: "Afficher le badge énergie solaire",
         advanced_options: "Seuils (avancé)",
         morning_azimuth: "Azimut du matin",
@@ -732,9 +846,11 @@ const ita = {
         time_format_centered: "Centrato",
         time_format_block: "A Blocchi",
         times_to_show: "Seleziona Orari",
+        use_12h_format: "Usa il formato 12 ore (AM/PM)",
         language: "Lingua",
         language_auto: "Automatico (Home Assistant)",
         solar_entity: "Entità energia solare (Opzionale)",
+        solar_decimals: "Arrotonda potenza solare (opzionale, predefinito: nessun arrotondamento)",
         show_solar_badge: "Mostra Badge Energia Solare",
         advanced_options: "Soglie (Avanzate)",
         morning_azimuth: "Azimut Mattino",
@@ -837,9 +953,11 @@ const nl = {
 		time_format_centered: "Gecentreerd",
 		time_format_block: "Blok",
 		times_to_show: "Selecteer tijden",
+		use_12h_format: "12-uursnotatie gebruiken (AM/PM)",
 		language: "Taal",
 		language_auto: "Automatisch (Home Assistant)",
 		solar_entity: "Zonne-energie entiteit (optioneel)",
+		solar_decimals: "Zonne-energie afronding (optioneel, standaard is geen afronding)",
 		show_solar_badge: "Toon zonne-energie badge",
 		advanced_options: "Drempels (Geavanceerd)",
 		morning_azimuth: "Ochtend Azimuth",
@@ -942,9 +1060,11 @@ const pl = {
         time_format_centered: "Wyśrodkowane",
         time_format_block: "Blokowe",
         times_to_show: "Wybierz czasy",
+        use_12h_format: "Użyj formatu 12-godzinnego (AM/PM)",
         language: "Język",
         language_auto: "Automatycznie (Home Assistant)",
         solar_entity: "Encja energii słonecznej (opcjonalnie)",
+        solar_decimals: "Zaokrąglenie mocy solarnej (opcjonalne, domyślnie: bez zaokrąglania)",
         show_solar_badge: "Pokaż plakietkę energii słonecznej",
         advanced_options: "Progi (zaawansowane)",
         morning_azimuth: "Azymut poranny",
@@ -1051,6 +1171,7 @@ const ru = {
         language: "Язык",
         language_auto: "Автоматически (Home Assistant)",
         solar_entity: "Объект солнечной мощности (Опционально, напр. сенсор погоды)",
+        solar_decimals: "Округление солнечной мощности (необязательно, по умолчанию без округления)",
         show_solar_badge: "Показывать солнечную мощность",
         advanced_options: "Пороги (Расширенные)",
         morning_azimuth: "Азимут утром",
@@ -1157,6 +1278,7 @@ const se = {
         language: "Språk",
         language_auto: "Automatiskt (Home Assistant)",
         solar_entity: "Solenergi-entitet (valfri, t.ex. vädersensor)",
+        solar_decimals: "Avrunda solenergi (valfritt, standard: ingen avrundning)",
         show_solar_badge: "Visa solenergi-indikator",
         advanced_options: "Tröskelvärden (avancerat)",
         morning_azimuth: "Morgon-azimut",
@@ -1198,6 +1320,7 @@ const images = {
 
 
 
+
 const fireEvent = (node, type, detail, options) => {
   options = options || {};
   detail = detail === null || detail === undefined ? {} : detail;
@@ -1214,7 +1337,7 @@ const fireEvent = (node, type, detail, options) => {
 class SunPositionCardEditor extends HTMLElement {
   constructor() {
     super();
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es, da };
     this._initialized = false;
   }
     
@@ -1228,31 +1351,10 @@ class SunPositionCardEditor extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this.shadowRoot) {
-        // Aktualisiere hass auch für die neuen ha-selector Elemente
+        // hass an alle ha-selector Elemente weitergeben
         this.shadowRoot.querySelectorAll("ha-selector").forEach(picker => {
-            if (picker) {
-                picker.hass = hass;
-            }
+            picker.hass = hass;
         });
-        // Fallback für verbleibende Picker, falls vorhanden
-        this.shadowRoot.querySelectorAll("ha-entity-picker").forEach(picker => {
-            if (picker) {
-                picker.hass = hass;
-            }
-        });
-        
-        // Aktualisiere Sichtbarkeit des 12h-Schalters basierend auf Sprache
-        const use12hContainer = this.shadowRoot.getElementById('use_12h_format_container');
-        if (use12hContainer) {
-            const currentLang = (this._config?.language || hass?.locale?.language || 'en').split('-')[0];
-            const isEnglish = currentLang === 'en';
-            
-            if (isEnglish) {
-                use12hContainer.classList.remove('hidden');
-            } else {
-                use12hContainer.classList.add('hidden');
-            }
-        }
     }
   }
   
@@ -1294,7 +1396,6 @@ class SunPositionCardEditor extends HTMLElement {
         ha-textfield, ha-selector { width: 100%; display: block; }
         h4 { margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--divider-color); color: var(--primary-text-color); }
         .hidden { display: none; }
-        .lang-specific { display: flex; }
       </style>
 
       <div class="card-config">
@@ -1326,10 +1427,15 @@ class SunPositionCardEditor extends HTMLElement {
             ></ha-selector>
         </div>
 
-        <div id="solar_entity_container" class="hidden">
+        <ha-selector
+          id="solar_entity"
+          label="${this._localize('editor.solar_entity')}"
+        ></ha-selector>
+
+        <div id="solar_decimals_container" class="hidden">
              <ha-selector
-              id="solar_entity"
-              label="${this._localize('editor.solar_entity')}"
+              id="solar_decimals"
+              label="${this._localize('editor.solar_decimals')}"
             ></ha-selector>
         </div>
 
@@ -1480,12 +1586,14 @@ class SunPositionCardEditor extends HTMLElement {
         tempSelector.required = false; 
     }
 
-    // Temperature Decimals Selector
-    const tempDecimalsSelector = this.shadowRoot.getElementById('temperature_decimals');
-    if (tempDecimalsSelector) {
-      tempDecimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
-      tempDecimalsSelector.required = false;
-    }
+    // Nachkommastellen für Temperatur und Solarleistung (leer = keine Rundung)
+    ['temperature_decimals', 'solar_decimals'].forEach(id => {
+        const decimalsSelector = this.shadowRoot.getElementById(id);
+        if (decimalsSelector) {
+            decimalsSelector.selector = { number: { min: 0, max: 3, mode: "box" } };
+            decimalsSelector.required = false;
+        }
+    });
 
     // Slider Konfiguration für Sun Size
     const sunSizeSelector = this.shadowRoot.getElementById('sun_size');
@@ -1558,7 +1666,8 @@ class SunPositionCardEditor extends HTMLElement {
             { value: "ru", label: "Русский" },
             { value: "sv", label: "Svenska" },
             { value: "es", label: "Español" },
-            { value: "pt", label: "Português do Brasil" }
+            { value: "pt", label: "Português do Brasil" },
+            { value: "da", label: "Dansk" }
         ], mode: "dropdown" } };
     }
 
@@ -1584,6 +1693,7 @@ class SunPositionCardEditor extends HTMLElement {
     add('temp_entity', 'value-changed');
     add('temperature_decimals', 'value-changed');
     add('solar_entity', 'value-changed');
+    add('solar_decimals', 'value-changed');
     add('view_mode', 'value-changed');
     add('sun_size', 'value-changed');
     add('state_position', 'value-changed');
@@ -1635,12 +1745,14 @@ class SunPositionCardEditor extends HTMLElement {
     setVal('temp_entity', config.temp_entity || '');
     setVal('temperature_decimals', config.temperature_decimals ?? '');
     setVal('solar_entity', config.solar_entity || '');
+    setVal('solar_decimals', config.solar_decimals ?? '');
     setVal('sun_size', config.sun_size || 50);
-    
+
+    // Standardwerte identisch zur Card
     setVal('view_mode', config.view_mode || 'classic');
     setVal('state_position', config.state_position || 'in_list');
     setVal('moon_phase_position', config.moon_phase_position || 'in_list');
-    setVal('time_position', config.time_position || 'right');
+    setVal('time_position', config.time_position || 'below');
     setVal('time_list_format', config.time_list_format || 'centered');
     setVal('language', config.language || '');
 
@@ -1652,14 +1764,14 @@ class SunPositionCardEditor extends HTMLElement {
     setCheck('show_night_arc', config.show_night_arc ?? false);
     setCheck('show_moon_icon_in_text', config.show_moon_icon_in_text ?? false); 
     setCheck('show_dividers', config.show_dividers ?? true);
-    setCheck('show_degrees', config.show_degrees ?? true);
+    setCheck('show_degrees', config.show_degrees ?? false);
     setCheck('show_degrees_in_list', config.show_degrees_in_list ?? false);
     setCheck('use_12h_format', config.use_12h_format ?? false);
 
     setVal('morning_azimuth', config.morning_azimuth || 150);
     setVal('noon_azimuth', config.noon_azimuth || 200);
     setVal('afternoon_azimuth', config.afternoon_azimuth || 255);
-    setVal('dusk_elevation', config.dusk_elevation || 9);
+    setVal('dusk_elevation', config.dusk_elevation || 10);
 
     const sunSizeContainer = root.getElementById('sun_size_container');
 
@@ -1668,19 +1780,6 @@ class SunPositionCardEditor extends HTMLElement {
         sunSizeContainer.classList.remove('hidden');
     } else {
         sunSizeContainer.classList.add('hidden');
-    }
-
-    // Sichtbarkeit des 12h Format Schalters nur für Englisch
-    const use12hContainer = root.getElementById('use_12h_format_container');
-    if (use12hContainer) {
-        const currentLang = (config.language || this._hass?.locale?.language || 'en').split('-')[0];
-        const isEnglish = currentLang === 'en';
-        
-        if (isEnglish) {
-            use12hContainer.classList.remove('hidden');
-        } else {
-            use12hContainer.classList.add('hidden');
-        }
     }
 
     // Steuerung der Sichtbarkeit für alle Mond-Optionen
@@ -1698,24 +1797,25 @@ class SunPositionCardEditor extends HTMLElement {
     const weatherCheckContainer = root.getElementById('weather_checkbox_container');
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
     const tempEntityContainer = root.getElementById('temp_entity_container');
-    const solarEntityContainer = root.getElementById('solar_entity_container');
-    const solarBadgeToggleContainer = root.getElementById('solar_badge_toggle_container');
-    
+
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
         tempEntityContainer.classList.remove('hidden');
-        solarEntityContainer.classList.remove('hidden');
-        if (config.solar_entity) {
-            solarBadgeToggleContainer.classList.remove('hidden');
-        } else {
-            solarBadgeToggleContainer.classList.add('hidden');
-        }
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
         tempEntityContainer.classList.add('hidden');
-        solarEntityContainer.classList.add('hidden');
+    }
+
+    // Solar-Badge ist unabhängig von der Wetter-Entität
+    const solarDecimalsContainer = root.getElementById('solar_decimals_container');
+    const solarBadgeToggleContainer = root.getElementById('solar_badge_toggle_container');
+    if (config.solar_entity) {
+        solarDecimalsContainer.classList.remove('hidden');
+        solarBadgeToggleContainer.classList.remove('hidden');
+    } else {
+        solarDecimalsContainer.classList.add('hidden');
         solarBadgeToggleContainer.classList.add('hidden');
     }
 
@@ -1729,9 +1829,6 @@ class SunPositionCardEditor extends HTMLElement {
     if (this._hass) {
         // hass auch an Selektoren übergeben
         root.querySelectorAll("ha-selector").forEach(picker => {
-            picker.hass = this._hass;
-        });
-        root.querySelectorAll("ha-entity-picker").forEach(picker => {
             picker.hass = this._hass;
         });
     }
@@ -1815,15 +1912,15 @@ class SunPositionCardEditor extends HTMLElement {
             newConfig.times_to_show = newConfig.times_to_show.filter(t => t !== 'weather');
          }
          delete newConfig.weather_entity;
-         delete newConfig.show_weather_badge; 
+         delete newConfig.show_weather_badge;
          delete newConfig.temp_entity;
-         delete newConfig.solar_entity;
-         delete newConfig.show_solar_badge;
+         delete newConfig.temperature_decimals;
     }
     // Cleanup Solar Entity wenn gelöscht
     if (configValue === 'solar_entity' && !newConfig.solar_entity) {
          delete newConfig.solar_entity;
          delete newConfig.show_solar_badge;
+         delete newConfig.solar_decimals;
     }
 
     // Wenn Sprache geändert wird, Editor neu rendern für aktualisierte Labels
@@ -1851,8 +1948,14 @@ customElements.define('sun-position-card-editor', SunPositionCardEditor);
 
 
 
+
+const MOON_PHASES = [
+  'new_moon', 'waxing_crescent', 'first_quarter', 'waxing_gibbous',
+  'full_moon', 'waning_gibbous', 'last_quarter', 'waning_crescent'
+];
+
 console.log(
-  "%c☀️ Sun-Position-Card v_2.2 ready",
+  "%c☀️ Sun-Position-Card v_2.3 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
 );
 
@@ -1868,8 +1971,24 @@ class SunPositionCard extends HTMLElement {
   constructor() {
     super();
     this._created = false;
-    this._lastImage = null;
-    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es };
+    this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es, da };
+  }
+
+  // Mondphase vereinheitlichen (z.B. "Waxing crescent" -> "waxing_crescent").
+  // Unbekannte Zustände (unknown, unavailable, ...) liefern null.
+  _normalizeMoonPhase(state) {
+    if (!state) return null;
+    const phase = String(state).trim().toLowerCase().replace(/[\s-]+/g, '_');
+    return MOON_PHASES.includes(phase) ? phase : null;
+  }
+
+  // Sonnenzeiten bevorzugt aus den Attributen der Sonnen-Entität,
+  // Fallback auf die Sensoren der Sun-Integration (sensor.sun_next_*).
+  _getSunTime(sunState, hass, key) {
+    const value = sunState?.attributes?.[key] || hass.states[`sensor.sun_${key}`]?.state;
+    if (!value) return null;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
@@ -1928,17 +2047,11 @@ class SunPositionCard extends HTMLElement {
     const fallback = { top: '270px', clipPath: 'inset(0 0 170px 0)' };
     if (!sunState || sunState.state !== 'above_horizon') return fallback;
 
-    const riseEnt = hass.states['sensor.sun_next_rising'];
-    const noonEnt = hass.states['sensor.sun_next_noon'];
-    const setEnt = hass.states['sensor.sun_next_setting'];
+    const riseNext = this._getSunTime(sunState, hass, 'next_rising');
+    const noonNext = this._getSunTime(sunState, hass, 'next_noon');
+    const setNext = this._getSunTime(sunState, hass, 'next_setting');
 
-    if (!riseEnt || !noonEnt || !setEnt) return fallback;
-
-    const riseNext = new Date(riseEnt.state);
-    const noonNext = new Date(noonEnt.state);
-    const setNext = new Date(setEnt.state);
-
-    if ([riseNext, noonNext, setNext].some(d => isNaN(d.getTime()))) return fallback;
+    if (!riseNext || !noonNext || !setNext) return fallback;
 
     const now = new Date();
     const dayMs = 24 * 60 * 60 * 1000;
@@ -1975,15 +2088,10 @@ class SunPositionCard extends HTMLElement {
 
     if (!sunState || sunState.state !== 'above_horizon') return fallback;
 
-    const riseEnt = hass.states['sensor.sun_next_rising'];
-    const setEnt = hass.states['sensor.sun_next_setting'];
+    const riseNext = this._getSunTime(sunState, hass, 'next_rising');
+    const setNext = this._getSunTime(sunState, hass, 'next_setting');
 
-    if (!riseEnt || !setEnt) return fallback;
-
-    const riseNext = new Date(riseEnt.state);
-    const setNext = new Date(setEnt.state);
-
-    if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
+    if (!riseNext || !setNext) return fallback;
 
     const now = new Date();
     const dayMs = 24 * 60 * 60 * 1000;
@@ -2020,16 +2128,11 @@ class SunPositionCard extends HTMLElement {
   _calculateNightPositionArc(sunState, hass, isCompact) {
     const fallback = { left: '50%', top: '100%' };
 
-    const riseEnt = hass.states['sensor.sun_next_rising'];
-    const setEnt = hass.states['sensor.sun_next_setting'];
-
-    if (!riseEnt || !setEnt) return fallback;
-
-    const riseNext = new Date(riseEnt.state);
-    const setNext = new Date(setEnt.state);
+    const riseNext = this._getSunTime(sunState, hass, 'next_rising');
+    const setNext = this._getSunTime(sunState, hass, 'next_setting');
     const now = new Date();
 
-    if (isNaN(riseNext.getTime()) || isNaN(setNext.getTime())) return fallback;
+    if (!riseNext || !setNext) return fallback;
 
     // Logik: Wir befinden uns in der Nacht VOR riseNext.
     const dayLength = setNext.getTime() - riseNext.getTime();
@@ -2061,7 +2164,7 @@ class SunPositionCard extends HTMLElement {
    * Berechnet die astronomische Tageslänge in Millisekunden für ein bestimmtes Datum
    */
   _getSunDuration(date, lat) {
-    if (!lat) return 0;
+    if (typeof lat !== 'number') return 0;
 
     const rad = Math.PI / 180;
     // Tag des Jahres berechnen
@@ -2116,7 +2219,14 @@ class SunPositionCard extends HTMLElement {
 
     const moonEntityId = config.moon_entity;
     const moonState = moonEntityId ? hass.states[moonEntityId] : null;
+    const moonPhase = moonState ? this._normalizeMoonPhase(moonState.state) : null;
     const moonPhasePosition = config.moon_phase_position || 'in_list';
+
+    // Südhalbkugel: automatisch über den Breitengrad, per YAML überschreibbar (hemisphere: north/south)
+    const latitude = hass.config?.latitude;
+    const hemisphere = config.hemisphere || 'auto';
+    const isSouthern = hemisphere === 'south' ||
+      (hemisphere !== 'north' && typeof latitude === 'number' && latitude < 0);
 
     const weatherEntityId = config.weather_entity;
     const weatherStateObj = weatherEntityId ? hass.states[weatherEntityId] : null;
@@ -2125,6 +2235,7 @@ class SunPositionCard extends HTMLElement {
     const solarEntityId = config.solar_entity;
     const solarStateObj = solarEntityId ? hass.states[solarEntityId] : null;
     const showSolarBadge = config.show_solar_badge ?? true;
+    const solarDecimals = config.solar_decimals;
 
     const tempEntityId = config.temp_entity;
     const tempStateObj = tempEntityId ? hass.states[tempEntityId] : null;
@@ -2146,35 +2257,38 @@ class SunPositionCard extends HTMLElement {
     const afternoonAzimuth = config.afternoon_azimuth || 255;
     const duskElevation = config.dusk_elevation || 10;
 
+    // Auf der Südhalbkugel steht die Sonne mittags im Norden (Azimut ~0°/360°).
+    // Für die Tageszeit-Einteilung wird der Azimut an der Ost-West-Achse gespiegelt,
+    // damit dieselben Grenzwerte gelten (Osten 90° bleibt 90°, Norden 0° wird 180°, Westen 270° bleibt 270°).
+    const stateAzimuth = isSouthern ? (540 - azimuth) % 360 : azimuth;
+
     let currentState = this._localize('sun_state.below_horizon');
     let image = 'unterHorizont.png';
 
     if (sunState === 'above_horizon' && elevation > 0) {
       if (elevation < duskElevation) {
-        if (azimuth < noonAzimuth) {
+        if (stateAzimuth < noonAzimuth) {
           currentState = this._localize('sun_state.dawn');
           image = 'dammerung.png';
         } else {
           currentState = this._localize('sun_state.dusk');
           image = 'dammerung.png';
         }
-      } else if (azimuth < morningAzimuth) {
+      } else if (stateAzimuth < morningAzimuth) {
         currentState = this._localize('sun_state.morning');
         image = 'morgen.png';
-      } else if (azimuth < noonAzimuth) {
+      } else if (stateAzimuth < noonAzimuth) {
         currentState = this._localize('sun_state.noon');
         image = 'mittag.png';
-      } else if (azimuth < afternoonAzimuth) {
+      } else if (stateAzimuth < afternoonAzimuth) {
         currentState = this._localize('sun_state.afternoon');
         image = 'nachmittag.png';
       } else {
         currentState = this._localize('sun_state.evening');
         image = 'abend.png';
       }
-    } else {
-      if (moonState) {
-        image = `${moonState.state}.png`;
-      }
+    } else if (moonPhase) {
+      image = `${moonPhase}.png`;
     }
 
     let statePosition = config.state_position || 'in_list';
@@ -2192,24 +2306,33 @@ class SunPositionCard extends HTMLElement {
     const formatTime = (isoString) => {
       if (!isoString) return '';
 
-      const date = new Date(Date.parse(isoString));
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) return '';
 
       const locale =
         config.language ||
         hass.locale?.language ||
         navigator.language ||
         'en-US';
-      
-      const timeZone =
-        hass.config?.time_zone ||
-        Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      return date.toLocaleTimeString(locale, {
+      // Zeitzone wie im HA-Benutzerprofil: "local" = Browser, sonst Server-Zeitzone
+      const timeZone = hass.locale?.time_zone === 'local'
+        ? undefined
+        : (hass.config?.time_zone || undefined);
+
+      const options = {
         hour: use12hFormat ? 'numeric' : '2-digit',
         minute: '2-digit',
         hour12: use12hFormat,
-        timeZone
-      });
+        ...(timeZone && { timeZone })
+      };
+
+      try {
+        return date.toLocaleTimeString(locale, options);
+      } catch (e) {
+        // Ungültige Sprache oder Zeitzone: auf Browser-Standard zurückfallen
+        return date.toLocaleTimeString(undefined, { ...options, timeZone: undefined });
+      }
     };
 
     const calculateDaylight = (sunrise, sunset) => {
@@ -2232,8 +2355,8 @@ class SunPositionCard extends HTMLElement {
 
     // UPDATE: Nutzt den Sensor-Text für die Mitte, berechnet Diffs relativ dazu
     const calculateDaylightComparison = (currentDurationString) => {
-      const lat = hass.config.latitude;
-      if (!lat || !currentDurationString) return null;
+      const lat = hass.config?.latitude;
+      if (typeof lat !== 'number' || !currentDurationString) return null;
 
       // next_setting als Anker nutzen für das "aktuelle" Datum der angezeigten Tageslänge.
       // Wenn next_setting "morgen" ist (weil es nacht ist), berechnet dies die Diffs für morgen.
@@ -2318,19 +2441,25 @@ class SunPositionCard extends HTMLElement {
     // Übergebe den Sensor-String an die Vergleichsfunktion
     const daylightComparison = calculateDaylightComparison(daylightDuration);
 
-    let translatedMoonPhase = moonState ? translateMoonPhase(moonState.state) : null;
+    // Unbekannte Zustände (z.B. "unavailable") werden unübersetzt angezeigt
+    let translatedMoonPhase = moonState
+      ? (moonPhase ? translateMoonPhase(moonPhase) : moonState.state)
+      : '';
 
-    if (moonState && showMoonIcon) {
-      const mIcon = this._getMoonIcon(moonState.state);
-      translatedMoonPhase += ` <ha-icon class="moon-phase-icon" icon="${mIcon}"></ha-icon>`;
+    if (moonPhase && showMoonIcon) {
+      const mIcon = this._getMoonIcon(moonPhase);
+      const iconClass = isSouthern ? 'moon-phase-icon southern' : 'moon-phase-icon';
+      translatedMoonPhase += ` <ha-icon class="${iconClass}" icon="${mIcon}"></ha-icon>`;
     }
 
     const isDay = elevation > 0;
-    const showMoonPhaseText = moonState && !(hideMoonOnDay && isDay);
+    const showMoonPhaseText = Boolean(moonState) && !(hideMoonOnDay && isDay);
 
-    const showMoonPhaseAbove = showMoonPhaseText && moonPhasePosition === 'above' && timesToShow.includes('moon_phase');
+    // Die Zeile über dem Bild wird unabhängig von Tag/Nacht angelegt und nur ein-/ausgeblendet,
+    // da die Struktur nur einmal pro Konfiguration aufgebaut wird.
+    const moonPhaseAboveConfigured = Boolean(moonState) && moonPhasePosition === 'above' && timesToShow.includes('moon_phase');
 
-    if (showMoonPhaseAbove) {
+    if (moonPhaseAboveConfigured) {
       timesToShow = timesToShow.filter(t => t !== 'moon_phase');
     }
 
@@ -2405,16 +2534,18 @@ class SunPositionCard extends HTMLElement {
     const timeHtml = timeEntries.join(showDividers ? '<hr class="divider">' : '');
 
     if (!this._created) {
-      this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, showMoonPhaseAbove, config.view_mode, showNightArc);
+      this._buildStructure(timePosition, statePosition, showImage, showDegrees, showDegreesInList, timeListFormat, moonPhaseAboveConfigured, config.view_mode, showNightArc);
       this._created = true;
-      this._lastImage = null;
     }
 
     const stateEl = this.querySelector('#sun-state-text');
     if (stateEl) stateEl.innerText = currentState;
 
     const moonPhaseEl = this.querySelector('#moon-phase-text');
-    if (moonPhaseEl) moonPhaseEl.innerHTML = translatedMoonPhase;
+    if (moonPhaseEl) {
+      moonPhaseEl.style.display = showMoonPhaseText ? '' : 'none';
+      if (moonPhaseEl.innerHTML !== translatedMoonPhase) moonPhaseEl.innerHTML = translatedMoonPhase;
+    }
 
     const degreesEl = this.querySelector('#sun-degrees-text');
     if (degreesEl) degreesEl.innerText = `${this._localize('time_entry.azimuth')}: ${azimuth.toFixed(2)}° / ${this._localize('time_entry.elevation')}: ${elevation.toFixed(2)}°`;
@@ -2439,9 +2570,12 @@ class SunPositionCard extends HTMLElement {
         solarBadgeEl.style.background = badgeBg;
         const solarValue = parseFloat(solarStateObj.state);
         const solarUnit = solarStateObj.attributes.unit_of_measurement || 'W';
-        solarBadgeEl.innerHTML = !isNaN(solarValue)
-          ? `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarValue} ${solarUnit}</span>`
-          : `<ha-icon icon="mdi:solar-power"></ha-icon><span>--</span>`;
+        let solarText = '--';
+        if (!isNaN(solarValue)) {
+          const value = typeof solarDecimals === 'number' ? solarValue.toFixed(solarDecimals) : solarStateObj.state;
+          solarText = `${value} ${solarUnit}`;
+        }
+        solarBadgeEl.innerHTML = `<ha-icon icon="mdi:solar-power"></ha-icon><span>${solarText}</span>`;
       } else {
         solarBadgeEl.style.display = 'none';
       }
@@ -2453,6 +2587,17 @@ class SunPositionCard extends HTMLElement {
 
     if (imgEl && container && wrapperEl) {
 
+      // Bild nur bei Wechsel neu setzen. Im Bundle sind die Bilder Data-URIs,
+      // ein Vergleich über imgEl.src würde das Bild bei jedem HA-Update neu laden.
+      let shownImage = null;
+      const setImage = (name, src) => {
+        shownImage = name;
+        if (imgEl.dataset.image !== name) {
+          imgEl.src = src;
+          imgEl.dataset.image = name;
+        }
+      };
+
       const forceNightArc = (elevation <= 0 && showNightArc);
       const isCalculatedOrArc = (config.view_mode === 'calculated' || config.view_mode === 'arc');
 
@@ -2463,13 +2608,8 @@ class SunPositionCard extends HTMLElement {
         const effectiveViewMode = forceNightArc ? 'arc' : config.view_mode;
 
         if (effectiveViewMode === 'arc') {
-          if (elevation <= 0) {
-            imgEl.style.width = `${sunSize}px`;
-            imgEl.style.maxWidth = `${sunSize}px`;
-          } else {
-            imgEl.style.width = `${sunSize}px`;
-            imgEl.style.maxWidth = `${sunSize}px`;
-          }
+          imgEl.style.width = `${sunSize}px`;
+          imgEl.style.maxWidth = `${sunSize}px`;
         } else {
           imgEl.style.width = '';
           imgEl.style.maxWidth = '';
@@ -2489,7 +2629,8 @@ class SunPositionCard extends HTMLElement {
           }
 
           const newSrc = images[displayImage];
-          if (!imgEl.src.endsWith(displayImage)) imgEl.src = newSrc;
+          setImage(displayImage, newSrc);
+          imgEl.alt = currentState;
           imgEl.classList.remove('sun-image-animated');
 
           if (effectiveViewMode === 'arc' && showNightArc) {
@@ -2517,7 +2658,8 @@ class SunPositionCard extends HTMLElement {
         } else {
           // *** TAG (Sonne) ***
           const sunSrc = images['calc-sun.png'];
-          if (!imgEl.src.endsWith('calc-sun.png')) imgEl.src = sunSrc;
+          setImage('calc-sun.png', sunSrc);
+          imgEl.alt = currentState;
 
           if (arcEl && config.view_mode === 'arc') arcEl.style.display = 'block';
           else if (arcEl) arcEl.style.display = 'none';
@@ -2552,11 +2694,8 @@ class SunPositionCard extends HTMLElement {
         imgEl.style.maxWidth = '';
 
         const newSrc = images[image];
-        if (this._lastImage !== image) {
-          imgEl.src = newSrc;
-          imgEl.alt = currentState;
-          this._lastImage = image;
-        }
+        setImage(image, newSrc);
+        imgEl.alt = currentState;
 
         wrapperEl.style.top = '';
         wrapperEl.style.left = '';
@@ -2570,6 +2709,10 @@ class SunPositionCard extends HTMLElement {
           imgEl.classList.remove('sun-image-animated');
         }
       }
+
+      // Südhalbkugel: Mond erscheint um 180° gedreht (beleuchtete Seite links statt rechts)
+      const isMoonImage = shownImage && MOON_PHASES.includes(shownImage.replace('.png', ''));
+      imgEl.style.transform = (isSouthern && isMoonImage) ? 'rotate(180deg)' : '';
     }
 
     const timesEl = this.querySelector('#sun-card-times');
@@ -2687,6 +2830,10 @@ class SunPositionCard extends HTMLElement {
             vertical-align: text-bottom;
             opacity: 0.8;
             padding-left: 4px;
+        }
+        .moon-phase-icon.southern {
+            display: inline-block;
+            transform: rotate(180deg);
         }
 
         @keyframes spin {
