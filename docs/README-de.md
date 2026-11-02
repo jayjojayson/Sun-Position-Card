@@ -178,7 +178,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 
 <img width="100%" height="auto" alt="3D-Kuppel" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
 
-Mit `view_mode: dome` zeigt die Card eine 3D-Himmelskuppel über einem Kompass. Tagsüber siehst du die echte Sonnenbahn des heutigen Tages (bereits zurückgelegt: durchgezogen, noch kommend: gepunktet) und die Sonne mit ihrem Lot zum Boden. Nachts werden die Mondbahn und der Mond mit seiner aktuellen Phase vor einem Sternenhimmel gezeigt. Beide Bahnen werden aus dem Standort deiner Home-Assistant-Instanz berechnet. Der Himmel wechselt seine Farben für Tag, Dämmerung und Nacht. Mit `show_dome_times: true` stehen die Aufgangszeit unter O und die Untergangszeit unter W.
+Mit `view_mode: dome` zeigt die Card eine 3D-Himmelskuppel über einem Kompass. Tagsüber siehst du die echte Sonnenbahn des heutigen Tages (bereits zurückgelegt: durchgezogen, noch kommend: gepunktet) und die Sonne mit ihrem Lot zum Boden. Nachts werden die Mondbahn und der Mond mit seiner aktuellen Phase vor einem Sternenhimmel gezeigt. Steht der Mond noch unter dem Horizont, siehst du stattdessen seine kommende Bahn und die Aufgangszeit am Aufgangspunkt. Beide Bahnen werden aus dem Standort deiner Home-Assistant-Instanz berechnet. Der Himmel wechselt seine Farben für Tag, Dämmerung und Nacht. Mit `show_dome_times: true` stehen die Aufgangszeit unter O und die Untergangszeit unter W.
 
 #### Animierte Wettereffekte
 

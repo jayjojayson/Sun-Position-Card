@@ -150,7 +150,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 
 <img width="100%" height="auto" alt="3D dome view" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
 
-With `view_mode: dome` the card shows a 3D sky dome over a compass. During the day you see today's real sun path (already passed: solid, still to come: dotted) and the sun with its drop line to the ground. At night the moon path and the moon with its current phase are shown, with a starry sky. Both paths are calculated from the location of your Home Assistant instance. The sky changes its colors for day, twilight and night. With `show_dome_times: true` the sunrise time is shown below E and the sunset time below W.
+With `view_mode: dome` the card shows a 3D sky dome over a compass. During the day you see today's real sun path (already passed: solid, still to come: dotted) and the sun with its drop line to the ground. At night the moon path and the moon with its current phase are shown, with a starry sky. If the moon is still below the horizon, its upcoming path and the moonrise time at the rising point are shown instead. Both paths are calculated from the location of your Home Assistant instance. The sky changes its colors for day, twilight and night. With `show_dome_times: true` the sunrise time is shown below E and the sunset time below W.
 
 #### Animated weather effects
 
