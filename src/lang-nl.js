@@ -58,6 +58,12 @@ export default {
 		moon_phase: "Maanfase",
 		weather: "Weer"
     },
+    compass: {
+        n: "N",
+        e: "O",
+        s: "Z",
+        w: "W"
+    },
     editor: {
         entity: "Zon-entiteit",
 		moon_entity: "Maan-entiteit (optioneel)",
@@ -69,10 +75,13 @@ export default {
 		view_mode_classic: "Klassiek (6 afbeeldingen)",
 		view_mode_calculated: "Berekend (Alleen hoogte)",
 		view_mode_arc: "Boog (180° Beweging)",
+		view_mode_dome: "3D-koepel (zon- en maanbaan)",
 		show_image: "Toon Zon-positie (afbeelding)",
 		show_weather_badge: "Toon weer-badge",
+		show_weather_overlay: "Geanimeerde weereffecten (over zon/maan)",
 		animate_images: "Animeer afbeeldingen (behalve ochtend/schemering)",
 		sun_size: "Zon grootte (alleen boog)",
+		show_dome_times: "Zonsopkomst/-ondergang onder O/W tonen",
 		state_position: "Positie status",
 		state_pos_above: "Boven afbeelding",
 		state_pos_in_list: "In lijst",

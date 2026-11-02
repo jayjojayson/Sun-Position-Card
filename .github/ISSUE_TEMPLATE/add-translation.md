@@ -74,6 +74,12 @@ export default {
         moon_phase: "Moon Phase",
         weather: "Weather"
     },
+    compass: {
+        n: "N",
+        e: "E",
+        s: "S",
+        w: "W"
+    },
     editor: {
         entity: "Sun Entity",
         moon_entity: "Moon Entity (Optional)",
@@ -85,10 +91,13 @@ export default {
         view_mode_classic: "Classic (6 Images)",
         view_mode_calculated: "Calculated (Elevation only)",
         view_mode_arc: "Arc (180° Movement)",
+        view_mode_dome: "3D Dome (sun & moon path)",
         show_image: "Show Sun Position (Image)",
         show_weather_badge: "Show Weather Badge",
+        show_weather_overlay: "Animated weather effects (over sun/moon)",
         animate_images: "Animate Images (except morning/twilight image)",
         sun_size: "Sun/Moon Size (Arc only)",
+        show_dome_times: "Show sunrise/sunset below E/W",
         state_position: "State Position",
         state_pos_above: "Above Image",
         state_pos_in_list: "In List",

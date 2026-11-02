@@ -149,9 +149,19 @@ class SunPositionCardEditor extends HTMLElement {
           <span style="margin-left: 16px;">${this._localize('editor.show_image')}</span>
         </div>
 
+        <div id="dome_times_container" class="row hidden">
+          <ha-switch id="show_dome_times"></ha-switch>
+          <span style="margin-left: 16px;">${this._localize('editor.show_dome_times')}</span>
+        </div>
+
         <div id="weather_badge_toggle_container" class="row">
           <ha-switch id="show_weather_badge"></ha-switch>
           <span style="margin-left: 16px;">${this._localize('editor.show_weather_badge')}</span>
+        </div>
+
+        <div id="weather_overlay_toggle_container" class="row hidden">
+          <ha-switch id="show_weather_overlay"></ha-switch>
+          <span style="margin-left: 16px;">${this._localize('editor.show_weather_overlay')}</span>
         </div>
 
         <div id="solar_badge_toggle_container" class="row hidden">
@@ -305,7 +315,8 @@ class SunPositionCardEditor extends HTMLElement {
         viewModeSelector.selector = { select: { options: [
             { value: "classic", label: this._localize('editor.view_mode_classic') },
             { value: "calculated", label: this._localize('editor.view_mode_calculated') },
-            { value: "arc", label: this._localize('editor.view_mode_arc') }
+            { value: "arc", label: this._localize('editor.view_mode_arc') },
+            { value: "dome", label: this._localize('editor.view_mode_dome') }
         ], mode: "dropdown" } };
     }
 
@@ -395,6 +406,8 @@ class SunPositionCardEditor extends HTMLElement {
     
     add('show_image', 'change');
     add('show_weather_badge', 'change');
+    add('show_weather_overlay', 'change');
+    add('show_dome_times', 'change');
     add('show_solar_badge', 'change');
     add('animate_images', 'change');
     add('hide_moon_phase_on_day', 'change');
@@ -449,6 +462,8 @@ class SunPositionCardEditor extends HTMLElement {
 
     setCheck('show_image', config.show_image ?? true);
     setCheck('show_weather_badge', config.show_weather_badge ?? true);
+    setCheck('show_weather_overlay', config.show_weather_overlay ?? false);
+    setCheck('show_dome_times', config.show_dome_times ?? false);
     setCheck('show_solar_badge', config.show_solar_badge ?? true); 
     setCheck('animate_images', config.animate_images ?? false);
     setCheck('hide_moon_phase_on_day', config.hide_moon_phase_on_day ?? false);
@@ -467,11 +482,14 @@ class SunPositionCardEditor extends HTMLElement {
     const sunSizeContainer = root.getElementById('sun_size_container');
 
     // Sichtbarkeit des Sun Size Sliders wenn ViewMode 'arc' IST ODER wenn NightArc aktiviert ist
-    if (config.view_mode === 'arc' || config.show_night_arc) {
+    if (config.view_mode === 'arc' || (config.show_night_arc && config.view_mode !== 'dome')) {
         sunSizeContainer.classList.remove('hidden');
     } else {
         sunSizeContainer.classList.add('hidden');
     }
+
+    // Auf-/Untergangszeiten nur in der 3D-Kuppel
+    root.getElementById('dome_times_container').classList.toggle('hidden', config.view_mode !== 'dome');
 
     // Steuerung der Sichtbarkeit für alle Mond-Optionen
     const moonPosContainer = root.getElementById('moon_phase_position_container');
@@ -489,13 +507,17 @@ class SunPositionCardEditor extends HTMLElement {
     const weatherBadgeToggleContainer = root.getElementById('weather_badge_toggle_container');
     const tempEntityContainer = root.getElementById('temp_entity_container');
 
+    const weatherOverlayToggleContainer = root.getElementById('weather_overlay_toggle_container');
+
     if (config.weather_entity) {
         weatherCheckContainer.classList.remove('hidden');
         weatherBadgeToggleContainer.classList.remove('hidden');
+        weatherOverlayToggleContainer.classList.remove('hidden');
         tempEntityContainer.classList.remove('hidden');
     } else {
         weatherCheckContainer.classList.add('hidden');
         weatherBadgeToggleContainer.classList.add('hidden');
+        weatherOverlayToggleContainer.classList.add('hidden');
         tempEntityContainer.classList.add('hidden');
     }
 
@@ -604,6 +626,7 @@ class SunPositionCardEditor extends HTMLElement {
          }
          delete newConfig.weather_entity;
          delete newConfig.show_weather_badge;
+         delete newConfig.show_weather_overlay;
          delete newConfig.temp_entity;
          delete newConfig.temperature_decimals;
     }

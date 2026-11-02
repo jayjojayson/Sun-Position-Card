@@ -58,6 +58,12 @@ export default {
         moon_phase: "Fáze Měsíce",
         weather: "Počasí"
     },
+    compass: {
+        n: "S",
+        e: "V",
+        s: "J",
+        w: "Z"
+    },
     editor: {
         entity: "Entita Slunce",
         moon_entity: "Entita Měsíce (volitelné)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Klasický (6 obrázků)",
         view_mode_calculated: "Vypočítaný (pouze výška nad obzorem)",
         view_mode_arc: "Oblouk (pohyb v rozsahu 180°)",
+        view_mode_dome: "3D kopule (dráha Slunce a Měsíce)",
         show_image: "Zobrazit polohu Slunce (obrázek)",
         show_weather_badge: "Zobrazit odznak počasí",
+        show_weather_overlay: "Animované efekty počasí (nad Sluncem/Měsícem)",
         animate_images: "Animovat obrázky (kromě obrázku rána a soumraku)",
         sun_size: "Velikost Slunce/Měsíce (pouze oblouk)",
+        show_dome_times: "Zobrazit východ/západ pod V/Z",
         state_position: "Umístění stavu",
         state_pos_above: "Nad obrázkem",
         state_pos_in_list: "V seznamu",

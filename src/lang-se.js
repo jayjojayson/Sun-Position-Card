@@ -58,6 +58,12 @@ export default {
         moon_phase: "Månfas",
         weather: "Väder"
     },
+    compass: {
+        n: "N",
+        e: "Ö",
+        s: "S",
+        w: "V"
+    },
     editor: {
         entity: "Sol-entitet",
         moon_entity: "Mån-entitet (valfri)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Klassisk (6 bilder)",
         view_mode_calculated: "Beräknad (endast elevation)",
         view_mode_arc: "Båge (180° rörelse)",
+        view_mode_dome: "3D-kupol (sol- och månbana)",
         show_image: "Visa solposition (bild)",
         show_weather_badge: "Visa väderindikator",
+        show_weather_overlay: "Animerade vädereffekter (över sol/måne)",
         animate_images: "Animera bilder (förutom morgon/skymningsbild)",
         sun_size: "Sol/Måne-storlek (endast båge)",
+        show_dome_times: "Visa soluppgång/solnedgång under Ö/V",
         state_position: "Statusposition",
         state_pos_above: "Ovanför bild",
         state_pos_in_list: "I lista",

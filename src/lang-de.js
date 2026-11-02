@@ -58,6 +58,12 @@ export default {
         moon_phase: "Mondphase",
         weather: "Wetter"
     },
+    compass: {
+        n: "N",
+        e: "O",
+        s: "S",
+        w: "W"
+    },
     editor: {
         entity: "Sonnen-Entität",
         moon_entity: "Mond-Entität (Optional)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Klassisch (6 Bilder)",
         view_mode_calculated: "Berechnet (Nur Elevation)",
         view_mode_arc: "Bogen (180° Verlauf)",
+        view_mode_dome: "3D-Kuppel (Sonnen- & Mondbahn)",
         show_image: "Sonnenstand (Bild) anzeigen",
         show_weather_badge: "Wetter-Badge im Bild anzeigen",
+        show_weather_overlay: "Animierte Wettereffekte (über Sonne/Mond)",
         animate_images: "Bilder animieren (außer Morgen/Dämmerung Bild)",
         sun_size: "Größe der Sonne/Mond (nur Bogen)",
+        show_dome_times: "Sonnenauf-/-untergang unter O/W anzeigen",
         state_position: "Position des Status",
         state_pos_above: "Über dem Bild",
         state_pos_in_list: "In der Liste",

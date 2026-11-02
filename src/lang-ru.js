@@ -58,6 +58,12 @@ export default {
         moon_phase: "Фаза луны",
         weather: "Погода"
     },
+    compass: {
+        n: "С",
+        e: "В",
+        s: "Ю",
+        w: "З"
+    },
     editor: {
         entity: "Объект солнца",
         moon_entity: "Объект луны (опционально)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Классический (6 изображений)",
         view_mode_calculated: "Рассчетный (Только высота)",
         view_mode_arc: "Дуга (движение 180°)",
+        view_mode_dome: "3D-купол (путь солнца и луны)",
         show_image: "Показывать положение солнца (изображение)",
         show_weather_badge: "Показывать погоду",
+        show_weather_overlay: "Анимированные погодные эффекты (над солнцем/луной)",
         animate_images: "Анимированные изображения (кроме изображений утра и сумерек)",
         sun_size: "Размер солнца/луны (только дуга)",
+        show_dome_times: "Показывать восход/закат под В/З",
         state_position: "Положение состояния",
         state_pos_above: "Над изображением",
         state_pos_in_list: "В списке",

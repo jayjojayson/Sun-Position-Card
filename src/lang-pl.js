@@ -58,6 +58,12 @@ export default {
         moon_phase: "Faza księżyca",
         weather: "Pogoda"
     },
+    compass: {
+        n: "N",
+        e: "E",
+        s: "S",
+        w: "W"
+    },
     editor: {
         entity: "Encja słońca",
         moon_entity: "Encja księżyca (opcjonalnie)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Klasyczny (6 obrazów)",
         view_mode_calculated: "Obliczony (tylko elewacja)",
         view_mode_arc: "Łuk (ruch 180°)",
+        view_mode_dome: "Kopuła 3D (tor słońca i księżyca)",
         show_image: "Pokaż pozycję słońca (obraz)",
         show_weather_badge: "Pokaż plakietkę pogodową",
+        show_weather_overlay: "Animowane efekty pogodowe (nad słońcem/księżycem)",
         animate_images: "Animuj obrazy (z wyjątkiem rana/świtu)",
         sun_size: "Rozmiar słońca/księżyca (tylko łuk)",
+        show_dome_times: "Pokaż wschód/zachód pod E/W",
         state_position: "Pozycja stanu",
         state_pos_above: "Nad obrazem",
         state_pos_in_list: "Na liście",

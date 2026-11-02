@@ -58,6 +58,12 @@ export default {
         moon_phase: "Fase da Lua",
         weather: "Clima"
     },
+    compass: {
+        n: "N",
+        e: "L",
+        s: "S",
+        w: "O"
+    },
     editor: {
         entity: "Entidade Solar",
         moon_entity: "Entidade Lunar (Opcional)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Clássico (6 Imagens)",
         view_mode_calculated: "Calculado (Apenas elevação)",
         view_mode_arc: "Arco (Movimento 180°)",
+        view_mode_dome: "Cúpula 3D (trajetória do sol e da lua)",
         show_image: "Mostrar Posição do Sol (Imagem)",
         show_weather_badge: "Mostrar Badge de Clima",
+        show_weather_overlay: "Efeitos de clima animados (sobre o sol/a lua)",
         animate_images: "Animar Imagens (exceto imagem de manhã/crepúsculo)",
         sun_size: "Tamanho do Sol/Lua (Apenas Arco)",
+        show_dome_times: "Mostrar nascer/pôr do sol sob L/O",
         state_position: "Posição do Estado",
         state_pos_above: "Acima da Imagem",
         state_pos_in_list: "Na Lista",

@@ -58,6 +58,12 @@ export default {
         moon_phase: "Fase Lunare",
         weather: "Meteo"
     },
+    compass: {
+        n: "N",
+        e: "E",
+        s: "S",
+        w: "O"
+    },
     editor: {
         entity: "Entità Sole",
         moon_entity: "Entità Luna (Opzionale)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Classica (6 Immagini)",
         view_mode_calculated: "Calcolata (solo Elevazione)",
         view_mode_arc: "Arco (Movimento a 180°)",
+        view_mode_dome: "Cupola 3D (percorso di sole e luna)",
         show_image: "Mostra Posizione del Sole (Immagine)",
         show_weather_badge: "Mostra Badge Meteo",
+        show_weather_overlay: "Effetti meteo animati (su sole/luna)",
         animate_images: "Anima le Immagini (eccetto mattino/crepuscolo)",
         sun_size: "Dimensione del Sole (solo Arco)",
+        show_dome_times: "Mostra alba/tramonto sotto E/O",
         state_position: "Posizione dello Stato",
         state_pos_above: "Sopra l'Immagine",
         state_pos_in_list: "Nella Lista",

@@ -58,6 +58,12 @@ export default {
         moon_phase: "Månefase",
         weather: "Vejr"
     },
+    compass: {
+        n: "N",
+        e: "Ø",
+        s: "S",
+        w: "V"
+    },
     editor: {
         entity: "Sol-entitet",
         moon_entity: "Måne-entitet (valgfri)",
@@ -69,10 +75,13 @@ export default {
         view_mode_classic: "Klassisk (6 billeder)",
         view_mode_calculated: "Beregnet (kun elevation)",
         view_mode_arc: "Bue (180° bevægelse)",
+        view_mode_dome: "3D-kuppel (sol- og månebane)",
         show_image: "Vis solposition (billede)",
         show_weather_badge: "Vis vejr-badge",
+        show_weather_overlay: "Animerede vejreffekter (over sol/måne)",
         animate_images: "Animér billeder (undtagen morgen-/skumringsbillede)",
         sun_size: "Sol-/månestørrelse (kun bue)",
+        show_dome_times: "Vis solopgang/solnedgang under Ø/V",
         state_position: "Placering af status",
         state_pos_above: "Over billedet",
         state_pos_in_list: "I listen",

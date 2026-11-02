@@ -17,6 +17,53 @@ const MOON_PHASES = [
   'full_moon', 'waning_gibbous', 'last_quarter', 'waning_crescent'
 ];
 
+// ---------------------------------------------------------------------------
+// Astronomie (vereinfachte Formeln, Genauigkeit ~1°) für die 3D-Kuppel:
+// Sonnen- und Mondbahn aus Breiten-/Längengrad, Mondphase als Fallback.
+// ---------------------------------------------------------------------------
+const RAD = Math.PI / 180;
+const OBLIQUITY = RAD * 23.4397;
+const toDays = (date) => date.valueOf() / 864e5 - 0.5 + 2440588 - 2451545;
+const rightAscension = (l, b) => Math.atan2(Math.sin(l) * Math.cos(OBLIQUITY) - Math.tan(b) * Math.sin(OBLIQUITY), Math.cos(l));
+const declination = (l, b) => Math.asin(Math.sin(b) * Math.cos(OBLIQUITY) + Math.cos(b) * Math.sin(OBLIQUITY) * Math.sin(l));
+
+const sunLongitude = (d) => {
+  const M = RAD * (357.5291 + 0.98560028 * d);
+  const C = RAD * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+  return M + C + RAD * 102.9372 + Math.PI;
+};
+
+const moonEcliptic = (d) => {
+  const L = RAD * (218.316 + 13.176396 * d);
+  const M = RAD * (134.963 + 13.064993 * d);
+  const F = RAD * (93.272 + 13.229350 * d);
+  return { l: L + RAD * 6.289 * Math.sin(M), b: RAD * 5.128 * Math.sin(F) };
+};
+
+// Azimut (0° = Norden, im Uhrzeigersinn) und Höhe in Grad
+const horizontalPosition = (date, lat, lng, l, b) => {
+  const d = toDays(date);
+  const phi = RAD * lat;
+  const dec = declination(l, b);
+  const H = RAD * (280.16 + 360.9856235 * d) + RAD * lng - rightAscension(l, b);
+  const alt = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+  const azSouth = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi));
+  return { az: ((azSouth / RAD) + 540) % 360, alt: alt / RAD };
+};
+
+const sunPosition = (date, lat, lng) => horizontalPosition(date, lat, lng, sunLongitude(toDays(date)), 0);
+
+const moonPosition = (date, lat, lng) => {
+  const m = moonEcliptic(toDays(date));
+  return horizontalPosition(date, lat, lng, m.l, m.b);
+};
+
+const moonPhaseFromDate = (date) => {
+  const d = toDays(date);
+  const elongation = (((moonEcliptic(d).l - sunLongitude(d)) / RAD) % 360 + 360) % 360;
+  return MOON_PHASES[Math.round(elongation / 45) % 8];
+};
+
 console.log(
   "%c☀️ Sun-Position-Card v_2.3 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
@@ -34,6 +81,8 @@ class SunPositionCard extends HTMLElement {
   constructor() {
     super();
     this._created = false;
+    // Eindeutige ID-Präfixe für SVG-Verläufe/Clips (mehrere Cards auf einem Dashboard)
+    this._uid = 'spc' + Math.random().toString(36).slice(2, 8);
     this.langs = { de, en, fr, it: ita, nl, pl, cs, ru, sv: se, pt: br, es, da };
   }
 
@@ -52,6 +101,319 @@ class SunPositionCard extends HTMLElement {
     if (!value) return null;
     const date = new Date(value);
     return isNaN(date.getTime()) ? null : date;
+  }
+
+  // Bildquelle (wird von build.js auf die eingebetteten Data-URIs umgestellt)
+  _imageSrc(image) {
+    const newSrc = `/local/community/Sun-Position-Card/images/${image}`;
+    return newSrc;
+  }
+
+  /**
+   * Animierter Wetter-Layer als SVG-Gruppe rund um den Ursprung (0,0) = Sonne bzw. Mond.
+   * Der Aufrufer verschiebt die Gruppe an die gewünschte Position.
+   */
+  _weatherLayer(state, isDay) {
+    const uid = this._uid;
+    let seed = 11;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    const n1 = (v) => v.toFixed(1);
+
+    const light = isDay ? ['#ffffff', '#dbe4ee'] : ['#c4cedb', '#8995a6'];
+    const dark = isDay ? ['#b9c3cf', '#737e8c'] : ['#7d8898', '#4a5462'];
+
+    const defs = `<defs>
+      <linearGradient id="${uid}-cl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${light[0]}"/><stop offset="1" stop-color="${light[1]}"/></linearGradient>
+      <linearGradient id="${uid}-cd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${dark[0]}"/><stop offset="1" stop-color="${dark[1]}"/></linearGradient>
+      <radialGradient id="${uid}-sg"><stop offset="0" stop-color="#fff3b0" stop-opacity=".6"/><stop offset="1" stop-color="#ffd54f" stop-opacity="0"/></radialGradient>
+      <filter id="${uid}-blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+    </defs>`;
+
+    const cloud = (x, y, s, tone, dur, delay, op = 0.95) =>
+      `<g class="spc-drift" style="animation-duration:${dur}s;animation-delay:-${delay}s">` +
+      `<g transform="translate(${x} ${y}) scale(${s})" opacity="${op}" fill="url(#${uid}-${tone})">` +
+      `<ellipse cx="0" cy="8" rx="34" ry="11"/><circle cx="-16" cy="2" r="12"/><circle cx="-1" cy="-6" r="17"/><circle cx="17" cy="0" r="13"/>` +
+      `</g></g>`;
+
+    const rays = () => {
+      let lines = '';
+      for (let i = 0; i < 12; i++) {
+        const a = i * 30 * RAD;
+        lines += `<line x1="${n1(Math.cos(a) * 19)}" y1="${n1(Math.sin(a) * 19)}" x2="${n1(Math.cos(a) * 30)}" y2="${n1(Math.sin(a) * 30)}"/>`;
+      }
+      return `<circle r="36" fill="url(#${uid}-sg)" class="spc-pulse"/>` +
+        `<g class="spc-rays" stroke="#ffd54f" stroke-width="2.5" stroke-linecap="round" opacity=".85">${lines}</g>`;
+    };
+
+    const drops = (count, heavy) => {
+      const dur = heavy ? 0.6 : 0.9;
+      let s = '';
+      for (let i = 0; i < count; i++) {
+        const x = -48 + rnd() * 96, y = 12 + rnd() * 8, len = heavy ? 11 : 8;
+        s += `<line class="spc-drop" style="animation-duration:${dur}s;animation-delay:-${(rnd() * dur).toFixed(2)}s"x1="${n1(x)}" y1="${n1(y)}" x2="${n1(x - 2)}" y2="${n1(y + len)}"/>`;
+      }
+      return `<g stroke="#8fc8ff" stroke-width="${heavy ? 1.8 : 1.4}" stroke-linecap="round" opacity=".9">${s}</g>`;
+    };
+
+    const particles = (count, cls, r, fill, dur) => {
+      let s = '';
+      for (let i = 0; i < count; i++) {
+        s += `<circle class="${cls}" style="animation-duration:${dur}s;animation-delay:-${n1(rnd() * dur)}s" cx="${n1(-48 + rnd() * 96)}" cy="${n1(12 + rnd() * 10)}" r="${n1(r * (0.7 + rnd() * 0.6))}"/>`;
+      }
+      return `<g fill="${fill}">${s}</g>`;
+    };
+
+    const stars = () => {
+      let s = '';
+      for (let i = 0; i < 12; i++) {
+        s += `<circle class="spc-twinkle" style="animation-delay:-${n1(rnd() * 3)}s" cx="${n1(-70 + rnd() * 140)}" cy="${n1(-45 + rnd() * 70)}" r="${n1(0.8 + rnd() * 1)}"/>`;
+      }
+      return `<g fill="#fff">${s}</g>`;
+    };
+
+    const bolt = () => `<polygon class="spc-bolt" points="6,10 -5,30 2,30 -5,50 13,24 5,24 11,10" fill="#ffe066" stroke="#fff6bf" stroke-width=".8"/>`;
+    const flash = () => `<rect class="spc-flash" x="-240" y="-180" width="480" height="360" fill="#fff"/>`;
+
+    const fog = () => {
+      let s = '';
+      for (let i = 0; i < 4; i++) {
+        s += `<rect class="spc-fog-band" style="animation-delay:-${i * 2.3}s" x="${-75 + i * 6}" y="${-18 + i * 11}" width="${150 - i * 12}" height="8" rx="4"/>`;
+      }
+      return `<g fill="#fff" opacity=".45" filter="url(#${uid}-blur)">${s}</g>`;
+    };
+
+    const wind = () =>
+      `<g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".85">` +
+      `<path class="spc-wind" d="M -80 -10 q 30 -12 60 0 t 60 0 t 40 -6"/>` +
+      `<path class="spc-wind" style="animation-delay:-1s" d="M -90 8 q 35 -10 70 0 t 70 0"/>` +
+      `<path class="spc-wind" style="animation-delay:-1.9s" d="M -70 24 q 30 -8 60 0 t 50 0"/></g>`;
+
+    let layer = '';
+    switch (state) {
+      case 'sunny': layer = isDay ? rays() : stars(); break;
+      case 'clear-night': layer = stars(); break;
+      case 'partlycloudy': layer = (isDay ? rays() : '') + cloud(16, 10, 0.75, 'cl', 9, 2); break;
+      case 'cloudy': layer = cloud(-24, -4, 0.8, 'cl', 11, 4, 0.9) + cloud(20, 8, 0.95, 'cd', 13, 7); break;
+      case 'fog': layer = fog(); break;
+      case 'rainy': layer = drops(14, false) + cloud(0, 0, 1, 'cd', 12, 3); break;
+      case 'pouring': layer = drops(26, true) + cloud(-18, -2, 0.85, 'cd', 10, 1) + cloud(18, 2, 1, 'cd', 13, 6); break;
+      case 'snowy': layer = particles(16, 'spc-flake', 2, '#fff', 4) + cloud(0, 0, 1, 'cl', 12, 3); break;
+      case 'snowy-rainy': layer = drops(8, false) + particles(8, 'spc-flake', 2, '#fff', 4) + cloud(0, 0, 1, 'cd', 12, 3); break;
+      case 'hail': layer = particles(14, 'spc-hail', 1.8, '#e8f4ff', 0.7) + cloud(0, 0, 1, 'cd', 12, 3); break;
+      case 'lightning': layer = flash() + bolt() + cloud(-18, -2, 0.85, 'cd', 10, 1) + cloud(18, 2, 1, 'cd', 13, 6); break;
+      case 'lightning-rainy': layer = flash() + drops(18, true) + bolt() + cloud(-18, -2, 0.85, 'cd', 10, 1) + cloud(18, 2, 1, 'cd', 13, 6); break;
+      case 'windy': layer = wind(); break;
+      case 'windy-variant': layer = wind() + cloud(10, -6, 0.8, 'cl', 7, 2); break;
+      case 'exceptional': layer = flash() + cloud(0, 0, 1, 'cd', 12, 3); break;
+      default: layer = '';
+    }
+    return layer ? defs + layer : '';
+  }
+
+  /**
+   * 3D-Kuppel: Himmelshalbkugel über einer Kompass-Ellipse, Sonnenbahn am Tag, Mondbahn in der Nacht.
+   * Orthografische Projektion mit 17° Neigung; Blick nach Süden (Südhalbkugel: nach Norden).
+   */
+  _renderDome(o) {
+    const uid = this._uid;
+    const cx = 160, cy = 166, R = 128;
+    const tilt = 17 * RAD;
+    const ry = R * Math.sin(tilt), rz = R * Math.cos(tilt);
+    const f = o.isSouthern ? -1 : 1;
+    const n1 = (v) => v.toFixed(1);
+
+    const project = (az, alt, onGround = false) => {
+      const A = az * RAD, h = alt * RAD;
+      const e = Math.sin(A) * Math.cos(h), n = Math.cos(A) * Math.cos(h), u = onGround ? 0 : Math.sin(h);
+      return [cx - f * R * e, cy + f * ry * n - rz * u];
+    };
+
+    // Himmelsfarbe nach Sonnenhöhe: Tag, Dämmerung, Nacht
+    const el = o.sunEl;
+    const sky = el > 6 ? ['#3b8ed8', '#a8d6ff', 0.6, 0.12]
+      : el > -6 ? ['#39407c', '#f2a36a', 0.62, 0.3]
+        : ['#07142e', '#22335f', 0.85, 0.35];
+
+    const domePath = this._domeOutline();
+
+    // Gitter: Höhenkreise 30°/60°, Meridian und Ost-West-Bogen
+    let grid = '';
+    for (const a of [30, 60]) {
+      grid += `<ellipse cx="${cx}" cy="${n1(cy - rz * Math.sin(a * RAD))}" rx="${n1(R * Math.cos(a * RAD))}" ry="${n1(ry * Math.cos(a * RAD))}"/>`;
+    }
+    const greatArc = (azA, azB) => {
+      const pts = [];
+      for (let t = 0; t <= 180; t += 6) pts.push(t <= 90 ? project(azA, t) : project(azB, 180 - t));
+      return `<path d="M ${pts.map(p => `${n1(p[0])} ${n1(p[1])}`).join(' L ')}"/>`;
+    };
+    grid += greatArc(0, 180) + greatArc(90, 270);
+
+    // Kompass-Teilung am Boden
+    let ticks = '';
+    for (let a = 0; a < 360; a += 10) {
+      const k = a % 90 === 0 ? 0.86 : 0.94;
+      const A = a * RAD;
+      ticks += `<line x1="${n1(cx - f * R * k * Math.sin(A))}" y1="${n1(cy + f * ry * k * Math.cos(A))}" x2="${n1(cx - f * R * Math.sin(A))}" y2="${n1(cy + f * ry * Math.cos(A))}"${a % 90 === 0 ? ' class="major"' : ''}/>`;
+    }
+
+    // Bahn (Sonne oder Mond) für ±12 h, getrennt in vergangenen und kommenden Teil
+    const trackPaths = (posFn) => {
+      if (!posFn) return { past: '', future: '' };
+      const now = o.now.getTime();
+      const samples = [];
+      for (let i = -120; i <= 120; i++) {
+        const p = posFn(new Date(now + i * 6 * 60000));
+        samples.push({ i, az: p.az, alt: p.alt });
+      }
+      const past = [], future = [];
+      let run = [];
+      const flush = () => {
+        if (run.length > 1) {
+          const toD = (pts) => pts.length > 1 ? `M ${pts.map(s => { const p = project(s.az, s.alt); return `${n1(p[0])} ${n1(p[1])}`; }).join(' L ')}` : '';
+          past.push(toD(run.filter(s => s.i <= 0)));
+          future.push(toD(run.filter(s => s.i >= 0)));
+        }
+        run = [];
+      };
+      for (let k = 0; k < samples.length; k++) {
+        const s = samples[k];
+        const prev = samples[k - 1];
+        if (s.alt >= 0) {
+          // Horizont-Schnittpunkt interpolieren, damit die Bahn auf der Ellipse beginnt
+          if (prev && prev.alt < 0) {
+            const t = prev.alt / (prev.alt - s.alt);
+            run.push({ i: s.i - 0.5, az: prev.az + this._angleDiff(prev.az, s.az) * t, alt: 0 });
+          }
+          run.push(s);
+        } else if (run.length) {
+          const t = prev.alt / (prev.alt - s.alt);
+          run.push({ i: s.i - 0.5, az: prev.az + this._angleDiff(prev.az, s.az) * t, alt: 0 });
+          flush();
+        }
+      }
+      flush();
+      return { past: past.filter(Boolean).join(' '), future: future.filter(Boolean).join(' ') };
+    };
+
+    const isDay = el > 0;
+    const hasLoc = typeof o.lat === 'number' && typeof o.lng === 'number';
+    const track = trackPaths(hasLoc ? (d) => (isDay ? sunPosition(d, o.lat, o.lng) : moonPosition(d, o.lat, o.lng)) : null);
+
+    let marker = '';
+    let focus = [cx, cy - rz * 0.55];
+    let trackOpacity = 1;
+
+    if (isDay) {
+      const [sx, sy] = project(o.sunAz, el);
+      const [gx, gy] = project(o.sunAz, el, true);
+      focus = [sx, sy];
+      marker =
+        `<line class="spc-dome-drop" x1="${n1(sx)}" y1="${n1(sy)}" x2="${n1(gx)}" y2="${n1(gy)}"/>` +
+        `<ellipse cx="${n1(gx)}" cy="${n1(gy)}" rx="7" ry="2.4" fill="rgba(0,0,0,.28)"/>` +
+        `<circle cx="${n1(sx)}" cy="${n1(sy)}" r="24" fill="url(#${uid}-sunglow)"/>` +
+        `<circle cx="${n1(sx)}" cy="${n1(sy)}" r="10" fill="url(#${uid}-sun)"/>`;
+    } else if (hasLoc) {
+      const m = moonPosition(o.now, o.lat, o.lng);
+      if (m.alt > 0) {
+        const [mx, my] = project(m.az, m.alt);
+        const [gx, gy] = project(m.az, m.alt, true);
+        focus = [mx, my];
+        const rot = o.isSouthern ? ` transform="rotate(180 ${n1(mx)} ${n1(my)})"` : '';
+        marker =
+          `<line class="spc-dome-drop moon" x1="${n1(mx)}" y1="${n1(my)}" x2="${n1(gx)}" y2="${n1(gy)}"/>` +
+          `<ellipse cx="${n1(gx)}" cy="${n1(gy)}" rx="6" ry="2" fill="rgba(0,0,0,.25)"/>` +
+          `<circle cx="${n1(mx)}" cy="${n1(my)}" r="28" fill="url(#${uid}-moonglow)"/>` +
+          `<image href="${o.moonSrc}" x="${n1(mx - 16)}" y="${n1(my - 16)}" width="32" height="32"${rot}/>`;
+      } else {
+        // Mond aktuell unter dem Horizont: Bahn nur andeuten
+        trackOpacity = 0.35;
+      }
+    }
+
+    // Sterne nachts, in der Dämmerung schwächer
+    let starsSvg = '';
+    const starOpacity = Math.max(0, Math.min(1, (-el - 2) / 8));
+    if (starOpacity > 0) {
+      let seed = 3;
+      const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+      for (let i = 0; i < 46; i++) {
+        const az = rnd() * 360, alt = 8 + Math.asin(rnd()) / RAD * 0.9;
+        const [x, y] = project(az, alt);
+        const twinkle = i % 4 === 0 ? ` class="spc-twinkle" style="animation-delay:-${n1(rnd() * 3)}s"` : '';
+        starsSvg += `<circle${twinkle} cx="${n1(x)}" cy="${n1(y)}" r="${n1(0.5 + rnd() * 0.8)}"/>`;
+      }
+      starsSvg = `<g fill="#fff" opacity="${n1(starOpacity * 0.85)}">${starsSvg}</g>`;
+    }
+
+    // Beschriftung: Himmelsrichtungen und optional Auf-/Untergang unter Ost/West
+    const L = o.labels;
+    const leftIsEast = f === 1;
+    const front = f === 1 ? L.n : L.s;
+    const back = f === 1 ? L.s : L.n;
+    let labels =
+      `<text x="${cx - R - 7}" y="${cy + 4}" text-anchor="end" class="spc-dome-cardinal">${leftIsEast ? L.e : L.w}</text>` +
+      `<text x="${cx + R + 7}" y="${cy + 4}" text-anchor="start" class="spc-dome-cardinal">${leftIsEast ? L.w : L.e}</text>` +
+      `<text x="${cx}" y="${n1(cy + ry + 15)}" text-anchor="middle" class="spc-dome-cardinal">${front}</text>` +
+      `<text x="${cx}" y="${n1(cy - ry - 4)}" text-anchor="middle" class="spc-dome-cardinal back">${back}</text>`;
+    if (o.showTimes) {
+      const riseText = o.rise ? `↑ ${o.rise}` : '';
+      const setText = o.set ? `↓ ${o.set}` : '';
+      labels +=
+        `<text x="4" y="${cy + 28}" text-anchor="start" class="spc-dome-time">${leftIsEast ? riseText : setText}</text>` +
+        `<text x="316" y="${cy + 28}" text-anchor="end" class="spc-dome-time">${leftIsEast ? setText : riseText}</text>`;
+    }
+
+    const trackColor = isDay ? `url(#${uid}-track)` : '#cfd8e6';
+
+    const svg = `<svg viewBox="0 0 320 236" class="spc-dome-svg spc-anim" role="img" aria-label="${o.ariaLabel}">
+      <defs>
+        <linearGradient id="${uid}-sky" x1="0" y1="${cy - R}" x2="0" y2="${cy}" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="${sky[0]}" stop-opacity="${sky[2]}"/><stop offset="1" stop-color="${sky[1]}" stop-opacity="${sky[3]}"/>
+        </linearGradient>
+        <radialGradient id="${uid}-rim" cx="${cx}" cy="${cy}" r="${R}" gradientUnits="userSpaceOnUse">
+          <stop offset=".82" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/>
+        </radialGradient>
+        <radialGradient id="${uid}-ground" cx=".5" cy=".35" r=".65">
+          <stop offset="0" stop-color="#8a96a8" stop-opacity=".35"/><stop offset="1" stop-color="#2c3440" stop-opacity=".55"/>
+        </radialGradient>
+        <linearGradient id="${uid}-track" x1="${cx - R}" y1="0" x2="${cx + R}" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ff9e3d"/><stop offset=".5" stop-color="#ffd23f"/><stop offset="1" stop-color="#ff7a3d"/>
+        </linearGradient>
+        <radialGradient id="${uid}-sun"><stop offset="0" stop-color="#fffbe6"/><stop offset=".55" stop-color="#ffd84a"/><stop offset="1" stop-color="#ff9f1c"/></radialGradient>
+        <radialGradient id="${uid}-sunglow"><stop offset="0" stop-color="#ffd54f" stop-opacity=".75"/><stop offset="1" stop-color="#ffb300" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${uid}-moonglow"><stop offset="0" stop-color="#e8f0ff" stop-opacity=".8"/><stop offset="1" stop-color="#9fb4e6" stop-opacity="0"/></radialGradient>
+        <filter id="${uid}-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path d="${domePath}" fill="url(#${uid}-sky)"/>
+      <path d="${domePath}" fill="url(#${uid}-rim)"/>
+      ${starsSvg}
+      <ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${n1(ry)}" fill="url(#${uid}-ground)" class="spc-dome-ground"/>
+      <g class="spc-dome-grid">${grid}</g>
+      <g class="spc-dome-ticks">${ticks}</g>
+      <line class="spc-dome-axis" x1="${cx - R}" y1="${cy}" x2="${cx + R}" y2="${cy}"/>
+      <line class="spc-dome-axis" x1="${cx}" y1="${n1(cy - ry)}" x2="${cx}" y2="${n1(cy + ry)}"/>
+      <path d="M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}" class="spc-dome-outline"/>
+      <g opacity="${trackOpacity}">
+        <path d="${track.future}" fill="none" stroke="${trackColor}" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 5" opacity=".75"/>
+        <path d="${track.past}" fill="none" stroke="${trackColor}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#${uid}-glow)"/>
+      </g>
+      ${marker}
+      ${labels}
+    </svg>`;
+
+    return { svg, focus, domePath };
+  }
+
+  // Umriss der Kuppel (Halbkreis + vordere Bodenhälfte), auch als Clip für den Wetter-Layer
+  _domeOutline() {
+    const cx = 160, cy = 166, R = 128;
+    const ry = (R * Math.sin(17 * RAD)).toFixed(1);
+    return `M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy} A ${R} ${ry} 0 0 1 ${cx - R} ${cy} Z`;
+  }
+
+  // Kleinster Winkelabstand a -> b in Grad (für die Interpolation über 0°/360°)
+  _angleDiff(a, b) {
+    return ((b - a + 540) % 360) - 180;
   }
 
   _localize(key, lang = this.config?.language || this._hass?.locale?.language || 'en') {
@@ -778,6 +1140,54 @@ class SunPositionCard extends HTMLElement {
       imgEl.style.transform = (isSouthern && isMoonImage) ? 'rotate(180deg)' : '';
     }
 
+    // --- Animierte Wettereffekte (nur bei Zustandswechsel neu aufbauen, damit Animationen weiterlaufen) ---
+    const showWeatherOverlay = (config.show_weather_overlay ?? false) && weatherStateObj;
+    const wxState = showWeatherOverlay ? weatherStateObj.state : '';
+    const wxLayerEl = this.querySelector(`#${this._uid}-wx`);
+    const wxKey = `${wxState}|${isDay}`;
+    if (wxLayerEl && this._wxKey !== wxKey) {
+      this._wxKey = wxKey;
+      wxLayerEl.innerHTML = wxState ? this._weatherLayer(wxState, isDay) : '';
+    }
+    // In Berechnet/Bogen wächst der Layer mit der Größe von Sonne bzw. Mond
+    if (wxLayerEl && wxLayerEl.closest('.spc-wx-overlay.follow')) {
+      const imgSize = parseFloat(this.querySelector('#sun-card-image')?.style.width) || 170;
+      const followTransform = `translate(120 80) scale(${Math.max(0.7, imgSize / 80).toFixed(2)})`;
+      if (wxLayerEl.getAttribute('transform') !== followTransform) wxLayerEl.setAttribute('transform', followTransform);
+    }
+
+    // --- 3D-Kuppel (neu zeichnen bei ~0,5° Bewegung oder alle 5 Minuten) ---
+    const domeEl = this.querySelector(`#${this._uid}-dome`);
+    if (domeEl) {
+      const now = new Date();
+      const lat = hass.config?.latitude;
+      const lng = hass.config?.longitude;
+      const hasLocation = typeof lat === 'number' && typeof lng === 'number';
+      const moonImage = `${moonPhase || (hasLocation ? moonPhaseFromDate(now) : 'full_moon')}.png`;
+      const showDomeTimes = config.show_dome_times ?? false;
+      const rise = showDomeTimes ? formatTime(state.attributes.next_rising) : '';
+      const set = showDomeTimes ? formatTime(state.attributes.next_setting) : '';
+      const domeKey = [Math.round(azimuth * 2), Math.round(elevation * 2), Math.floor(now.getTime() / 300000), moonImage, rise, set, isSouthern].join('|');
+
+      if (this._domeKey !== domeKey) {
+        this._domeKey = domeKey;
+        const dome = this._renderDome({
+          now, lat, lng, isSouthern,
+          sunAz: azimuth, sunEl: elevation,
+          moonSrc: this._imageSrc(moonImage),
+          showTimes: showDomeTimes, rise, set,
+          ariaLabel: currentState,
+          labels: {
+            n: this._localize('compass.n'), e: this._localize('compass.e'),
+            s: this._localize('compass.s'), w: this._localize('compass.w')
+          }
+        });
+        domeEl.innerHTML = dome.svg;
+        // Wetter-Layer der Sonne bzw. dem Mond folgen lassen
+        if (wxLayerEl) wxLayerEl.setAttribute('transform', `translate(${dome.focus[0].toFixed(1)} ${dome.focus[1].toFixed(1)})`);
+      }
+    }
+
     const timesEl = this.querySelector('#sun-card-times');
     if (timesEl) {
       if (timesEl.innerHTML !== timeHtml) {
@@ -927,6 +1337,54 @@ class SunPositionCard extends HTMLElement {
         .sun-image-container:not(.calculated) .sun-icon-wrapper {
             position: relative;
         }
+
+        /* --- Animierte Wettereffekte --- */
+        .spc-wx-overlay { position: absolute; pointer-events: none; z-index: 3; overflow: visible; }
+        .spc-wx-overlay.full { inset: 0; }
+        .spc-wx-overlay.follow { left: 50%; top: 50%; width: 240px; height: 170px; transform: translate(-50%, -50%); }
+        .spc-wx-overlay svg { width: 100%; height: 100%; display: block; overflow: visible; }
+        .spc-drift { animation: spc-drift 12s ease-in-out infinite alternate; }
+        .spc-drop { animation: spc-fall .9s linear infinite; }
+        .spc-flake { animation: spc-snow 4s linear infinite; }
+        .spc-hail { animation: spc-fall .7s linear infinite; }
+        .spc-rays { transform-box: fill-box; transform-origin: center; animation: spc-spin 40s linear infinite; }
+        .spc-pulse { transform-box: fill-box; transform-origin: center; animation: spc-pulse 4s ease-in-out infinite; }
+        .spc-bolt { opacity: 0; animation: spc-bolt 5s linear infinite; }
+        .spc-flash { opacity: 0; animation: spc-flash 5s linear infinite; }
+        .spc-fog-band { animation: spc-fog 9s ease-in-out infinite alternate; }
+        .spc-wind { stroke-dasharray: 60 120; animation: spc-wind 2.4s linear infinite; }
+        .spc-twinkle { animation: spc-twinkle 3s ease-in-out infinite; }
+        @keyframes spc-drift { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+        @keyframes spc-fall { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: .9; } 100% { transform: translate(-6px, 64px); opacity: 0; } }
+        @keyframes spc-snow { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 50% { transform: translate(5px, 32px); } 100% { transform: translate(-3px, 66px); opacity: 0; } }
+        @keyframes spc-spin { to { transform: rotate(360deg); } }
+        @keyframes spc-pulse { 0%, 100% { transform: scale(.9); opacity: .7; } 50% { transform: scale(1.12); opacity: 1; } }
+        @keyframes spc-bolt { 0%, 86%, 90%, 93%, 100% { opacity: 0; } 87%, 89%, 94%, 95% { opacity: 1; } }
+        @keyframes spc-flash { 0%, 86%, 90%, 93%, 100% { opacity: 0; } 87%, 94% { opacity: .3; } }
+        @keyframes spc-fog { from { transform: translateX(-16px); } to { transform: translateX(16px); } }
+        @keyframes spc-wind { from { stroke-dashoffset: 180; } to { stroke-dashoffset: 0; } }
+        @keyframes spc-twinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) {
+          .spc-anim * { animation: none !important; }
+          .spc-anim .spc-bolt, .spc-anim .spc-flash { opacity: 0; }
+        }
+
+        /* --- 3D-Kuppel --- */
+        .spc-dome-container { padding: 8px 0 4px 0; }
+        .spc-dome-stage { position: relative; width: 100%; max-width: 420px; }
+        .spc-dome svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .spc-dome-wx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+        .spc-dome-grid { fill: none; stroke: var(--secondary-text-color, #888); stroke-opacity: .22; stroke-width: .8; stroke-dasharray: 2 4; }
+        .spc-dome-ticks line { stroke: var(--secondary-text-color, #888); stroke-opacity: .45; stroke-width: 1; }
+        .spc-dome-ticks line.major { stroke-opacity: .8; stroke-width: 1.6; }
+        .spc-dome-axis { stroke: var(--secondary-text-color, #888); stroke-opacity: .35; stroke-width: .8; stroke-dasharray: 3 4; }
+        .spc-dome-outline { fill: none; stroke: var(--secondary-text-color, #888); stroke-opacity: .45; stroke-width: 1.2; }
+        .spc-dome-ground { stroke: var(--secondary-text-color, #888); stroke-opacity: .6; stroke-width: 1.4; }
+        .spc-dome-drop { stroke: #ffd23f; stroke-opacity: .7; stroke-width: 1.2; stroke-dasharray: 2 3; }
+        .spc-dome-drop.moon { stroke: #cfd8e6; }
+        .spc-dome-cardinal { fill: var(--primary-text-color, #222); font-size: 13px; font-weight: 600; }
+        .spc-dome-cardinal.back { font-size: 10px; opacity: .45; }
+        .spc-dome-time { fill: var(--secondary-text-color, #666); font-size: 10.5px; }
       </style>
     `;
 
@@ -934,15 +1392,38 @@ class SunPositionCard extends HTMLElement {
     const moonPhaseHtml = (showMoonPhaseAbove) ? `<div class="moon-phase-state" id="moon-phase-text"></div>` : '';
     const degreesHtml = (showDegrees && !showDegreesInList) ? `<div class="degrees" id="sun-degrees-text"></div>` : '';
 
+    // Neuaufbau: Kuppel und Wetter-Layer beim nächsten Update neu zeichnen
+    this._domeKey = null;
+    this._wxKey = null;
+    const uid = this._uid;
+
+    // Wetter-Layer: folgt in Berechnet/Bogen der Sonne, liegt in Klassisch über dem Bild
+    const wxOverlay = (follow) => follow
+      ? `<div class="spc-wx-overlay follow"><svg class="spc-anim" viewBox="0 0 240 170" aria-hidden="true"><g id="${uid}-wx" transform="translate(120 80)"></g></svg></div>`
+      : `<div class="spc-wx-overlay full"><svg class="spc-anim" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g id="${uid}-wx" transform="translate(150 70) scale(1.4)"></g></svg></div>`;
+
     let imageHtml = '';
     if (showImage) {
-      if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
+      if (viewMode === 'dome') {
+        imageHtml = `<div class="sun-image-container spc-dome-container">
+                           <div class="solar-badge" id="solar-badge"></div>
+                           <div class="weather-badge" id="weather-badge"></div>
+                           <div class="spc-dome-stage">
+                               <div class="spc-dome" id="${uid}-dome"></div>
+                               <svg class="spc-dome-wx spc-anim" viewBox="0 0 320 236" aria-hidden="true">
+                                   <defs><clipPath id="${uid}-clip"><path d="${this._domeOutline()}"/></clipPath></defs>
+                                   <g clip-path="url(#${uid}-clip)"><g id="${uid}-wx"></g></g>
+                               </svg>
+                           </div>
+                         </div>`;
+      } else if (viewMode === 'calculated' || viewMode === 'arc' || showNightArc) {
         imageHtml = `<div class="sun-image-container calculated">
                            <div class="solar-badge" id="solar-badge"></div>
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
+                               ${wxOverlay(true)}
                            </div>
                          </div>`;
       } else {
@@ -951,6 +1432,7 @@ class SunPositionCard extends HTMLElement {
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="sun-image" src="" alt="">
+                               ${wxOverlay(false)}
                            </div>
                          </div>`;
       }
