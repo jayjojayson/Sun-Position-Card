@@ -2126,12 +2126,6 @@ const moonPosition = (date, lat, lng) => {
   return horizontalPosition(date, lat, lng, m.l, m.b);
 };
 
-const moonPhaseFromDate = (date) => {
-  const d = toDays(date);
-  const elongation = (((moonEcliptic(d).l - sunLongitude(d)) / RAD) % 360 + 360) % 360;
-  return MOON_PHASES[Math.round(elongation / 45) % 8];
-};
-
 console.log(
   "%c☀️ Sun-Position-Card v_2.3 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
@@ -2169,12 +2163,6 @@ class SunPositionCard extends HTMLElement {
     if (!value) return null;
     const date = new Date(value);
     return isNaN(date.getTime()) ? null : date;
-  }
-
-  // Bildquelle (wird von build.js auf die eingebetteten Data-URIs umgestellt)
-  _imageSrc(image) {
-    const newSrc = images[image];
-    return newSrc;
   }
 
   /**
@@ -2324,43 +2312,51 @@ class SunPositionCard extends HTMLElement {
       ticks += `<line x1="${n1(cx - f * R * k * Math.sin(A))}" y1="${n1(cy + f * ry * k * Math.cos(A))}" x2="${n1(cx - f * R * Math.sin(A))}" y2="${n1(cy + f * ry * Math.cos(A))}"${a % 90 === 0 ? ' class="major"' : ''}/>`;
     }
 
-    // Bahn (Sonne oder Mond) für ±12 h, getrennt in vergangenen und kommenden Teil
+    // Bahn (Sonne oder Mond): nur der aktuelle Durchgang über dem Horizont.
+    // Steht das Gestirn gerade unter dem Horizont, wird der nächste Durchgang (ab Aufgang) geliefert.
+    const STEP = 6 * 60000;
     const trackPaths = (posFn) => {
-      if (!posFn) return { past: '', future: '' };
+      const empty = { past: '', future: '', rise: null };
+      if (!posFn) return empty;
       const now = o.now.getTime();
       const samples = [];
-      for (let i = -120; i <= 120; i++) {
-        const p = posFn(new Date(now + i * 6 * 60000));
+      for (let i = -150; i <= 150; i++) {          // ±15 h in 6-Minuten-Schritten
+        const p = posFn(new Date(now + i * STEP));
         samples.push({ i, az: p.az, alt: p.alt });
       }
-      const past = [], future = [];
-      let run = [];
-      const flush = () => {
-        if (run.length > 1) {
-          const toD = (pts) => pts.length > 1 ? `M ${pts.map(s => { const p = project(s.az, s.alt); return `${n1(p[0])} ${n1(p[1])}`; }).join(' L ')}` : '';
-          past.push(toD(run.filter(s => s.i <= 0)));
-          future.push(toD(run.filter(s => s.i >= 0)));
-        }
-        run = [];
+      // Horizont-Schnittpunkt interpolieren, damit die Bahn genau auf der Ellipse beginnt/endet
+      const crossing = (a, b) => {
+        const t = a.alt / (a.alt - b.alt);
+        return { i: a.i + t, az: a.az + this._angleDiff(a.az, b.az) * t, alt: 0 };
       };
+      const runs = [];
+      let run = null;
       for (let k = 0; k < samples.length; k++) {
-        const s = samples[k];
-        const prev = samples[k - 1];
+        const s = samples[k], prev = samples[k - 1];
         if (s.alt >= 0) {
-          // Horizont-Schnittpunkt interpolieren, damit die Bahn auf der Ellipse beginnt
-          if (prev && prev.alt < 0) {
-            const t = prev.alt / (prev.alt - s.alt);
-            run.push({ i: s.i - 0.5, az: prev.az + this._angleDiff(prev.az, s.az) * t, alt: 0 });
+          if (!run) {
+            run = [];
+            if (prev) run.push(crossing(prev, s));
+            runs.push(run);
           }
           run.push(s);
-        } else if (run.length) {
-          const t = prev.alt / (prev.alt - s.alt);
-          run.push({ i: s.i - 0.5, az: prev.az + this._angleDiff(prev.az, s.az) * t, alt: 0 });
-          flush();
+        } else if (run) {
+          run.push(crossing(prev, s));
+          run = null;
         }
       }
-      flush();
-      return { past: past.filter(Boolean).join(' '), future: future.filter(Boolean).join(' ') };
+      const current = runs.find(r => r[0].i <= 0 && r[r.length - 1].i >= 0);
+      const chosen = current || runs.find(r => r[0].i > 0);
+      if (!chosen) return empty;
+
+      const toD = (pts) => pts.length > 1
+        ? `M ${pts.map(s => { const p = project(s.az, s.alt); return `${n1(p[0])} ${n1(p[1])}`; }).join(' L ')}`
+        : '';
+      return {
+        past: toD(chosen.filter(s => s.i <= 0)),
+        future: toD(chosen.filter(s => s.i >= 0)),
+        rise: current ? null : { az: chosen[0].az, time: new Date(now + chosen[0].i * STEP) }
+      };
     };
 
     const isDay = el > 0;
@@ -2382,19 +2378,30 @@ class SunPositionCard extends HTMLElement {
         `<circle cx="${n1(sx)}" cy="${n1(sy)}" r="10" fill="url(#${uid}-sun)"/>`;
     } else if (hasLoc) {
       const m = moonPosition(o.now, o.lat, o.lng);
+      const d = toDays(o.now);
+      const elongation = (moonEcliptic(d).l - sunLongitude(d)) / RAD;
       if (m.alt > 0) {
         const [mx, my] = project(m.az, m.alt);
         const [gx, gy] = project(m.az, m.alt, true);
         focus = [mx, my];
-        const rot = o.isSouthern ? ` transform="rotate(180 ${n1(mx)} ${n1(my)})"` : '';
         marker =
           `<line class="spc-dome-drop moon" x1="${n1(mx)}" y1="${n1(my)}" x2="${n1(gx)}" y2="${n1(gy)}"/>` +
           `<ellipse cx="${n1(gx)}" cy="${n1(gy)}" rx="6" ry="2" fill="rgba(0,0,0,.25)"/>` +
-          `<circle cx="${n1(mx)}" cy="${n1(my)}" r="28" fill="url(#${uid}-moonglow)"/>` +
-          `<image href="${o.moonSrc}" x="${n1(mx - 16)}" y="${n1(my - 16)}" width="32" height="32"${rot}/>`;
+          `<circle cx="${n1(mx)}" cy="${n1(my)}" r="26" fill="url(#${uid}-moonglow)"/>` +
+          this._moonSvg(mx, my, 11, elongation, o.isSouthern);
       } else {
-        // Mond aktuell unter dem Horizont: Bahn nur andeuten
-        trackOpacity = 0.35;
+        // Mond aktuell unter dem Horizont: kommende Bahn andeuten und Aufgang markieren
+        trackOpacity = 0.55;
+        if (track.rise) {
+          const [rx, ry0] = project(track.rise.az, 0);
+          const riseTime = o.formatTime ? o.formatTime(track.rise.time) : '';
+          marker =
+            `<g class="spc-dome-moonrise">` +
+            `<circle cx="${n1(rx)}" cy="${n1(ry0 - 9)}" r="15" fill="url(#${uid}-moonglow)" opacity=".5"/>` +
+            this._moonSvg(rx, ry0 - 9, 7, elongation, o.isSouthern, 0.75) +
+            (riseTime ? `<text x="${n1(rx)}" y="${n1(ry0 - 22)}" text-anchor="middle" class="spc-dome-time">↑ ${riseTime}</text>` : '') +
+            `</g>`;
+        }
       }
     }
 
@@ -2449,6 +2456,7 @@ class SunPositionCard extends HTMLElement {
         </linearGradient>
         <radialGradient id="${uid}-sun"><stop offset="0" stop-color="#fffbe6"/><stop offset=".55" stop-color="#ffd84a"/><stop offset="1" stop-color="#ff9f1c"/></radialGradient>
         <radialGradient id="${uid}-sunglow"><stop offset="0" stop-color="#ffd54f" stop-opacity=".75"/><stop offset="1" stop-color="#ffb300" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${uid}-moonlit" cx=".38" cy=".35" r=".75"><stop offset="0" stop-color="#fffdf4"/><stop offset=".7" stop-color="#ece6d4"/><stop offset="1" stop-color="#c9c2ad"/></radialGradient>
         <radialGradient id="${uid}-moonglow"><stop offset="0" stop-color="#e8f0ff" stop-opacity=".8"/><stop offset="1" stop-color="#9fb4e6" stop-opacity="0"/></radialGradient>
         <filter id="${uid}-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
@@ -2470,6 +2478,28 @@ class SunPositionCard extends HTMLElement {
     </svg>`;
 
     return { svg, focus, domePath };
+  }
+
+  /**
+   * Mond als Vektorgrafik mit exakter Lichtgestalt aus dem Mondalter (Elongation 0° = Neumond, 180° = Vollmond).
+   * Zunehmend ist auf der Nordhalbkugel rechts beleuchtet; auf der Südhalbkugel wird um 180° gedreht.
+   */
+  _moonSvg(x, y, r, elongation, southern, opacity = 1) {
+    const uid = this._uid;
+    const n1 = (v) => v.toFixed(2);
+    const e = ((elongation % 360) + 360) % 360;
+    const waxing = e < 180;
+    const gibbous = e > 90 && e < 270;
+    const rx = Math.abs(Math.cos(e * RAD)) * r;
+    // Rand der beleuchteten Seite (oben -> unten), dann Terminator zurück nach oben
+    const limbSweep = waxing ? 1 : 0;
+    const termSweep = waxing ? (gibbous ? 1 : 0) : (gibbous ? 0 : 1);
+    const lit = `M 0 ${n1(-r)} A ${n1(r)} ${n1(r)} 0 0 ${limbSweep} 0 ${n1(r)} A ${n1(rx)} ${n1(r)} 0 0 ${termSweep} 0 ${n1(-r)} Z`;
+    const rot = southern ? ' rotate(180)' : '';
+    return `<g transform="translate(${n1(x)} ${n1(y)})${rot}" opacity="${opacity}">` +
+      `<circle r="${n1(r)}" fill="#2a3244" fill-opacity=".9" stroke="#fff" stroke-opacity=".18" stroke-width=".8"/>` +
+      `<path d="${lit}" fill="url(#${uid}-moonlit)"/>` +
+      `</g>`;
   }
 
   // Umriss der Kuppel (Halbkreis + vordere Bodenhälfte), auch als Clip für den Wetter-Layer
@@ -3230,20 +3260,19 @@ class SunPositionCard extends HTMLElement {
       const now = new Date();
       const lat = hass.config?.latitude;
       const lng = hass.config?.longitude;
-      const hasLocation = typeof lat === 'number' && typeof lng === 'number';
-      const moonImage = `${moonPhase || (hasLocation ? moonPhaseFromDate(now) : 'full_moon')}.png`;
       const showDomeTimes = config.show_dome_times ?? false;
       const rise = showDomeTimes ? formatTime(state.attributes.next_rising) : '';
       const set = showDomeTimes ? formatTime(state.attributes.next_setting) : '';
-      const domeKey = [Math.round(azimuth * 2), Math.round(elevation * 2), Math.floor(now.getTime() / 300000), moonImage, rise, set, isSouthern].join('|');
+      // Mond-Lichtgestalt und -Position werden in der Kuppel astronomisch berechnet (alle 5 Minuten neu)
+      const domeKey = [Math.round(azimuth * 2), Math.round(elevation * 2), Math.floor(now.getTime() / 300000), rise, set, isSouthern].join('|');
 
       if (this._domeKey !== domeKey) {
         this._domeKey = domeKey;
         const dome = this._renderDome({
           now, lat, lng, isSouthern,
           sunAz: azimuth, sunEl: elevation,
-          moonSrc: this._imageSrc(moonImage),
           showTimes: showDomeTimes, rise, set,
+          formatTime: (date) => formatTime(date.toISOString()),
           ariaLabel: currentState,
           labels: {
             n: this._localize('compass.n'), e: this._localize('compass.e'),
