@@ -185,7 +185,7 @@ class SunPositionCardEditor extends HTMLElement {
               label="${this._localize('editor.moon_phase_position')}"
             ></ha-selector>
 
-            <div class="row" style="margin: 16px 0 10px 0;">
+            <div id="night_arc_container" class="row" style="margin: 16px 0 10px 0;">
                 <ha-switch id="show_night_arc"></ha-switch>
                 <span style="margin-left: 16px;">${this._localize('editor.show_night_arc')}</span>
             </div>
@@ -490,8 +490,9 @@ class SunPositionCardEditor extends HTMLElement {
         sunSizeContainer.classList.add('hidden');
     }
 
-    // Auf-/Untergangszeiten nur in der 3D-Kuppel
+    // Auf-/Untergangszeiten nur in der 3D-Kuppel; der Mondbogen hat dort keine Funktion
     root.getElementById('dome_times_container').classList.toggle('hidden', config.view_mode !== 'dome');
+    root.getElementById('night_arc_container').classList.toggle('hidden', config.view_mode === 'dome');
 
     // Steuerung der Sichtbarkeit für alle Mond-Optionen
     const moonPosContainer = root.getElementById('moon_phase_position_container');
