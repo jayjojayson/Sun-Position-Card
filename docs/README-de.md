@@ -40,6 +40,8 @@ Wenn euch die custom Card gefällt, würde ich mich sehr über eine Sternebewert
 - ### ⚙️ **UI-Konfiguration**
 - ### 🌐 **Manuelle Sprachauswahl** 
 - ### 🔋 **Solarleistungs-Badge** 
+- ### 🌐 **NEU: 3D-Kuppel mit echter Sonnen- und Mondbahn**
+- ### 🌦️ **NEU: Animierte Wettereffekte über Sonne und Mond**
 - ### 🌏 **Unterstützung für die Südhalbkugel**
 - ### 🔢 **Rundung für Temperatur und Solarleistung**
 - ### 🆕 **Dropdowns kompatibel mit HA 2026.3+**
@@ -146,9 +148,11 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `solar_entity`           | `string`  |                               | Sensor für die Solarleistung (Solar-Badge). |
 | `solar_decimals`         | `number`  | keine Rundung                 | Nachkommastellen der Solarleistung (`0` – `3`). |
 | `show_weather_badge`     | `boolean` | `true`                        | Wetter-Badge auf dem Bild anzeigen. |
+| `show_weather_overlay`   | `boolean` | `false`                       | Animierte Wettereffekte über Sonne/Mond (benötigt `weather_entity`). |
 | `show_solar_badge`       | `boolean` | `true`                        | Solar-Badge auf dem Bild anzeigen. |
-| `view_mode`              | `string`  | `classic`                     | `classic` (6 Bilder), `calculated` (Höhe) oder `arc` (180°-Bogen). |
+| `view_mode`              | `string`  | `classic`                     | `classic` (6 Bilder), `calculated` (Höhe), `arc` (180°-Bogen) oder `dome` (3D-Kuppel). |
 | `sun_size`               | `number`  | `50`                          | Größe von Sonne/Mond in px (nur Bogen-Ansicht). |
+| `show_dome_times`        | `boolean` | `false`                       | Sonnenaufgang unter O und Sonnenuntergang unter W anzeigen (nur 3D-Kuppel). |
 | `show_image`             | `boolean` | `true`                        | Bild des Sonnenstands anzeigen. |
 | `animate_images`         | `boolean` | `false`                       | Sonnenbilder animieren. |
 | `state_position`         | `string`  | `in_list`                     | Position des aktuellen Status: `above`, `in_list`, `hide`. |
@@ -170,12 +174,33 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `afternoon_azimuth`      | `number`  | `255`                         | Azimut-Grenzwert für den Nachmittag. |
 | `dusk_elevation`         | `number`  | `10`                          | Höhen-Grenzwert für die Dämmerung. |
 
+#### 3D-Kuppel
+
+<img width="100%" height="auto" alt="3D-Kuppel" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
+
+Mit `view_mode: dome` zeigt die Card eine 3D-Himmelskuppel über einem Kompass. Tagsüber siehst du die echte Sonnenbahn des heutigen Tages (bereits zurückgelegt: durchgezogen, noch kommend: gepunktet) und die Sonne mit ihrem Lot zum Boden. Nachts werden die Mondbahn und der Mond mit seiner aktuellen Phase vor einem Sternenhimmel gezeigt. Beide Bahnen werden aus dem Standort deiner Home-Assistant-Instanz berechnet. Der Himmel wechselt seine Farben für Tag, Dämmerung und Nacht. Mit `show_dome_times: true` stehen die Aufgangszeit unter O und die Untergangszeit unter W.
+
+#### Animierte Wettereffekte
+
+Mit einer Wetter-Entität und `show_weather_overlay: true` liegt eine animierte Ebene über Sonne bzw. Mond: Sonnenstrahlen, Wolken, Regen, Starkregen, Schnee, Schneeregen, Hagel, Gewitter mit Blitzen, Nebel, Wind oder funkelnde Sterne – je nach Zustand deiner Wetter-Entität. Das funktioniert in allen Ansichten. Ist auf dem Gerät „Bewegung reduzieren“ aktiv, werden die Effekte ohne Animation gezeigt.
+
+```yaml
+type: custom:sun-position-card
+entity: sun.sun
+moon_entity: sensor.moon_phase
+weather_entity: weather.home
+view_mode: dome
+show_dome_times: true
+show_weather_overlay: true
+```
+
 #### Südhalbkugel
 
 Die Card erkennt die Südhalbkugel automatisch über den Breitengrad deines Home-Assistant-Standorts:
 
 - Die Tageszeit (Morgen, Mittag, Nachmittag, Abend) wird korrekt bestimmt, obwohl die Sonne mittags im Norden steht. Die Azimut-Grenzwerte behalten dieselben Werte wie auf der Nordhalbkugel.
 - Mondbilder und Mond-Icons werden um 180° gedreht dargestellt, so wie der Mond von der Südhalbkugel aus zu sehen ist.
+- Die 3D-Kuppel blickt nach Norden, wo die Sonne mittags steht.
 
 Falls die Erkennung nicht passt, kann sie per YAML mit `hemisphere: north` oder `hemisphere: south` festgelegt werden.
 

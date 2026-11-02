@@ -42,6 +42,8 @@ If you like the Card, I would appreciate a Star rating ⭐ from you. 🤗
 - ### ⚙️ **UI Configuration**
 - ### 🌐 **Manual Language Selection** 
 - ### 🔋 **Solar Power Badge**
+- ### 🌐 **NEW: 3D Dome with real Sun & Moon Path**
+- ### 🌦️ **NEW: Animated Weather Effects over Sun and Moon**
 - ### 🌏 **Southern Hemisphere Support**
 - ### 🔢 **Rounding for Temperature and Solar Power**
 - ### 🆕 **Dropdowns compatible with HA 2026.3+** 
@@ -118,9 +120,11 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `solar_entity`           | `string`  |                               | Solar power sensor for the solar badge. |
 | `solar_decimals`         | `number`  | no rounding                   | Decimal places for the solar power (`0` – `3`). |
 | `show_weather_badge`     | `boolean` | `true`                        | Show the weather badge on the image. |
+| `show_weather_overlay`   | `boolean` | `false`                       | Animated weather effects over the sun/moon (requires `weather_entity`). |
 | `show_solar_badge`       | `boolean` | `true`                        | Show the solar power badge on the image. |
-| `view_mode`              | `string`  | `classic`                     | `classic` (6 images), `calculated` (elevation) or `arc` (180° arc). |
+| `view_mode`              | `string`  | `classic`                     | `classic` (6 images), `calculated` (elevation), `arc` (180° arc) or `dome` (3D dome). |
 | `sun_size`               | `number`  | `50`                          | Size of sun/moon in px (arc view only). |
+| `show_dome_times`        | `boolean` | `false`                       | Show sunrise below E and sunset below W (dome view only). |
 | `show_image`             | `boolean` | `true`                        | Show the sun position image. |
 | `animate_images`         | `boolean` | `false`                       | Animate the sun images. |
 | `state_position`         | `string`  | `in_list`                     | Position of the current state: `above`, `in_list`, `hide`. |
@@ -142,12 +146,33 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `afternoon_azimuth`      | `number`  | `255`                         | Azimuth threshold for afternoon. |
 | `dusk_elevation`         | `number`  | `10`                          | Elevation threshold for dawn/dusk. |
 
+#### 3D dome view
+
+<img width="100%" height="auto" alt="3D dome view" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
+
+With `view_mode: dome` the card shows a 3D sky dome over a compass. During the day you see today's real sun path (already passed: solid, still to come: dotted) and the sun with its drop line to the ground. At night the moon path and the moon with its current phase are shown, with a starry sky. Both paths are calculated from the location of your Home Assistant instance. The sky changes its colors for day, twilight and night. With `show_dome_times: true` the sunrise time is shown below E and the sunset time below W.
+
+#### Animated weather effects
+
+With a weather entity and `show_weather_overlay: true`, an animated layer is shown over the sun or moon: sun rays, clouds, rain, heavy rain, snow, sleet, hail, thunderstorm with lightning, fog, wind or twinkling stars – depending on the state of your weather entity. It works in all view modes. If your device has "reduce motion" enabled, the effects are shown without animation.
+
+```yaml
+type: custom:sun-position-card
+entity: sun.sun
+moon_entity: sensor.moon_phase
+weather_entity: weather.home
+view_mode: dome
+show_dome_times: true
+show_weather_overlay: true
+```
+
 #### Southern hemisphere
 
 The card detects the southern hemisphere automatically from the latitude of your Home Assistant location:
 
 - The time of day (morning, noon, afternoon, evening) is calculated correctly, although the sun is in the north at noon. The azimuth thresholds keep the same values as on the northern hemisphere.
 - Moon images and moon icons are shown rotated by 180°, as the moon is seen from the southern hemisphere.
+- The 3D dome looks to the north, where the sun passes at noon.
 
 If the detection does not fit your setup, you can force it in YAML with `hemisphere: north` or `hemisphere: south`.
 
