@@ -55,6 +55,8 @@ export default {
         next_dusk: "Сумерки",
         next_noon: "Полдень",
         next_midnight: "Полночь",
+        next_moonrise: "Восход луны",
+        next_moonset: "Заход луны",
         moon_phase: "Фаза луны",
         weather: "Погода"
     },

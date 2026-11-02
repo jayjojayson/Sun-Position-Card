@@ -55,6 +55,8 @@ export default {
         next_dusk: "Skymning",
         next_noon: "Middag",
         next_midnight: "Midnatt",
+        next_moonrise: "Månuppgång",
+        next_moonset: "Månnedgång",
         moon_phase: "Månfas",
         weather: "Väder"
     },

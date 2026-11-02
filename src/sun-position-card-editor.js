@@ -246,6 +246,8 @@ class SunPositionCardEditor extends HTMLElement {
             ${this._renderCheckbox('next_dusk', this._localize('time_entry.next_dusk'))}
             ${this._renderCheckbox('next_noon', this._localize('time_entry.next_noon'))}
             ${this._renderCheckbox('next_midnight', this._localize('time_entry.next_midnight'))}
+            ${this._renderCheckbox('next_moonrise', this._localize('time_entry.next_moonrise'))}
+            ${this._renderCheckbox('next_moonset', this._localize('time_entry.next_moonset'))}
             <div id="moon_phase_checkbox_container" class="hidden">
                 ${this._renderCheckbox('moon_phase', this._localize('time_entry.moon_phase'))}
             </div>

@@ -55,6 +55,8 @@ export default {
         next_dusk: "Dusk",
         next_noon: "Noon",
         next_midnight: "Midnight",
+        next_moonrise: "Moonrise",
+        next_moonset: "Moonset",
         moon_phase: "Moon Phase",
         weather: "Weather"
     },

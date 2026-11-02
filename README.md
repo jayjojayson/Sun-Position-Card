@@ -132,7 +132,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 | `hide_moon_phase_on_day` | `boolean` | `false`                       | Hide the moon phase during the day. |
 | `show_night_arc`         | `boolean` | `false`                       | Show the moon on an arc at night. |
 | `show_moon_icon_in_text` | `boolean` | `false`                       | Show a moon icon next to the moon phase text. |
-| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `moon_phase`, `weather` |
+| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `next_moonrise`, `next_moonset`, `moon_phase`, `weather` |
 | `time_position`          | `string`  | `below`                       | Position of the times: `above`, `below`, `right`. |
 | `time_list_format`       | `string`  | `centered`                    | Alignment of the time list: `centered`, `block`. |
 | `show_degrees`           | `boolean` | `false`                       | Show azimuth and elevation. |
@@ -150,7 +150,7 @@ Although the UI configuration is recommended, the card can also be configured ma
 
 <img width="100%" height="auto" alt="3D dome view" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
 
-With `view_mode: dome` the card shows a 3D sky dome over a compass. During the day you see today's real sun path (already passed: solid, still to come: dotted) and the sun with its drop line to the ground. At night the moon path and the moon with its current phase are shown, with a starry sky. If the moon is still below the horizon, its upcoming path and the moonrise time at the rising point are shown instead. Both paths are calculated from the location of your Home Assistant instance. The sky changes its colors for day, twilight and night. With `show_dome_times: true` the sunrise time is shown below E and the sunset time below W.
+With `view_mode: dome` the card shows a 3D sky dome over a compass. During the day you see today's real sun path (already passed: solid, still to come: dotted) and the sun with its drop line to the ground. At night the moon path and the moon with its current phase are shown, with a starry sky. If the moon is still below the horizon, it is not shown; instead its upcoming path and the moonrise time at the rising point are shown. Moonrise and moonset can also be added to the time list (`next_moonrise`, `next_moonset`); they are calculated from your HA location. In the arc view with the moon arc enabled, the moon now follows its real path from moonrise (left) to moonset (right). Both paths are calculated from the location of your Home Assistant instance. The sky changes its colors for day, twilight and night. With `show_dome_times: true` the sunrise time is shown below E and the sunset time below W.
 
 #### Animated weather effects
 

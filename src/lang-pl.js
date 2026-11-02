@@ -55,6 +55,8 @@ export default {
         next_dusk: "Zmierzch",
         next_noon: "Południe",
         next_midnight: "Północ",
+        next_moonrise: "Wschód księżyca",
+        next_moonset: "Zachód księżyca",
         moon_phase: "Faza księżyca",
         weather: "Pogoda"
     },

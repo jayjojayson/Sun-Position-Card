@@ -55,6 +55,8 @@ export default {
         next_dusk: "Abenddämmerung",
         next_noon: "Mittag",
         next_midnight: "Mitternacht",
+        next_moonrise: "Mondaufgang",
+        next_moonset: "Monduntergang",
         moon_phase: "Mondphase",
         weather: "Wetter"
     },

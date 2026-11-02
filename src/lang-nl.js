@@ -55,6 +55,8 @@ export default {
 		next_dusk: "Schemering",
 		next_noon: "Middag",
 		next_midnight: "Middernacht",
+		next_moonrise: "Maanopkomst",
+		next_moonset: "Maanondergang",
 		moon_phase: "Maanfase",
 		weather: "Weer"
     },

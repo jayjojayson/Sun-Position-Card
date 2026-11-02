@@ -55,6 +55,8 @@ export default {
         next_dusk: "Soumrak",
         next_noon: "Poledne",
         next_midnight: "Půlnoc",
+        next_moonrise: "Východ Měsíce",
+        next_moonset: "Západ Měsíce",
         moon_phase: "Fáze Měsíce",
         weather: "Počasí"
     },

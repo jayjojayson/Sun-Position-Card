@@ -55,6 +55,8 @@ export default {
       next_dusk: "Crepúsculo",
       next_noon: "Mediodía",
       next_midnight: "Medianoche",
+      next_moonrise: "Salida de la luna",
+      next_moonset: "Puesta de la luna",
       moon_phase: "Fase lunar",
       weather: "Tiempo",
     },

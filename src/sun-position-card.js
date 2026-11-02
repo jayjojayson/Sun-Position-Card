@@ -58,6 +58,40 @@ const moonPosition = (date, lat, lng) => {
   return horizontalPosition(date, lat, lng, m.l, m.b);
 };
 
+/**
+ * Mondaufgang/-untergang rund um "now": steht der Mond, letzter Aufgang, nächster Auf- und Untergang.
+ * Schwelle +0,125° (geozentrische Höhe, berücksichtigt Parallaxe, Refraktion und Mondradius).
+ * Genauigkeit wenige Minuten.
+ */
+const moonEvents = (now, lat, lng) => {
+  const H0 = 0.125;
+  const STEP = 10 * 60000;
+  const t0 = now.getTime();
+  const alt = (t) => moonPosition(new Date(t), lat, lng).alt - H0;
+  const cross = (ta, aa, tb, ab) => new Date(ta + (tb - ta) * (aa / (aa - ab)));
+
+  const a0 = alt(t0);
+  let nextRise = null, nextSet = null, lastRise = null;
+
+  let prevT = t0, prevA = a0;
+  for (let t = t0 + STEP; t <= t0 + 48 * 36e5 && (!nextRise || !nextSet); t += STEP) {
+    const a = alt(t);
+    if (!nextRise && prevA < 0 && a >= 0) nextRise = cross(prevT, prevA, t, a);
+    if (!nextSet && prevA >= 0 && a < 0) nextSet = cross(prevT, prevA, t, a);
+    prevT = t; prevA = a;
+  }
+
+  if (a0 >= 0) {
+    prevT = t0; prevA = a0;
+    for (let t = t0 - STEP; t >= t0 - 30 * 36e5; t -= STEP) {
+      const a = alt(t);
+      if (a < 0 && prevA >= 0) { lastRise = cross(t, a, prevT, prevA); break; }
+      prevT = t; prevA = a;
+    }
+  }
+  return { up: a0 >= 0, nextRise, nextSet, lastRise };
+};
+
 console.log(
   "%c☀️ Sun-Position-Card v_2.3 ready",
   "background: #2ecc71; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;"
@@ -322,16 +356,18 @@ class SunPositionCard extends HTMLElement {
           `<circle cx="${n1(mx)}" cy="${n1(my)}" r="26" fill="url(#${uid}-moonglow)"/>` +
           this._moonSvg(mx, my, 11, elongation, o.isSouthern);
       } else {
-        // Mond aktuell unter dem Horizont: kommende Bahn andeuten und Aufgang markieren
+        // Mond noch nicht aufgegangen: kommende Bahn andeuten, Aufgangspunkt mit Uhrzeit markieren (ohne Mond)
         trackOpacity = 0.55;
         if (track.rise) {
           const [rx, ry0] = project(track.rise.az, 0);
-          const riseTime = o.formatTime ? o.formatTime(track.rise.time) : '';
+          const riseDate = o.moonRise || track.rise.time;
+          const riseTime = o.formatTime ? o.formatTime(riseDate) : '';
           marker =
             `<g class="spc-dome-moonrise">` +
-            `<circle cx="${n1(rx)}" cy="${n1(ry0 - 9)}" r="15" fill="url(#${uid}-moonglow)" opacity=".5"/>` +
-            this._moonSvg(rx, ry0 - 9, 7, elongation, o.isSouthern, 0.75) +
-            (riseTime ? `<text x="${n1(rx)}" y="${n1(ry0 - 22)}" text-anchor="middle" class="spc-dome-time">↑ ${riseTime}</text>` : '') +
+            `<line x1="${n1(rx)}" y1="${n1(ry0)}" x2="${n1(rx)}" y2="${n1(ry0 - 7)}" stroke="#cfd8e6" stroke-width="1.6" stroke-linecap="round"/>` +
+            `<circle cx="${n1(rx)}" cy="${n1(ry0)}" r="2" fill="#cfd8e6"/>` +
+            // Zeit nach innen versetzt, damit sie nicht mit der Himmelsrichtung kollidiert
+            (riseTime ? `<text x="${n1(rx < cx ? rx + 7 : rx - 7)}" y="${n1(ry0 - 9)}" text-anchor="${rx < cx ? 'start' : 'end'}" class="spc-dome-time">↑ ${riseTime}</text>` : '') +
             `</g>`;
         }
       }
@@ -580,6 +616,40 @@ class SunPositionCard extends HTMLElement {
     };
   }
 
+  // Mondzeiten aus dem HA-Standort, pro Minute zwischengespeichert (hass-Updates kommen sehr häufig)
+  _getMoonEvents(hass) {
+    const lat = hass.config?.latitude;
+    const lng = hass.config?.longitude;
+    if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+    const now = new Date();
+    const key = `${Math.floor(now.getTime() / 60000)}|${lat}|${lng}`;
+    if (this._moonEventsKey !== key) {
+      this._moonEventsKey = key;
+      this._moonEventsCache = moonEvents(now, lat, lng);
+    }
+    return this._moonEventsCache;
+  }
+
+  // Mond auf dem 180°-Bogen: links = Mondaufgang, rechts = Monduntergang (echter Durchgang)
+  _calculateMoonPositionArc(events, isCompact) {
+    const radius = isCompact ? 90 : 120;
+    const baselineY = isCompact ? (70 + 90) : (50 + 120);
+    let percent = 0.5;
+    if (events.up && events.lastRise && events.nextSet) {
+      percent = (Date.now() - events.lastRise.getTime()) / (events.nextSet.getTime() - events.lastRise.getTime());
+      percent = Math.max(0, Math.min(1, percent));
+    }
+    const rad = Math.PI * (1 - percent);
+    return {
+      left: `calc(50% + ${Math.cos(rad) * radius}px)`,
+      top: `calc(${baselineY}px - ${Math.sin(rad) * radius}px)`,
+      visible: events.up,
+      labelLeft: `calc(50% - ${radius - 8}px)`,
+      labelTop: `${baselineY - 18}px`
+    };
+  }
+
+  // Fallback ohne Standort: Mond nach Anteil der Nacht zwischen Sonnenunter- und -aufgang
   _calculateNightPositionArc(sunState, hass, isCompact) {
     const fallback = { left: '50%', top: '100%' };
 
@@ -932,6 +1002,9 @@ class SunPositionCard extends HTMLElement {
       }
     }
 
+    // Einträge mit fertigem Inhalt (keine Sonnenzeit aus sun.sun)
+    const CONTENT_KEYS = ['daylight_duration', 'day_comparison', 'moon_phase', 'weather', 'next_moonrise', 'next_moonset'];
+
     timesToShow.forEach(timeKey => {
       let label = '';
       let content = '';
@@ -967,15 +1040,26 @@ class SunPositionCard extends HTMLElement {
             content = weatherText;
           }
           break;
+        case 'next_moonrise':
+        case 'next_moonset': {
+          // Aus dem HA-Standort berechnet (die Mond-Integration liefert keine Zeiten)
+          const events = this._getMoonEvents(hass);
+          const date = events && (timeKey === 'next_moonrise' ? events.nextRise : events.nextSet);
+          if (date) {
+            label = this._localize(`time_entry.${timeKey}`);
+            content = formatTime(date.toISOString());
+          }
+          break;
+        }
       }
 
       if (timeListFormat === 'block' && label) {
-        const timeValue = (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') ? content : formatTime(state.attributes[timeKey]);
+        const timeValue = CONTENT_KEYS.includes(timeKey) ? content : formatTime(state.attributes[timeKey]);
         if (timeValue) {
           timeEntries.push(`<div class="time-entry-block"><span class="time-label">${label}</span><span class="time-value">${timeValue}</span></div>`);
         }
       } else if (label) {
-        if (timeKey === 'daylight_duration' || timeKey === 'day_comparison' || timeKey === 'moon_phase' || timeKey === 'weather') {
+        if (CONTENT_KEYS.includes(timeKey)) {
           if (content) timeEntries.push(`<div class="time-entry">${label}: ${content}</div>`);
         } else {
           const timeValue = state.attributes[timeKey];
@@ -1039,6 +1123,8 @@ class SunPositionCard extends HTMLElement {
     const imgEl = this.querySelector('#sun-card-image');
     const wrapperEl = this.querySelector('#sun-icon-wrapper');
     const container = this.querySelector('.sun-image-container');
+    let moonHidden = false;       // Mondbogen: Mond noch nicht aufgegangen
+    let moonRiseLabel = null;     // Mondbogen: Aufgangszeit am Bogenanfang
 
     if (imgEl && container && wrapperEl) {
 
@@ -1092,9 +1178,21 @@ class SunPositionCard extends HTMLElement {
             container.classList.add('arc-mode');
             if (arcEl) arcEl.style.display = 'block';
 
-            const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
-            wrapperEl.style.left = left;
-            wrapperEl.style.top = top;
+            const events = this._getMoonEvents(hass);
+            if (events) {
+              // Echter Mond-Durchgang; vor dem Aufgang ausgeblendet, Aufgangszeit am Bogenanfang
+              const pos = this._calculateMoonPositionArc(events, isCompact);
+              wrapperEl.style.left = pos.left;
+              wrapperEl.style.top = pos.top;
+              moonHidden = !pos.visible;
+              if (moonHidden && events.nextRise) {
+                moonRiseLabel = { text: `↑ ${formatTime(events.nextRise.toISOString())}`, left: pos.labelLeft, top: pos.labelTop };
+              }
+            } else {
+              const { left, top } = this._calculateNightPositionArc(state, hass, isCompact);
+              wrapperEl.style.left = left;
+              wrapperEl.style.top = top;
+            }
             wrapperEl.style.transform = 'translate(-50%, -50%)';
 
           } else {
@@ -1168,6 +1266,20 @@ class SunPositionCard extends HTMLElement {
       // Südhalbkugel: Mond erscheint um 180° gedreht (beleuchtete Seite links statt rechts)
       const isMoonImage = shownImage && MOON_PHASES.includes(shownImage.replace('.png', ''));
       imgEl.style.transform = (isSouthern && isMoonImage) ? 'rotate(180deg)' : '';
+
+      // Mondbogen: Mond erst nach dem Aufgang zeigen, vorher die Aufgangszeit
+      imgEl.style.visibility = moonHidden ? 'hidden' : '';
+      const riseLabelEl = this.querySelector(`#${this._uid}-moonrise`);
+      if (riseLabelEl) {
+        if (moonRiseLabel) {
+          riseLabelEl.textContent = moonRiseLabel.text;
+          riseLabelEl.style.left = moonRiseLabel.left;
+          riseLabelEl.style.top = moonRiseLabel.top;
+          riseLabelEl.style.display = '';
+        } else {
+          riseLabelEl.style.display = 'none';
+        }
+      }
     }
 
     // --- Animierte Wettereffekte (nur bei Zustandswechsel neu aufbauen, damit Animationen weiterlaufen) ---
@@ -1204,6 +1316,7 @@ class SunPositionCard extends HTMLElement {
           now, lat, lng, isSouthern,
           sunAz: azimuth, sunEl: elevation,
           showTimes: showDomeTimes, rise, set,
+          moonRise: this._getMoonEvents(hass)?.nextRise || null,
           formatTime: (date) => formatTime(date.toISOString()),
           ariaLabel: currentState,
           labels: {
@@ -1398,6 +1511,8 @@ class SunPositionCard extends HTMLElement {
           .spc-anim .spc-bolt, .spc-anim .spc-flash { opacity: 0; }
         }
 
+        .spc-moonrise-label { position: absolute; z-index: 4; font-size: 0.8em; color: var(--secondary-text-color, #888); white-space: nowrap; pointer-events: none; }
+
         /* --- 3D-Kuppel --- */
         .spc-dome-container { padding: 8px 0 4px 0; }
         .spc-dome-stage { position: relative; width: 100%; max-width: 420px; }
@@ -1450,6 +1565,7 @@ class SunPositionCard extends HTMLElement {
                            <div class="solar-badge" id="solar-badge"></div>
                            <div class="weather-badge" id="weather-badge"></div>
                            <div class="sun-arc-path"></div>
+                           <div class="spc-moonrise-label" id="${uid}-moonrise" style="display:none"></div>
                            <div class="sun-icon-wrapper" id="sun-icon-wrapper">
                                <img id="sun-card-image" class="calculated-sun" src="/local/community/Sun-Position-Card/images/calc-sun.png" alt="">
                                ${wxOverlay(true)}

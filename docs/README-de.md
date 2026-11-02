@@ -160,7 +160,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 | `hide_moon_phase_on_day` | `boolean` | `false`                       | Mondphase tagsüber ausblenden. |
 | `show_night_arc`         | `boolean` | `false`                       | Mond nachts auf einem Bogen anzeigen. |
 | `show_moon_icon_in_text` | `boolean` | `false`                       | Mond-Icon neben dem Mondphasen-Text anzeigen. |
-| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `moon_phase`, `weather` |
+| `times_to_show`          | `list`    | `next_rising`, `next_setting` | `daylight_duration`, `day_comparison`, `next_rising`, `next_setting`, `next_dawn`, `next_dusk`, `next_noon`, `next_midnight`, `next_moonrise`, `next_moonset`, `moon_phase`, `weather` |
 | `time_position`          | `string`  | `below`                       | Position der Zeitangaben: `above`, `below`, `right`. |
 | `time_list_format`       | `string`  | `centered`                    | Ausrichtung der Zeitliste: `centered`, `block`. |
 | `show_degrees`           | `boolean` | `false`                       | Azimut und Höhe anzeigen. |
@@ -178,7 +178,7 @@ Obwohl die UI-Konfiguration empfohlen wird, kann die Karte auch manuell über de
 
 <img width="100%" height="auto" alt="3D-Kuppel" src="https://github.com/jayjojayson/Sun-Position-Card/blob/main/docs/sun-position-card-dome.png" />
 
-Mit `view_mode: dome` zeigt die Card eine 3D-Himmelskuppel über einem Kompass. Tagsüber siehst du die echte Sonnenbahn des heutigen Tages (bereits zurückgelegt: durchgezogen, noch kommend: gepunktet) und die Sonne mit ihrem Lot zum Boden. Nachts werden die Mondbahn und der Mond mit seiner aktuellen Phase vor einem Sternenhimmel gezeigt. Steht der Mond noch unter dem Horizont, siehst du stattdessen seine kommende Bahn und die Aufgangszeit am Aufgangspunkt. Beide Bahnen werden aus dem Standort deiner Home-Assistant-Instanz berechnet. Der Himmel wechselt seine Farben für Tag, Dämmerung und Nacht. Mit `show_dome_times: true` stehen die Aufgangszeit unter O und die Untergangszeit unter W.
+Mit `view_mode: dome` zeigt die Card eine 3D-Himmelskuppel über einem Kompass. Tagsüber siehst du die echte Sonnenbahn des heutigen Tages (bereits zurückgelegt: durchgezogen, noch kommend: gepunktet) und die Sonne mit ihrem Lot zum Boden. Nachts werden die Mondbahn und der Mond mit seiner aktuellen Phase vor einem Sternenhimmel gezeigt. Steht der Mond noch unter dem Horizont, wird er nicht gezeigt; stattdessen siehst du seine kommende Bahn und die Aufgangszeit am Aufgangspunkt. Mondaufgang und Monduntergang lassen sich auch in die Zeitliste aufnehmen (`next_moonrise`, `next_moonset`); sie werden aus deinem HA-Standort berechnet. In der Bogen-Ansicht mit Mondbogen folgt der Mond jetzt seinem echten Verlauf von Mondaufgang (links) bis Monduntergang (rechts). Beide Bahnen werden aus dem Standort deiner Home-Assistant-Instanz berechnet. Der Himmel wechselt seine Farben für Tag, Dämmerung und Nacht. Mit `show_dome_times: true` stehen die Aufgangszeit unter O und die Untergangszeit unter W.
 
 #### Animierte Wettereffekte
 
